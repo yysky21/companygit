@@ -1,0 +1,8 @@
+*.class
+*/.idea/
+*/.svn/
+*.iml
+*.ipr
+*.iws
+*.log
+*/README.md
