@@ -6,3 +6,5 @@
 *.iws
 *.log
 */README.md
+*/logs/
+*/target/
