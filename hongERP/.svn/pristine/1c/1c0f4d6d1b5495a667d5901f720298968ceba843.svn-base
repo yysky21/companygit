@@ -1,0 +1,32 @@
+package com.hzg.customer;
+
+import com.hzg.tools.Writer;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: OrderManagementController.java
+ *
+ * @author smjie
+ * @version 1.00
+ * @Date 2017/8/28
+ */
+@Controller
+@RequestMapping("/customerManagement")
+public class CustomerManagementController extends com.hzg.base.Controller {
+
+    Logger logger = Logger.getLogger(CustomerManagementController.class);
+
+    @Autowired
+    private CustomerClient customerClient;
+
+    @Autowired
+    private Writer writer;
+
+    public CustomerManagementController(CustomerClient customerClient) {
+        super(customerClient);
+    }
+}

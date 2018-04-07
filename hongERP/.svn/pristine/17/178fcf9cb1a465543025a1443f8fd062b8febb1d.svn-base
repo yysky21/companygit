@@ -1,0 +1,142 @@
+package com.hzg.pay;
+
+import com.boyuanitsm.pay.alipay.bean.AyncNotify;
+import com.boyuanitsm.pay.alipay.bean.SyncReturn;
+import com.boyuanitsm.pay.wxpay.protocol.pay_query_protocol.OrderQueryResData;
+import com.boyuanitsm.pay.wxpay.protocol.refund_protocol.RefundResData;
+import com.boyuanitsm.pay.wxpay.protocol.refund_query_protocol.RefundQueryResData;
+import com.hzg.base.Client;
+import com.hzg.tools.CommonConstant;
+import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: PayClient.java
+ * 使用@FeignClient注解的fallback属性，指定fallback类
+ *
+ * @author smjie
+ * @version 1.00
+ * @Date 2017/3/16
+ */
+@FeignClient(name = "microservice-provider-pay", path = "/pay", fallback = PayClient.ErpClientFallback.class)
+public interface PayClient extends Client {
+    org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(PayClient.class);
+
+    @RequestMapping(value = "/alipay/pay", method = RequestMethod.POST)
+    String alipay(@RequestParam("WIDout_trade_no") String WIDout_trade_no, @RequestParam("WIDtotal_fee") String WIDtotal_fee, @RequestParam("WIDsubject") String WIDsubject, @RequestBody String WIDbody);
+
+    @RequestMapping(value = "/alipay/refund", method = RequestMethod.POST)
+    String alipayRefund(@RequestParam("WIDbatch_no") String WIDbatch_no, @RequestParam("WIDbatch_num") String WIDbatch_num, @RequestBody String WIDdetail_data);
+
+    @RequestMapping(value = "/alipay/ayncNotify", method = RequestMethod.POST)
+    String alipayAyncNotify(@RequestBody AyncNotify ayncNotify);
+
+    @RequestMapping(value = "/alipay/syncReturn", method = RequestMethod.GET)
+    String alipaySyncReturn(@RequestBody SyncReturn ayncReturn);
+
+    @RequestMapping(value = "/alipay/payQrcode", method = RequestMethod.POST)
+    byte[] payQrcode(@RequestParam("payNo") String payNo);
+
+    @RequestMapping(value = "/alipay/toAlipay", method = RequestMethod.POST)
+    String toAlipay(@RequestParam("payNo") String payNo);
+
+    @RequestMapping(value = "/wechat/unifiedOrder", method = RequestMethod.GET)
+    byte[] unifiedOrder(@RequestParam("productId") String productId);
+
+    @RequestMapping(value = "/wechat/refund", method = RequestMethod.POST)
+    RefundResData wechatRefund(@RequestParam("transactionID") String transactionID, @RequestParam("outTradeNo") String outTradeNo, @RequestParam("outRefundNo") String outRefundNo, @RequestParam("totalFee") int totalFee, @RequestParam("refundFee") int refundFee);
+
+    @RequestMapping(value = "/wechat/payResultCallback", method = RequestMethod.POST)
+    String payResultCallback(@RequestParam("responseString") String responseString);
+
+    @RequestMapping(value = "/wechat/orderQuery", method = RequestMethod.POST)
+    OrderQueryResData orderQuery(@RequestParam("transactionID") String transactionID, @RequestParam("outTradeNo") String outTradeNo);
+
+    @RequestMapping(value = "/wechat/refundQuery", method = RequestMethod.POST)
+    RefundQueryResData refundQuery(@RequestParam("transactionID") String transactionID, @RequestParam("outTradeNo") String outTradeNo, @RequestParam("outRefundNo") String outRefundNo, @RequestParam("refundID") String refundID);
+
+    @RequestMapping(value = "/unionpay/acp/frontConsume", method = RequestMethod.POST)
+    String frontConsume(@RequestParam("txnAmt") String txnAmt);
+
+    @Component
+    class ErpClientFallback extends ClientFallback implements PayClient {
+        public String alipay(String WIDout_trade_no, String WIDtotal_fee, String WIDsubject, String WIDbody) {
+            logger.info("alipay 异常发生，进入fallback方法，接收的参数：" + WIDout_trade_no + "," + WIDtotal_fee + "," + WIDsubject + "," + WIDbody);
+            return "<html><head><title>error</title></head><body>系统异常，支付宝即时到账交易失败</body></html>";
+        }
+
+        public String alipayRefund(String WIDbatch_no, String WIDbatch_num, String WIDdetail_data) {
+            logger.info("alipayRefund 异常发生，进入fallback方法，接收的参数：" + WIDbatch_no + "," + WIDbatch_num + "," + WIDdetail_data);
+            return "<html><head><title>error</title></head><body>系统异常，支付宝即时到账批量退款失败</body></html>";
+        }
+
+        public String alipayAyncNotify(AyncNotify ayncNotify){
+            logger.info("alipayAyncNotify 异常发生，进入fallback方法，接收的参数：" + ayncNotify.toString());
+            return "{\"" + CommonConstant.result + "\":\"系统异常，支付宝服务器异步通知出错\"}";
+        }
+
+        public String alipaySyncReturn(SyncReturn syncReturn){
+            logger.info("alipaySyncReturn 异常发生，进入fallback方法，接收的参数：" + syncReturn.toString());
+            return "{\"" + CommonConstant.result + "\":\"系统异常，支付宝页面跳转同步通知出错\"}";
+        }
+
+        public byte[] payQrcode(String payNo){
+            logger.info("payQrcode 异常发生，进入fallback方法，接收的参数：" + payNo);
+            try {
+                return ("{\"" + CommonConstant.result + "\":\"系统异常，获取支付宝支付二维码出错\"}").getBytes(CommonConstant.UTF8);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public String toAlipay(String payNo){
+            logger.info("toAlipay 异常发生，进入fallback方法，接收的参数：" + payNo);
+            return "<html><head><title>error</title></head><body>系统异常，跳转到支付宝支付出错</body></html>";
+        }
+
+        public byte[] unifiedOrder(String productId){
+            logger.info("unifiedOrder 异常发生，进入fallback方法，接收的参数：" + productId);
+            try {
+                return ("{\"" + CommonConstant.result + "\":\"系统异常，微信扫码支付出错\"}").getBytes(CommonConstant.UTF8);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public RefundResData wechatRefund(String transactionID, String outTradeNo, String outRefundNo, int totalFee, int refundFee){
+            logger.info("wechatRefund 异常发生，进入fallback方法，接收的参数：" + transactionID + "," + outTradeNo + "," + outRefundNo + "," + totalFee + "," + refundFee);
+            return new RefundResData();
+        }
+
+        public String payResultCallback(String responseString){
+            logger.info("payResultCallback 异常发生，进入fallback方法," + responseString);
+            return "<html><head><title>error</title></head><body>系统异常，微信支付结果通知出错</body></html>";
+        }
+
+        public OrderQueryResData orderQuery(String transactionID, String outTradeNo){
+            logger.info("orderQuery 异常发生，进入fallback方法，接收的参数：" + transactionID + "," + outTradeNo);
+            return new OrderQueryResData();
+        }
+
+        public RefundQueryResData refundQuery(@RequestParam("transactionID") String transactionID, @RequestParam("outTradeNo") String outTradeNo, @RequestParam("outRefundNo") String outRefundNo, @RequestParam("refundID") String refundID){
+            logger.info("refundQuery 异常发生，进入fallback方法，接收的参数：" + transactionID + "," + outTradeNo + "," + outRefundNo + "," + refundID);
+            return new RefundQueryResData();
+        }
+
+        public String frontConsume(@RequestParam("txnAmt") String txnAmt){
+            logger.info("frontConsume 异常发生，进入fallback方法，接收的参数：" + txnAmt);
+            return "<html><head><title>error</title></head><body>系统异常，银联网关支付出错</body></html>";
+        }
+
+    }
+}

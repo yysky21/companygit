@@ -1,0 +1,28 @@
+package com.hzg.tools;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: PayConstants.java
+ * 类的详细说明
+ *
+ * @author smjie
+ * @version 1.00
+ * @Date 2017/7/3
+ */
+public class PayConstants {
+    public final static String no_prefix_pay = "PA";
+    public final static String no_prefix_trade = "TN";
+
+    public final static int state_pay_apply = 0;
+    public final static int state_pay_success = 1;
+    public final static int state_pay_fail = 2;
+
+    public final static int type_pay_cash = 0;
+    public final static int type_pay_net = 1;
+    public final static int type_pay_qrcode = 2;
+    public final static int type_pay_remit = 3;
+
+    public final static int state_refund_apply = 0;
+    public final static int state_refund_success = 1;
+    public final static int state_refund_fail = 2;
+}

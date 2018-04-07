@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="microservice-consumer-portal" />
+        <module name="microservice-discovery-eureka" />
+        <module name="microservice-monitor-hystrix-dashboard" />
+        <module name="microservice-provider-customer" />
+        <module name="microservice-provider-erp" />
+        <module name="microservice-provider-finance" />
+        <module name="microservice-provider-order" />
+        <module name="microservice-provider-pay" />
+        <module name="microservice-provider-sms" />
+        <module name="microservice-provider-sys" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="erp" target="1.8" />
+      <module name="microservice-consumer-portal" target="1.8" />
+      <module name="microservice-discovery-eureka" target="1.8" />
+      <module name="microservice-monitor-hystrix-dashboard" target="1.8" />
+      <module name="microservice-provider-customer" target="1.8" />
+      <module name="microservice-provider-erp" target="1.8" />
+      <module name="microservice-provider-finance" target="1.8" />
+      <module name="microservice-provider-order" target="1.8" />
+      <module name="microservice-provider-pay" target="1.8" />
+      <module name="microservice-provider-sms" target="1.8" />
+      <module name="microservice-provider-sys" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

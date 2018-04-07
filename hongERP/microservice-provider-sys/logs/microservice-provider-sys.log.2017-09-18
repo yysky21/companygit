@@ -1,0 +1,102 @@
+[2017-09-18 09:16:15.621] boot - 2992  INFO [http-nio-8000-exec-1] --- SysController: signIn start, parameter:{"username":"admin","encryptPassword":"3B9E292EF420D10090E42B38D34DE787","sessionId":"1505696776675dv9PP36R9M5uks63oJIK5le5IQP2QHjN","oldSessionId":""}
+[2017-09-18 09:16:15.698] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t where t.username='admin' and t.state=0 order by t.id asc 
+[2017-09-18 09:16:15.816] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:15.817] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t, hzg_sys_userpost_relation t1, hzg_sys_post t2 where t.id=26 and t.name='信息管理员' and t.gender='male' and t.username='admin' and t.password='FCEA920F7412B5DA7BE0CF42B8C93759' and t.email='it@hzg.com' and t.inputDate='2017-05-03 15:53:28.0' and t.state=0 and t.id = t1.userId and t1.postId = t2.id order by t.id asc 
+[2017-09-18 09:16:15.948] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:15.948] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=20 and t.name='竞价' and t.inputDate='2017-05-04 14:13:22.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:16:15.954] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:15.954] boot - 2992  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=19 and t.name='新媒体' and t.inputDate='2017-05-04 13:14:59.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:16:15.974] boot - 2992  INFO [http-nio-8000-exec-1] --- Writer: the string to response:{"result":"success"}
+[2017-09-18 09:16:15.981] boot - 2992  INFO [http-nio-8000-exec-1] --- SysController: signIn end
+[2017-09-18 09:16:23.300] boot - 2992  INFO [http-nio-8000-exec-3] --- SysController: signIn start, parameter:{"username":"admin","encryptPassword":"3B9E292EF420D10090E42B38D34DE787","sessionId":"15056973757875ec9IDgeQAR8TEM7FzHFSUQ7jaZ1oRQo","oldSessionId":"1505696776675dv9PP36R9M5uks63oJIK5le5IQP2QHjN"}
+[2017-09-18 09:16:23.306] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t where t.username='admin' and t.state=0 order by t.id asc 
+[2017-09-18 09:16:23.308] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:23.309] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t, hzg_sys_userpost_relation t1, hzg_sys_post t2 where t.id=26 and t.name='信息管理员' and t.gender='male' and t.username='admin' and t.password='FCEA920F7412B5DA7BE0CF42B8C93759' and t.email='it@hzg.com' and t.inputDate='2017-05-03 15:53:28.0' and t.state=0 and t.id = t1.userId and t1.postId = t2.id order by t.id asc 
+[2017-09-18 09:16:23.313] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:23.313] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=20 and t.name='竞价' and t.inputDate='2017-05-04 14:13:22.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:16:23.379] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:16:23.379] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=19 and t.name='新媒体' and t.inputDate='2017-05-04 13:14:59.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:16:23.394] boot - 2992  INFO [http-nio-8000-exec-3] --- Writer: the string to response:{"result":"admin已经登录"}
+[2017-09-18 09:16:23.395] boot - 2992  INFO [http-nio-8000-exec-3] --- SysController: signIn end
+[2017-09-18 09:16:26.752] boot - 2992  INFO [http-nio-8000-exec-4] --- SysController: hasLoginDeal start, parameter:{"dealType":"againSignIn","username":"admin","password":"","encryptPassword":"","sessionId":"1505697383415jG7iEOCLe55yYVpvtW3h4wrSx3hMzNrl","oldSessionId":"15056973757875ec9IDgeQAR8TEM7FzHFSUQ7jaZ1oRQo"}
+[2017-09-18 09:16:26.773] boot - 2992  INFO [http-nio-8000-exec-4] --- Writer: the string to response:{"result":"success"}
+[2017-09-18 09:16:26.774] boot - 2992  INFO [http-nio-8000-exec-4] --- SysController: hasLoginDeal end
+[2017-09-18 09:16:50.409] boot - 2992  INFO [http-nio-8000-exec-6] --- SysController: hasLoginDeal start, parameter:{"dealType":"againSignIn","username":"admin","password":"","encryptPassword":"","sessionId":"1505697383415jG7iEOCLe55yYVpvtW3h4wrSx3hMzNrl","oldSessionId":"15056973757875ec9IDgeQAR8TEM7FzHFSUQ7jaZ1oRQo"}
+[2017-09-18 09:16:50.414] boot - 2992  INFO [http-nio-8000-exec-6] --- Writer: the string to response:{"result":"fail"}
+[2017-09-18 09:16:50.414] boot - 2992  INFO [http-nio-8000-exec-6] --- SysController: hasLoginDeal end
+[2017-09-18 09:17:00.415] boot - 2992  INFO [http-nio-8000-exec-8] --- SysController: signIn start, parameter:{"username":"admin","encryptPassword":"3B9E292EF420D10090E42B38D34DE787","sessionId":"1505697410484A4xjjieBHyy0FlCXaCJxoK94kyNhvjA2","oldSessionId":"1505697383415jG7iEOCLe55yYVpvtW3h4wrSx3hMzNrl"}
+[2017-09-18 09:17:00.417] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t where t.username='admin' and t.state=0 order by t.id asc 
+[2017-09-18 09:17:00.420] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:17:00.421] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t, hzg_sys_userpost_relation t1, hzg_sys_post t2 where t.id=26 and t.name='信息管理员' and t.gender='male' and t.username='admin' and t.password='FCEA920F7412B5DA7BE0CF42B8C93759' and t.email='it@hzg.com' and t.inputDate='2017-05-03 15:53:28.0' and t.state=0 and t.id = t1.userId and t1.postId = t2.id order by t.id asc 
+[2017-09-18 09:17:00.457] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:17:00.458] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=19 and t.name='新媒体' and t.inputDate='2017-05-04 13:14:59.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:17:00.460] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 09:17:00.460] boot - 2992  INFO [http-nio-8000-exec-8] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=20 and t.name='竞价' and t.inputDate='2017-05-04 14:13:22.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 09:17:00.468] boot - 2992  INFO [http-nio-8000-exec-8] --- Writer: the string to response:{"result":"admin已经登录"}
+[2017-09-18 09:17:00.468] boot - 2992  INFO [http-nio-8000-exec-8] --- SysController: signIn end
+[2017-09-18 09:17:02.503] boot - 2992  INFO [http-nio-8000-exec-9] --- SysController: hasLoginDeal start, parameter:{"dealType":"againSignIn","username":"admin","password":"","encryptPassword":"","sessionId":"1505697420477ivPLwTvrex4W8awrqlpFQyEiNcLBsmtC","oldSessionId":"1505697410484A4xjjieBHyy0FlCXaCJxoK94kyNhvjA2"}
+[2017-09-18 09:17:02.515] boot - 2992  INFO [http-nio-8000-exec-9] --- Writer: the string to response:{"result":"success"}
+[2017-09-18 09:17:02.516] boot - 2992  INFO [http-nio-8000-exec-9] --- SysController: hasLoginDeal end
+[2017-09-18 09:17:03.308] boot - 2992  INFO [http-nio-8000-exec-10] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"},0,30
+[2017-09-18 09:17:03.312] boot - 2992  INFO [http-nio-8000-exec-10] --- ObjectToSql: object is not an instance of declaring class
+[2017-09-18 09:17:03.312] boot - 2992  INFO [http-nio-8000-exec-10] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (19,16,20) order by t.id desc  limit 0,30
+[2017-09-18 09:17:03.334] boot - 2992  INFO [http-nio-8000-exec-10] --- Writer: the string to response:[]
+[2017-09-18 09:17:03.335] boot - 2992  INFO [http-nio-8000-exec-10] --- SysController: complexQuery end
+[2017-09-18 09:17:03.379] boot - 2992  INFO [http-nio-8000-exec-1] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"}
+[2017-09-18 09:17:03.380] boot - 2992  INFO [http-nio-8000-exec-1] --- Writer: the string to response:{"recordsSum":-1}
+[2017-09-18 09:17:03.381] boot - 2992  INFO [http-nio-8000-exec-1] --- SysController: recordsSum end
+[2017-09-18 10:49:55.034] boot - 2992  INFO [http-nio-8000-exec-3] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (16,20,19)","user":"26"},0,30
+[2017-09-18 10:49:55.035] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: object is not an instance of declaring class
+[2017-09-18 10:49:55.035] boot - 2992  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (16,20,19) order by t.id desc  limit 0,30
+[2017-09-18 10:49:55.083] boot - 2992  INFO [http-nio-8000-exec-3] --- Writer: the string to response:[]
+[2017-09-18 10:49:55.083] boot - 2992  INFO [http-nio-8000-exec-3] --- SysController: complexQuery end
+[2017-09-18 10:49:55.596] boot - 2992  INFO [http-nio-8000-exec-4] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (16,20,19)","user":"26"}
+[2017-09-18 10:49:55.596] boot - 2992  INFO [http-nio-8000-exec-4] --- Writer: the string to response:{"recordsSum":-1}
+[2017-09-18 10:49:55.597] boot - 2992  INFO [http-nio-8000-exec-4] --- SysController: recordsSum end
+[2017-09-18 10:53:14.800] boot - 2992  INFO [http-nio-8000-exec-6] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (16,20,19)","user":"26"},0,30
+[2017-09-18 10:53:14.800] boot - 2992  INFO [http-nio-8000-exec-6] --- ObjectToSql: object is not an instance of declaring class
+[2017-09-18 10:53:14.800] boot - 2992  INFO [http-nio-8000-exec-6] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (16,20,19) order by t.id desc  limit 0,30
+[2017-09-18 10:53:14.802] boot - 2992  INFO [http-nio-8000-exec-6] --- Writer: the string to response:[]
+[2017-09-18 10:53:14.803] boot - 2992  INFO [http-nio-8000-exec-6] --- SysController: complexQuery end
+[2017-09-18 10:53:14.809] boot - 2992  INFO [http-nio-8000-exec-7] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (16,20,19)","user":"26"}
+[2017-09-18 10:53:14.811] boot - 2992  INFO [http-nio-8000-exec-7] --- Writer: the string to response:{"recordsSum":-1}
+[2017-09-18 10:53:14.813] boot - 2992  INFO [http-nio-8000-exec-7] --- SysController: recordsSum end
+[2017-09-18 14:55:29.873] boot - 7720  INFO [http-nio-8000-exec-1] --- SysController: signIn start, parameter:{"username":"admin","encryptPassword":"451258FEAA46CE785C2EF183876295F6","sessionId":"1505717720465mL5dpPJP2yBIwNg913WfQjDg2fIPnWoz","oldSessionId":""}
+[2017-09-18 14:55:29.931] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t where t.username='admin' and t.state=0 order by t.id asc 
+[2017-09-18 14:55:29.982] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:29.982] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t, hzg_sys_userpost_relation t1, hzg_sys_post t2 where t.id=26 and t.name='信息管理员' and t.gender='male' and t.username='admin' and t.password='FCEA920F7412B5DA7BE0CF42B8C93759' and t.email='it@hzg.com' and t.inputDate='2017-05-03 15:53:28.0' and t.state=0 and t.id = t1.userId and t1.postId = t2.id order by t.id asc 
+[2017-09-18 14:55:30.005] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:30.005] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=19 and t.name='新媒体' and t.inputDate='2017-05-04 13:14:59.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 14:55:30.167] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:30.169] boot - 7720  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=20 and t.name='竞价' and t.inputDate='2017-05-04 14:13:22.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 14:55:30.193] boot - 7720  INFO [http-nio-8000-exec-1] --- Writer: the string to response:{"result":"success"}
+[2017-09-18 14:55:30.221] boot - 7720  INFO [http-nio-8000-exec-1] --- SysController: signIn end
+[2017-09-18 14:55:35.722] boot - 7720  INFO [http-nio-8000-exec-3] --- SysController: signIn start, parameter:{"username":"admin","encryptPassword":"451258FEAA46CE785C2EF183876295F6","sessionId":"1505717730117fIl7snqhFV3uwzsxuo7AbMz3MuuX34bx","oldSessionId":"1505717720465mL5dpPJP2yBIwNg913WfQjDg2fIPnWoz"}
+[2017-09-18 14:55:35.726] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t where t.username='admin' and t.state=0 order by t.id asc 
+[2017-09-18 14:55:35.728] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:35.729] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_user t, hzg_sys_userpost_relation t1, hzg_sys_post t2 where t.id=26 and t.name='信息管理员' and t.gender='male' and t.username='admin' and t.password='FCEA920F7412B5DA7BE0CF42B8C93759' and t.email='it@hzg.com' and t.inputDate='2017-05-03 15:53:28.0' and t.state=0 and t.id = t1.userId and t1.postId = t2.id order by t.id asc 
+[2017-09-18 14:55:35.795] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:35.796] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=19 and t.name='新媒体' and t.inputDate='2017-05-04 13:14:59.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 14:55:35.799] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: java.sql.Timestamp.getId()
+[2017-09-18 14:55:35.800] boot - 7720  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_post t, hzg_sys_privilege_relation t1, hzg_sys_privilege_resource t2 where t.id=20 and t.name='竞价' and t.inputDate='2017-05-04 14:13:22.0' and t.deptId=13 and t.id = t1.postId and t1.resourceId = t2.id order by t.id asc 
+[2017-09-18 14:55:35.813] boot - 7720  INFO [http-nio-8000-exec-3] --- Writer: the string to response:{"result":"admin已经登录"}
+[2017-09-18 14:55:35.813] boot - 7720  INFO [http-nio-8000-exec-3] --- SysController: signIn end
+[2017-09-18 14:55:37.597] boot - 7720  INFO [http-nio-8000-exec-4] --- SysController: hasLoginDeal start, parameter:{"dealType":"againSignIn","username":"admin","password":"","encryptPassword":"","sessionId":"1505717735837Tw9La7hs9ib7RFN7tu66FqJvcDmHPQSA","oldSessionId":"1505717730117fIl7snqhFV3uwzsxuo7AbMz3MuuX34bx"}
+[2017-09-18 14:55:37.618] boot - 7720  INFO [http-nio-8000-exec-4] --- Writer: the string to response:{"result":"success"}
+[2017-09-18 14:55:37.619] boot - 7720  INFO [http-nio-8000-exec-4] --- SysController: hasLoginDeal end
+[2017-09-18 14:55:41.380] boot - 7720  INFO [http-nio-8000-exec-5] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"},0,30
+[2017-09-18 14:55:41.384] boot - 7720  INFO [http-nio-8000-exec-5] --- ObjectToSql: object is not an instance of declaring class
+[2017-09-18 14:55:41.385] boot - 7720  INFO [http-nio-8000-exec-5] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (19,16,20) order by t.id desc  limit 0,30
+[2017-09-18 14:55:41.391] boot - 7720  INFO [http-nio-8000-exec-5] --- Writer: the string to response:[]
+[2017-09-18 14:55:41.391] boot - 7720  INFO [http-nio-8000-exec-5] --- SysController: complexQuery end
+[2017-09-18 14:55:41.423] boot - 7720  INFO [http-nio-8000-exec-6] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"}
+[2017-09-18 14:55:41.424] boot - 7720  INFO [http-nio-8000-exec-6] --- Writer: the string to response:{"recordsSum":-1}
+[2017-09-18 14:55:41.424] boot - 7720  INFO [http-nio-8000-exec-6] --- SysController: recordsSum end
+[2017-09-18 15:51:03.698] boot - 8092  INFO [http-nio-8000-exec-1] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"},0,30
+[2017-09-18 15:51:03.717] boot - 8092  INFO [http-nio-8000-exec-1] --- ObjectToSql: object is not an instance of declaring class
+[2017-09-18 15:51:03.717] boot - 8092  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (19,16,20) order by t.id desc  limit 0,30
+[2017-09-18 15:51:03.775] boot - 8092  INFO [http-nio-8000-exec-1] --- Writer: the string to response:[]
+[2017-09-18 15:51:03.795] boot - 8092  INFO [http-nio-8000-exec-1] --- SysController: complexQuery end
+[2017-09-18 15:51:03.942] boot - 8092  INFO [http-nio-8000-exec-2] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (19,16,20)","user":"26"}
+[2017-09-18 15:51:03.944] boot - 8092  INFO [http-nio-8000-exec-2] --- Writer: the string to response:{"recordsSum":-1}
+[2017-09-18 15:51:03.945] boot - 8092  INFO [http-nio-8000-exec-2] --- SysController: recordsSum end

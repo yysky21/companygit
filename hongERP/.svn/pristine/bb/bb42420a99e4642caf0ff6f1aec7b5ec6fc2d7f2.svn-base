@@ -1,0 +1,231 @@
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: productCheck.js
+ *
+ * @author yuanyun
+ * @Date  2017/11/30
+ * @version 1.00
+ */
+var finance = (function ($) {
+    "use strict";
+
+    // 保存凭证
+    function saveVoucher(uri) {
+        var $form = $("#form");
+        if (!validator.checkAll($form)) {
+            return;
+        }
+
+        var json = JSON.stringify($form.serializeJSON());
+        json = json.substring(0, (json.indexOf("details")-2))+json.substring((json.indexOf("]")+1),json.length-1) + ',"details":[';
+
+        var trs = $("#voucherList tbody tr");
+
+        for (var i = 0; i < trs.length; i++) {
+            var inputs = $(trs[i]).find(":input");
+            json += JSON.stringify(inputs.not('[value=""]').serializeJSON()["details"][0]) + ",";
+        }
+
+        json = json.substring(0, json.length-1) + ']}';
+
+        $form.sendData(uri, json);
+    }
+
+    function init() {
+        initDocType();
+        initChartMaker();
+        initWarehouse();
+        initProductType();
+        initPayType();
+        initAccount();
+    }
+    var position = 0;
+    var json = "{}";
+    var recordsSum = 0;
+    function initDocType() {
+        $("#docTypeChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 800,
+            height:760,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $("#docTypeChooseDiv tbody tr").remove();
+                    $(this).dialog("close");
+                    position = 0;
+                    recordsSum = 0;
+                }
+            }
+
+        });
+
+        $("#docType").unbind('click').click(function () {
+            $("#docTypeChooseDiv").dialog("open");
+            console.log(position);
+            $("#docTypeChooseDiv").ajaxPost1("/finance/privateQuery/docType",json,position,function (result) {
+                recordsSum = result.recordsSum;
+                $("#recordsSum").html(result.recordsSum);
+                $("#loadSum").html(result.entities.length);
+                $.each(result.entities, function(i, item) {  //遍历出来json里边的内容；i，表示当前遍历到第几条内容；item，表示当前遍历的对象；
+                    $("#docTypeChooseDiv tbody").append(
+                        '<tr>'+
+                            '<td style="width:30px;padding-left: 8px"><input type="checkbox"></td>'+
+                            '<td>'+item.name+'</td>'+
+                            '<input type="hidden" value="'+item.id+'">'+
+                        '</tr>'
+                    )
+                });
+                $('table').tableCheckbox({ /* options */ });
+            });
+        });
+
+        $("#docTypeChooseDiv table tbody").unbind("scroll").scroll(function() {
+            //$("#docTypeChooseDiv table tbody").scrollTop()    滚动条位置距离body顶部的距离；
+            //$("#docTypeChooseDiv table tbody tr").height() * $("#docTypeChooseDiv table tbody tr").size()    tbody中tr的总高度；
+            //$("#docTypeChooseDiv table tbody").height()+17    tbody中可视窗口的高度；
+            console.log("=============="+$("#docTypeChooseDiv table tbody").scrollTop());
+            console.log("++++++++++++++++"+$("#docTypeChooseDiv table tbody tr").height());
+            console.log("____________"+$("#docTypeChooseDiv table tbody tr").size());
+            console.log("----------------"+$("#docTypeChooseDiv table tbody").height());
+            if ($("#docTypeChooseDiv table tbody").scrollTop() >=$("#docTypeChooseDiv table tbody tr").height() * $("#docTypeChooseDiv table tbody tr").size()- $("#docTypeChooseDiv table tbody").height()+17) {   //判断是否已经滚动到页面底部；
+                console.log(position);
+                position += 30;
+                console.log(position);
+                if (recordsSum > position){
+                    $("#docTypeChooseDiv").ajaxPost1("/finance/privateQuery/docType",json,position,function (result) {
+                        $("#loadSum").html(position + result.entities.length);
+                        $.each(result.entities, function(i, item) {  //遍历出来json里边的内容；i，表示当前遍历到第几条内容；item，表示当前遍历的对象；
+                            $("#docTypeChooseDiv tbody").append(
+                                '<tr>'+
+                                '<td style="width:30px;"><input type="checkbox"</td>'+
+                                '<td>'+item.name+'</td>'+
+                                '<input type="hidden" value="'+item.id+'">'+
+                                '</tr>'
+                            )
+                        });
+                        $('table').tableCheckbox({ /* options */ });
+                    });
+                }
+            }
+        });
+    }
+
+    function initChartMaker() {
+        $("#chartMakerChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 1100,
+            height:660,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
+
+        $("#chartMaker").click(function () {
+            $("#chartMakerChooseDiv").dialog("open");
+        })
+    }
+
+    function initWarehouse() {
+        $("#warehouseChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 1100,
+            height:360,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
+
+        $("#warehouse").click(function () {
+            $("#warehouseChooseDiv").dialog("open");
+        })
+    }
+
+    function initProductType() {
+        $("#productTypeChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 1100,
+            height:360,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
+
+        $("#productType").click(function () {
+            $("#productTypeChooseDiv").dialog("open");
+        })
+    }
+
+    function initPayType() {
+        $("#payTypeChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 1100,
+            height:360,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
+
+        $("#payType").click(function () {
+            $("#payTypeChooseDiv").dialog("open");
+        })
+    }
+
+    function initAccount() {
+        $("#accountChooseDiv").dialog({
+            title: "选择单据类型",
+            autoOpen: false,
+            width: 1100,
+            height:360,
+            buttons: {
+                "确定":function () {
+
+                },
+                "取消": function () {
+                    $(this).dialog("close");
+                }
+            }
+
+        });
+
+        $("#account").click(function () {
+            $("#accountChooseDiv").dialog("open");
+        })
+    }
+
+    return {
+        saveVoucher: saveVoucher,
+        init: init
+    }
+
+})(jQuery);
