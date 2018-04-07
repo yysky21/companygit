@@ -1,0 +1,262 @@
+package com.hzg.afterSaleService;
+
+import com.hzg.order.*;
+import com.hzg.sys.Action;
+import com.hzg.sys.User;
+import com.hzg.tools.*;
+import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.*;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: AfterSaleServiceService.java
+ * 类的详细说明
+ *
+ * @author smjie
+ * @version 1.00
+ * @Date 2017/11/30
+ */
+@Service
+public class AfterSaleServiceService {
+    Logger logger = Logger.getLogger(AfterSaleServiceService.class);
+
+    @Autowired
+    private AfterSaleServiceDao afterSaleServiceDao;
+
+    @Autowired
+    private PayClient payClient;
+
+    @Autowired
+    private ErpClient erpClient;
+
+    @Autowired
+    private SysClient sysClient;
+
+    @Autowired
+    private Writer writer;
+
+    @Autowired
+    public ObjectToSql objectToSql;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    public SessionFactory sessionFactory;
+
+    @Autowired
+    private DateUtil dateUtil;
+
+    @Autowired
+    CustomerClient customerClient;
+
+    /**
+     * 保存退货单
+     * @param returnProduct
+     * @return
+     */
+    public String saveReturnProduct(ReturnProduct returnProduct) {
+        String result = CommonConstant.fail;
+
+        logger.info("saveReturnProduct start");
+
+        ReturnProduct setReturnProduct = setReturnProduct(returnProduct);
+        String isCanReturnMsg = isCanReturn(setReturnProduct);
+
+        if (!isCanReturnMsg.equals("")) {
+            return CommonConstant.fail + isCanReturnMsg;
+        }
+
+        result += afterSaleServiceDao.save(returnProduct);
+        ReturnProduct idReturnProduct = new ReturnProduct(returnProduct.getId());
+        ReturnProductDetail idReturnProductDetail = new ReturnProductDetail();
+
+        for (ReturnProductDetail returnProductDetail : returnProduct.getDetails()) {
+            returnProductDetail.setReturnProduct(idReturnProduct);
+            result += afterSaleServiceDao.save(returnProductDetail);
+
+            idReturnProductDetail.setId(returnProductDetail.getId());
+            for (ReturnProductDetailProduct returnProductDetailProduct : returnProductDetail.getReturnProductDetailProducts()) {
+                returnProductDetailProduct.setReturnProductDetail(idReturnProductDetail);
+                result += afterSaleServiceDao.save(returnProductDetailProduct);
+
+                /**
+                 * 更新订单状态为申请退货状态
+                 */
+                result += afterSaleServiceDao.updateById(returnProductDetailProduct.getProduct().getId(), returnProductDetailProduct.getProduct());
+            }
+        }
+
+        logger.info("saveReturnProduct end, result:" + result);
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+
+    }
+
+    public List<ReturnProduct> queryReturnProduct(ReturnProduct returnProduct) {
+        List<ReturnProduct> returnProducts = afterSaleServiceDao.query(returnProduct);
+
+        for (ReturnProduct item : returnProducts) {
+            for (ReturnProductDetail detail : item.getDetails()) {
+            }
+        }
+
+        return returnProducts;
+    }
+
+    /**
+     * 检查是否可退货
+     * @param returnProduct
+     * @return
+     */
+    public String isCanReturn(ReturnProduct returnProduct) {
+        String canSellMsg = "";
+
+        for (ReturnProductDetail detail : returnProduct.getDetails()) {
+            if (detail.getReturnProductDetailProducts().size() == 0) {
+                canSellMsg += "商品：" + detail.getProductNo() + "退货数量为: 0;";
+            }
+
+            if (!detail.getUnit().equals(ErpConstant.unit_g) && !detail.getUnit().equals(ErpConstant.unit_kg) &&
+                    !detail.getUnit().equals(ErpConstant.unit_oz) && !detail.getUnit().equals(ErpConstant.unit_ct) ) {
+                if (detail.getQuantity().intValue() != detail.getReturnProductDetailProducts().size()) {
+                    canSellMsg += "商品：" + detail.getProductNo() + "退货数量为: " + detail.getQuantity() +
+                            "，而实际可退数量为: " + detail.getReturnProductDetailProducts().size() + ";";
+                }
+            }
+        }
+
+        if (!canSellMsg.equals("")) {
+            canSellMsg += "尊敬的顾客你好，你提交的退货申请单 " + returnProduct.getNo() + "申请退货失败。具体原因是：" +
+                    canSellMsg + "。如有帮助需要，请联系我公司客服人员处理";
+        }
+
+        return canSellMsg;
+    }
+
+    /**
+     * 退货单退款
+     * @param returnProduct
+     */
+    public String refundReturnProduct(ReturnProduct returnProduct) {
+        String result = CommonConstant.fail;
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    /**
+     * 设置退货单
+     * @param returnProduct
+     * @return
+     */
+    public ReturnProduct setReturnProduct(ReturnProduct returnProduct) {
+        if (returnProduct.getEntity().equals(OrderConstant.order)) {
+            Order order = orderService.queryOrder(new Order(returnProduct.getEntityId())).get(0);
+
+            returnProduct.setEntityNo(order.getNo());
+            returnProduct.setUser(order.getUser());
+            returnProduct.setInputDate(dateUtil.getSecondCurrentTimestamp());
+
+            /**
+             * 根据 sessionId 获取到用户，如果用户是后台销售人员，则设置为销售确认可退状态，否则设置为申请状态
+             */
+            Object user = afterSaleServiceDao.getFromRedis((String)afterSaleServiceDao.
+                    getFromRedis(CommonConstant.sessionId + CommonConstant.underline + returnProduct.getSessionId()));
+            if (user instanceof com.hzg.sys.User) {
+                returnProduct.setState(AfterSaleServiceConstant.returnProduct_state_salePass);
+            } else {
+                returnProduct.setState(AfterSaleServiceConstant.returnProduct_state_apply);
+            }
+
+            for (ReturnProductDetail detail : returnProduct.getDetails()) {
+                for (OrderDetail orderDetail : order.getDetails()) {
+                    if (detail.getProductNo().equals(orderDetail.getProductNo())) {
+
+                        detail.setState(AfterSaleServiceConstant.returnProduct_detail_state_unReturn);
+                        detail.setUnit(orderDetail.getUnit());
+
+                        if (orderDetail.getPriceChange() == null) {
+                            detail.setRefundPrice(orderDetail.getProductPrice());
+                        } else {
+                            detail.setRefundPrice(orderDetail.getPriceChange().getPrice());
+                        }
+                        detail.setRefundAmount(new BigDecimal(Float.toString(detail.getRefundPrice())).
+                                multiply(new BigDecimal(Float.toString(detail.getQuantity()))).floatValue());
+
+                        detail.setReturnProductDetailProducts(new HashSet<>());
+                        for (OrderDetailProduct orderDetailProduct : orderDetail.getOrderDetailProducts()) {
+                            if (detail.getReturnProductDetailProducts().size() <= detail.getQuantity()) {
+
+                                if (orderDetailProduct.getProduct().getState().compareTo(ErpConstant.product_state_sold) == 0 ||
+                                        orderDetailProduct.getProduct().getState().compareTo(ErpConstant.product_state_shipped) == 0) {
+                                    /**
+                                     * 设置商品状态为申请退货状态
+                                     */
+                                    orderDetailProduct.getProduct().setState(ErpConstant.product_state_onReturnProduct);
+                                    detail.getReturnProductDetailProducts().add(new ReturnProductDetailProduct(orderDetailProduct.getProduct()));
+                                }
+
+                            } else {
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return returnProduct;
+    }
+
+    public String doReturnProductBusinessAction(String json, Integer returnProductPassState, Integer actionPassState,
+                                                Integer returnProductNotPassState, Integer actionNotPassState) {
+        String result = CommonConstant.fail;
+
+        Action action = writer.gson.fromJson(json, Action.class);
+        ReturnProduct returnProduct = (ReturnProduct) afterSaleServiceDao.queryById(action.getId(), ReturnProduct.class);
+
+        if (action.getAuditResult().equals(CommonConstant.Y)) {
+            returnProduct.setState(returnProductPassState);
+            action.setType(actionPassState);
+        } else {
+            returnProduct.setState(returnProductNotPassState);
+            action.setType(actionNotPassState);
+        }
+
+        result += afterSaleServiceDao.updateById(returnProduct.getId(), returnProduct);
+
+        action.setEntity(AfterSaleServiceConstant.returnProduct);
+        action.setInputer(getUserBySessionId(action.getSessionId()));
+        action.setInputDate(dateUtil.getSecondCurrentTimestamp());
+        result += afterSaleServiceDao.save(action);
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    public String refund(String json) {
+        String result = CommonConstant.fail;
+
+        Action action = writer.gson.fromJson(json, Action.class);
+
+        ReturnProduct returnProduct = (ReturnProduct) afterSaleServiceDao.queryById(action.getId(), ReturnProduct.class);
+        returnProduct.setState(AfterSaleServiceConstant.returnProduct_state_refund);
+        result += afterSaleServiceDao.updateById(returnProduct.getId(), returnProduct);
+
+        action.setEntity(AfterSaleServiceConstant.returnProduct);
+        action.setType(AfterSaleServiceConstant.returnProduct_action_refund);
+        action.setInputer(getUserBySessionId(action.getSessionId()));
+        action.setInputDate(dateUtil.getSecondCurrentTimestamp());
+        result += afterSaleServiceDao.save(action);
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    public User getUserBySessionId(String sessionId){
+        return (User)afterSaleServiceDao.getFromRedis((String)afterSaleServiceDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + sessionId));
+    }
+}

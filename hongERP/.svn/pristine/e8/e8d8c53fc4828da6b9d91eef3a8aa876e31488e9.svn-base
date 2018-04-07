@@ -1,0 +1,412 @@
+<%@ page import="com.hzg.tools.FinanceConstant" %><%--
+**
+* Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+* 文件名: productCheck.jsp
+*
+* @author yuanyun
+* @Date  2017/10/25
+* @version 1.00
+*
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fm" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%--jquery ui--%>
+<link type="text/css" href="../../../res/css/jquery-ui-1.10.0.custom.css" rel="stylesheet">
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3><c:choose><c:when test="${entity != null}">查看</c:when><c:otherwise>填制</c:otherwise></c:choose>凭证</h3>
+            </div>
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placehold="Search for...">
+                        <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                  </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>财务 <small>凭证</small></h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <span class="section">凭证信息</span>
+                    <div class="x_content" id="voucher">
+                        <h2 class="text-center header"><strong>记账凭证</strong></h2>
+                        <form class="form-horizontal form-inline" role="form" id="form" >
+                            <div class="row" id="head" style="margin-bottom: -5px">
+                                <div class="item form-group">
+                                    <label class="control-label col-md-7 col-sm-7 col-xs-7"  for="voucherCategory"><span class="required">*</span>凭证类别：
+                                    </label>
+                                    <div class="col-md-5 col-sm-5 col-xs-5">
+                                        <input id="voucherCategory" name="voucherCategory" value="<c:choose><c:when test="${entity != null}">${entity.voucherCategory.name}</c:when><c:otherwise>记账凭证</c:otherwise></c:choose>" class="form-control col-md-7 col-xs-12" <c:if test="${entity != null}">readonly</c:if> required >
+                                        <input type="hidden" id="voucherCategory[id]" name="voucherCategory[id]" value="<c:choose><c:when test="${entity != null}">${entity.voucherCategory.id}</c:when><c:otherwise>1</c:otherwise></c:choose>">
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="control-label col-md-7 col-sm-7 col-xs-7"  for="no"><span class="required">*</span>凭证编号：
+                                    </label>
+                                    <div class="col-md-5 col-sm-5 col-xs-5">
+                                        <input id="no" name="no" value="<c:if test="${entity != null}">${entity.no}</c:if>${no}" class="form-control col-md-7 col-xs-12" data-validate-length-range="4，10" data-validate-words="1" <c:if test="${entity != null}">readonly</c:if> required>
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="makeDate"><span class="required">*</span>制单日期：
+                                    </label>
+                                    <div class="col-md-6 col-sm-6 col-xs-6">
+                                        <div class="input-prepend input-group" style="margin-bottom:0">
+                                            <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                            <input type="text" name="makeDate" id="makeDate" class="form-control col-md-7 col-xs-12" value="<fm:formatDate value="${entity.makeDate}" pattern="yyyy-MM-dd"/>" <c:if test="${entity != null}">readonly</c:if> required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item form-group">
+                                    <label class="control-label col-md-7 col-sm-7 col-xs-7"  for="attachDocumentNum">附单据数：
+                                    </label>
+                                    <div class="col-md-5 col-sm-5 col-xs-5">
+                                        <input id="attachDocumentNum" name="attachDocumentNum:number" value="${entity.attachDocumentNum}"  <c:if test="${entity != null}">readonly</c:if> class="form-control col-md-7 col-xs-12">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="x_content" style="overflow: auto;margin-top: 15px">
+                                <table id="voucherList" class="table table-striped table-bordered jambo_table bulk_action" style="margin-bottom: 0px;">
+                                    <thead>
+                                    <tr><th>摘要</th><th>科目名称</th><th>辅助项</th><th>借方</th><th>贷方</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    <c:if test="${entity == null}">
+                                        <tr>
+                                            <td><input type="text" name='details[][voucherItem[summary]]:string' /></td>
+                                            <td><input type="text" class="text1" name='details[][voucherItem[subject[name]]]:string' />
+                                                <input type="hidden" name='details[][voucherItem[subject[id]]]:number' />
+                                            </td>
+                                            <td><input type="text" class="text2" name='details[][voucherItem[assistant]]:string' /></td>
+                                            <td><input type="text" name='details[][voucherItem[debit]]:number'  /></td>
+                                            <td><input type="text" name='details[][voucherItem[credit]]:number'  /></td>
+                                        </tr>
+                                    </c:if>
+                                    <c:if test="${entity != null &&entity.details != null}">
+                                        <c:forEach items="${entity.details}" var="detail">
+                                                <tr>
+                                                    <td><input type="text" name='details[][voucherItem[summary]]:string' value='${detail.voucherItem.summary}' readonly /></td>
+                                                    <td><input type="text" name='details[][voucherItem[subject[name]]]:string' value='${detail.voucherItem.subject.name}' readonly /></td>
+                                                    <td><input type="text" name='details[][voucherItem[assistant]]:string' value='${detail.voucherItem.assistant}' readonly /></td>
+                                                    <td><input type="text" name='details[][voucherItem[debit]]:number' value='${detail.voucherItem.debit}' readonly /></td>
+                                                    <td><input type="text" name='details[][voucherItem[credit]]:number' value='${detail.voucherItem.credit}' readonly /></td>
+                                                </tr>
+                                        </c:forEach>
+                                    </c:if>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="x_content" style="overflow: auto; margin-top: 2px">
+                                <table id="voucherTotal" class="table table-striped table-bordered  bulk_action" style="margin-bottom: 5px;">
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" name='total' value='合计' readonly  /></td>
+                                            <td><input type="text" name='totalCapitalString' value='大写合计' readonly  /></td>
+                                            <td><input type="text" name='totalCapital' data-validate-length-range="2，30" data-validate-words="1" value='${entity.totalCapital}' <c:if test="${entity != null}">readonly</c:if> /></td>
+                                            <td><input type="text" name='debit:number' value='${entity.debit}' <c:if test="${entity != null}">readonly</c:if> /></td>
+                                            <td><input type="text" name='credit:number' value='${entity.credit}' <c:if test="${entity != null}">readonly</c:if> /></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="x_content" style="margin-top: 5px;">
+                                <div class="row" id="foot">
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="bookkeeper">记账人：
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-6">
+                                            <input id="bookkeeper" name="bookkeeper" value="${entity.bookkeeper.name}" class="form-control col-md-7 col-xs-12" <c:if test="${entity != null}">readonly</c:if> >
+                                            <input type="hidden" id="bookkeeper[id]" name="bookkeeper[id]:number" value="${entity.bookkeeper.id}" >
+                                        </div>
+                                    </div>
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="auditor">审核人：
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-6">
+                                            <input id="auditor" name="auditor" value="${entity.auditor.name}" class="form-control col-md-7 col-xs-12" <c:if test="${entity != null}">readonly</c:if> >
+                                            <input type="hidden" id="auditor[id]" name="auditor[id]:number" value="${entity.auditor.id}" >
+                                        </div>
+                                    </div>
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="cashier">出纳：
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-6">
+                                            <input id="cashier" name="cashier" value="${entity.cashier.name}" class="form-control col-md-7 col-xs-12" <c:if test="${entity != null}">readonly</c:if> >
+                                            <input type="hidden" id="cashier[id]" name="cashier[id]:number" value="${entity.cashier.id}" >
+                                        </div>
+                                    </div>
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="chartMaker"><span class="required">*</span>制单人：
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-6">
+                                            <input id="chartMaker" name="chartMaker" value="<c:choose><c:when test="${entity != null}">${entity.chartMaker.name}</c:when><c:otherwise>${userName}</c:otherwise></c:choose>" class="form-control col-md-7 col-xs-12" readonly required>
+                                            <input type="hidden" id="chartMaker[id]" name="chartMaker[id]:number" value="<c:choose><c:when test="${entity != null}">${entity.chartMaker.id}</c:when><c:otherwise>${userId}</c:otherwise></c:choose>" >
+                                        </div>
+                                    </div>
+                                    <div class="item form-group">
+                                        <label class="control-label col-md-6 col-sm-6 col-xs-6"  for="attachDocumentNum"><span class="required">*</span>打印次数：
+                                        </label>
+                                        <div class="col-md-6 col-sm-6 col-xs-6">
+                                            <input id="printTimes" name="printTimes:number" value="<c:choose><c:when test="${entity != null}">${entity.printTimes}</c:when><c:otherwise>0</c:otherwise></c:choose>" style="width: 100px" class="form-control col-md-7 col-xs-12" <c:if test="${entity != null}">readonly</c:if> required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="state" name="state:number" value="<c:if test="${entity != null}">${entity.state}</c:if>0">
+                            <input type="hidden" id="id" name="id:number" value="${entity.id}"/>
+                        </form>
+                    </div>
+                    <div class="x_content">
+                        <div class="form-horizontal form-label-left">
+                            <div class="ln_solid"></div>
+                            <div class="form-group" id="submitDiv">
+                                <div class="col-md-6 col-md-offset-10">
+                                    <button id="cancel" type="button" class="btn btn-primary">取消</button>
+                                    <c:choose>
+                                        <c:when test="${entity == null}">
+                                            <button id="send" type="button" class="btn btn-success">保存</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button class="btn btn-default" id="printVoucherBtn"><i class="fa fa-print"></i> 打印凭证</button>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="actionForm" style="display: none">
+    <input type="hidden" id="printContent" name="printContent">
+</form>
+<form id="printForm" method="post" style="display: none" target="_blank">
+    <input type="hidden" id="jsonn" name="json">
+</form>
+
+<script type="text/javascript">
+
+    $("#cancel").unbind("click").click(function(){
+        render(getPreUrls());
+        returnPage = true;
+    });
+
+    $('#makeDate').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            applyLabel : '确定',
+            cancelLabel : '取消',
+            fromLabel : '起始时间',
+            toLabel : '结束时间',
+            customRangeLabel : '自定义',
+            daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+            monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+            firstDay : 1
+        },
+        singleDatePicker: true,
+        singleClasses: "picker_3"
+    }, function(start, end, label) {
+        console.log(start.toISOString(), end.toISOString(), label);
+    });
+
+    $("#voucherCategory").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/voucherCategory/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("voucherCategory[id]")).val(result.id);
+            }
+        }
+    });
+
+    $(".text1").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/subject/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementsByName("details[][voucherItem[subject[id]]]:number").item(0)).val(result.id);
+                var a = result.accountItems;
+                for(var i in a){
+                    if(a[i]==3){
+                        $(".text2").coolautosuggest({
+                            url:"<%=request.getContextPath()%>/finance/suggest/supplier/name/",
+                            showProperty: 'name'
+                        });
+                    }else if (a[i]==4){
+                        $(".text2").coolautosuggest({
+                            url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+                            showProperty: 'name'
+                        });
+                    }
+                }
+            }
+        }
+    });
+
+
+
+    $("#bookkeeper").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("bookkeeper[id]")).val(result.id);
+            }
+        }
+    });
+
+    $("#auditor").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("auditor[id]")).val(result.id);
+            }
+        }
+    });
+    $("#cashier").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("cashier[id]")).val(result.id);
+            }
+        }
+    });
+    $("#chartMaker").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("chartMaker[id]")).val(result.id);
+            }
+        }
+    });
+
+    $("#voucherCategory").coolautosuggest({
+        url:"<%=request.getContextPath()%>/finance/suggest/voucherCategory/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("voucherCategory[id]")).val(result.id);
+            }
+        }
+    });
+
+    $("#voucherList tbody").on("mousedown","tr",function (e) {
+        $.smartMenu.remove();//重新加载smartMenu，这很重要，不然会使用html的缓存
+        if (e.which == 3) {
+            var opertionn = {
+                name: "",
+                offsetX: 2,
+                offsetY: 2,
+                textLimit: 10,
+                beforeShow: $.noop,
+                afterShow: $.noop
+            };
+            var imageMenuData = [
+                [{
+                    text: "增行",
+                    func: function(){
+                        var tr = "<tr>"+
+                            "<td><input name='details[][voucherItem[summary]]:string' /></td>"+
+                            "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' />"+
+                            "<input type='hidden' name='details[][voucherItem[subject[id]]]:number' />"+
+                            "</td>"+
+                            "<td><input name='details[][voucherItem[assistant]]:string' /></td>"+
+                            "<td><input name='details[][voucherItem[debit]]:number' /></td>"+
+                            "<td><input name='details[][voucherItem[credit]]:number' /></td>"+
+                            "</tr>"
+                        $(this).after(tr);
+                        var subjectInput = $("[class='text1']");
+                        $(this).next().find(subjectInput).coolautosuggest({
+                            url:"<%=request.getContextPath()%>/finance/suggest/subject/name/",
+                            showProperty: 'name',
+                            onSelected:function(result){
+                                if(result!=null){
+                                    $(this).next().next().val(result.id);
+                                    var a = result.accountItems;
+                                    for(var i in a){
+                                        if(a[i]==3){
+                                            $(this).parent().next().find("input").coolautosuggest({
+                                                url:"<%=request.getContextPath()%>/finance/suggest/supplier/name/",
+                                                showProperty: 'name'
+                                            });
+                                        }else if (a[i]==4){
+                                            $(this).parent().next().find("input").coolautosuggest({
+                                                url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+                                                showProperty: 'name'
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }, {
+                    text: "删行",
+                    func: function(){
+                        $(this).remove();
+                    }
+                }]
+            ];
+            $(this).smartMenu(imageMenuData,opertionn);
+        }
+    });
+
+    $("#voucherList tbody").on("keypress","tr",function (e) {
+        if (e.keyCode == 13) {
+            var tr = "<tr>"+
+                "<td><input name='details[][voucherItem[summary]]:string' /></td>"+
+                "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' />"+
+                "<input type='hidden' name='details[][voucherItem[subject[id]]]:number' />"+
+                "</td>"+
+                "<td><input name='details[][voucherItem[assistant]]:string' /></td>"+
+                "<td><input name='details[][voucherItem[debit]]:number' /></td>"+
+                "<td><input name='details[][voucherItem[credit]]:number' /></td>"+
+                "</tr>"
+            $(this).after(tr);
+            var subjectInput = $("[class='text1']");
+            $(this).next().find(subjectInput).coolautosuggest({
+                url:"<%=request.getContextPath()%>/finance/suggest/subject/name/",
+                showProperty: 'name',
+                onSelected:function(result){
+                    if(result!=null){
+                        $(this).next().next().val(result.id);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#send").click(function () {
+        finance.saveVoucher('<%=request.getContextPath()%>/finance/save/voucher');
+    });
+
+    $("#printVoucherBtn").click(function(){
+        $("#printContent").val($("#voucher").html()
+            .replace(/\r/ig,"").replace(/\n/ig,""));
+
+        $("#jsonn").val(JSON.stringify($("#actionForm").serializeJSON()));
+        $("#printForm").attr("action", "<%=request.getContextPath()%>/finance/print/<%=FinanceConstant.voucher_action_name_print_voucher%>").submit();
+    });
+
+    <c:choose><c:when test="${entity != null}">document.title = "查看凭证";</c:when><c:otherwise> document.title = "填制凭证";</c:otherwise></c:choose>
+
+</script>

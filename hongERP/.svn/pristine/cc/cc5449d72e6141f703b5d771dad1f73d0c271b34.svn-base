@@ -1,0 +1,25 @@
+function addProductCheck(uri) {
+    var $form = $("#form");
+    if (!validator.checkAll($form)) {
+        return;
+    }
+
+    var json = JSON.stringify($form.serializeJSON());
+    json = json.substring(0, json.length-1) + ',"details":[';
+
+
+    var trs = $("#code tbody tr td");
+
+    for (var i = 0; i < trs.length; i++) {
+        var inputs = $(trs[i]).find(":input");
+        json += JSON.stringify(inputs.not('[value=""]').serializeJSON()["details"][0]) + ",";
+    }
+
+    json = json.substring(0, json.length-1) + ']}';
+
+    $form.sendData(uri, json, function(result){
+        if(result != null){
+            $("table tr:not(:first)").remove();
+        }
+    });
+}

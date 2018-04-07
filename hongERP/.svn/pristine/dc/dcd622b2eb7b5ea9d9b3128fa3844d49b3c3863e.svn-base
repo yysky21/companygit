@@ -1,0 +1,89 @@
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: returnProduct.js
+ *类的详细说明
+ *
+ * @author smjie
+ * @Date  2017/12/9
+ * @version 1.00
+ */
+var returnProduct = (function ($) {
+    "use strict";
+
+    function calculateReturnProductAmounts(tdChild) {
+        calculateReturnProductDetailAmount(tdChild);
+        calculateReturnProductAmount(tdChild);
+    }
+
+    function calculateReturnProductDetailAmount(tdChild) {
+        var refundAmount, refundPrice, quantity;
+        var inputs = tdChild.parent().parent().find(":input");
+
+        for (var x = 0; x < inputs.length; x++) {
+            var name = $(inputs[x]).attr("name");
+
+            if (name != undefined) {
+                if (name == "details[][refundAmount]:number") {
+                    refundAmount = inputs[x];
+                }
+
+                if (name == "details[][refundPrice]:number") {
+                    refundPrice = inputs[x];
+                }
+
+                if (name == "details[][quantity]:number") {
+                    quantity = inputs[x];
+                }
+            }
+        }
+
+        if ($.trim(quantity.value) != "") {
+            refundAmount.value = Math.formatFloat(parseFloat(refundPrice.value) * parseFloat(quantity.value), 2);
+        }
+    }
+
+    function calculateReturnProductAmount(tdChild) {
+        var refundAmount = 0;
+
+        var trs = tdChild.parent().parent().parent().find("tbody tr");
+
+        $.each(trs, function(ci, tr){
+            var quantity = "", refundPrice = "";
+
+            $.each($(tr).find(":input"), function(cii, item){
+                var name = $(item).attr("name");
+
+                if (name != undefined) {
+                    if (name == "details[][quantity]:number") {
+                        quantity = item.value;
+                    }
+
+                    if (name == "details[][refundPrice]:number") {
+                        refundPrice = item.value;
+                    }
+                }
+            });
+
+            if ($.trim(quantity) != "" && $.trim(refundPrice) != "") {
+                refundAmount = Math.formatFloat(refundAmount + parseFloat(refundPrice) * parseFloat(quantity), 2);
+            }
+        });
+
+        $("#refundAmount").val(refundAmount);
+    }
+
+    function audit(auditResult, url) {
+        $("#auditResult").val(auditResult);
+        $("#actionForm").submitForm(url);
+    }
+
+    return {
+        calculateReturnProductAmounts: calculateReturnProductAmounts,
+        calculateReturnProductDetailAmount: calculateReturnProductDetailAmount,
+        calculateReturnProductAmount: calculateReturnProductAmount,
+        saleAudit: audit,
+        directorAudit: audit,
+        warehousingAudit: audit,
+        refund: audit
+    }
+})(jQuery);

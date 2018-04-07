@@ -1,0 +1,129 @@
+package com.hzg.finance;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: Subject.java
+ * 类的详细说明
+ *
+ * @author yuanyun
+ * @version 1.00
+ * @Date 2017/11/24
+ */
+@Entity(name = "hzg_finance_subject")
+public class Subject implements Serializable {
+
+    private static final long serialVersionUID = 2486554138700278364L;
+
+    public Subject(){
+        super();
+    }
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @Column(name="id", length = 11)
+    private Integer id;
+
+    @ManyToOne(cascade=CascadeType.DETACH, fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoryId")
+    private SubjectCategory subjectCategory; // 科目类别id
+
+    @Column(name="name",length=20)
+    private String name; // 科目名称
+
+    @Column(name="no",length=16)
+    private String no; // 科目编码
+
+    @Column(name="type",length = 1)
+    private Integer type; // 科目类型
+
+    @Column(name="remainderDirection",length = 1)
+    private Integer remainderDirection; // 余额方向
+
+    @Column(name="auxiliaryAccountingItem",length = 1)
+    private Integer auxiliaryAccountingItem; // 辅助核算项
+
+    @Column(name="disabled",length = 1)
+    private Integer disabled; // 是否停用
+
+    @Column(name="paperFormat",length = 1)
+    private Integer paperFormat; // 账面格式
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public SubjectCategory getSubjectCategory() {
+        return subjectCategory;
+    }
+
+    public void setSubjectCategory(SubjectCategory subjectCategory) {
+        this.subjectCategory = subjectCategory;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getNo() {
+        return no;
+    }
+
+    public void setNo(String no) {
+        this.no = no;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getRemainderDirection() {
+        return remainderDirection;
+    }
+
+    public void setRemainderDirection(Integer remainderDirection) {
+        this.remainderDirection = remainderDirection;
+    }
+
+    public Integer getAuxiliaryAccountingItem() {
+        return auxiliaryAccountingItem;
+    }
+
+    public void setAuxiliaryAccountingItem(Integer auxiliaryAccountingItem) {
+        this.auxiliaryAccountingItem = auxiliaryAccountingItem;
+    }
+
+    public Integer getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Integer disabled) {
+        this.disabled = disabled;
+    }
+
+    public Integer getPaperFormat() {
+        return paperFormat;
+    }
+
+    public void setPaperFormat(Integer paperFormat) {
+        this.paperFormat = paperFormat;
+    }
+}

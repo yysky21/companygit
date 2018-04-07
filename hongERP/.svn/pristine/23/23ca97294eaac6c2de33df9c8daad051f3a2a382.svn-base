@@ -1,0 +1,164 @@
+<%--
+**
+* Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+* 文件名: article.jsp
+*
+* @author yuanyun
+* @Date  2017/09/28
+* @version 1.00
+*
+--%>
+<%@ page import="com.hzg.sys.ArticleCate" %>
+<%@ page import="com.hzg.sys.Article" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+                <h3><c:choose><c:when test="${entity != null}">修改</c:when><c:otherwise>添加</c:otherwise></c:choose>文章</h3>
+            </div>
+
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                  </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>后台管理 <small>文章</small></h2>
+
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <form class="form-horizontal form-label-left" novalidate id="form">
+                            <span class="section">文章信息</span>
+
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="articleCate[id]">分类<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select id="articleCate[id]" name="articleCate[id]" class="form-control col-md-7 col-xs-12" required>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">标题<span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input id="title" name="title" class="form-control col-md-7 col-xs-12" value="${entity.title}" data-validate-length="5,100" data-validate-words="1"  required type="text">
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label for="imageUrl" class="control-label col-md-3 col-sm-3 col-xs-12">封面图 <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input id="imageUrl" type="text" name="imageUrl" value="${entity.imageUrl}" data-validate-length="5,50" data-validate-words="1" class="form-control col-md-7 col-xs-12" required>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="content">内容 <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <textarea id="content"  name="content" required >${entity.content}</textarea>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="shortContent">摘要<span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <textarea id="shortContent" name="shortContent" cols="20" rows="5" required >${entity.shortContent}</textarea>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label for="position" class="control-label col-md-3 col-sm-3 col-xs-12">推荐位 <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <select id="position" name="position" class="form-control col-md-7 col-xs-12" required>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoTiltle">文章优化标题<span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input id="seoTiltle" name="seoTiltle" class="form-control col-md-7 col-xs-12" value="${entity.seoTiltle}" data-validate-length="5,80" data-validate-words="1" required type="text">
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoKeyword">文章优化关键词<span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input id="seoKeyword" name="seoKeyword" class="form-control col-md-7 col-xs-12" value="${entity.seoKeyword}" data-validate-length="5,80" data-validate-words="1" required type="text">
+                                </div>
+                            </div>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoDesc">文章优化描述<span class="required">*</span>
+                                </label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input id="seoDesc" name="seoDesc" class="form-control col-md-7 col-xs-12" value="${entity.seoDesc}" data-validate-length="5,100" data-validate-words="1" required type="text">
+                                </div>
+                            </div>
+                            <div class="ln_solid"></div>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-3">
+                                    <button id="cancel" type="button" class="btn btn-primary">取消</button>
+                                    <c:if test="${entity == null}">
+                                        <button id="send" type="button" class="btn btn-success">保存</button>
+                                        <button id="publish" type="button" class="btn btn-success">发布</button>
+                                    </c:if>
+                                    <c:if test="${entity != null}">
+                                            <c:if test="${entity.state == 0}">
+                                                <button id="edit" type="button" class="btn btn-primary">编辑</button>
+                                                <button id="send" type="button" class="btn btn-success">保存</button>
+                                                <button id="publish" type="button" class="btn btn-success">发布</button>
+                                            </c:if>
+                                            <c:if test="${entity.state == 1}">
+                                                <button id="edit" type="button" class="btn btn-primary">编辑</button>
+                                                <button id="revokePublish" type="button" class="btn btn-primary">撤销发布</button>
+                                            </c:if>
+                                            <c:if test="${entity.state == 2}">
+                                                <button id="edit" type="button" class="btn btn-primary">编辑</button>
+                                                <button id="recoverPublish" type="button" class="btn btn-primary">恢复发布</button>
+                                            </c:if>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <c:if test="${entity != null}"><input type="hidden" id="id" name="id" value="${entity.id}"></c:if>
+                            <input type="hidden" id="state" name="state:number" value="<c:choose><c:when test="${entity != null}">${entity.state}</c:when><c:otherwise>0</c:otherwise></c:choose>">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    init(<c:out value="${entity == null}"/>);
+
+    $("#send").click(function(){$('#form').submitForm('<%=request.getContextPath()%>/sys/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/articleCate');});
+
+    selector.setSelect(['articleCate[id]'], ['name'], ['id'],
+        [<c:if test="${entity != null}">'${entity.articleCate.id}'</c:if>],
+        ['<%=request.getContextPath()%>/sys/query/articleCate'],
+        '{}', [], 0);
+
+    <c:choose><c:when test="${entity != null}">document.title = "文章修改";</c:when><c:otherwise> document.title = "文章添加";</c:otherwise></c:choose>
+
+    CKEDITOR.replace( 'content');
+    /*function test() {
+        var editor_data = CKEDITOR.instances.content.getDate();
+        if(editor_data == null || editor_data == ""){
+            alert("请填写内容！");
+            return false;
+        }
+    }*/
+</script>

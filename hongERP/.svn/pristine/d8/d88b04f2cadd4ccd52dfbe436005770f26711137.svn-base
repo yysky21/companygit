@@ -1,0 +1,31 @@
+function addProductCheck(uri, callback) {
+    var $form = $("#form");
+    if (!validator.checkAll($form)) {
+        return;
+    }
+
+    var json = JSON.stringify($form.serializeJSON());
+    json = json.substring(0, json.length-1) + ',"details":[';
+
+
+    var trs = $("#table tbody tr");
+
+    for (var i = 0; i < trs.length; i++) {
+        console.log("---------trsLength"+trs.length);
+        var inputs = $(trs[i]).find(":input");
+        console.log("---------inputsLength"+inputs.length);
+        console.log(JSON.stringify(inputs.not('[value=""]').serializeJSON()));
+        json += JSON.stringify(inputs.not('[value=""]').serializeJSON()["details"][0]) + ",";
+    }
+
+    json = json.substring(0, json.length-1) + ']}';
+
+    $form.sendData(uri, json, function(result){
+        if(result.result.indexOf("success") != -1){
+            $("table tbody tr").remove();
+            if (callback != undefined) {
+                callback(result);
+            }
+        }
+    });
+}

@@ -1,0 +1,169 @@
+package com.hzg.finance;
+
+import com.hzg.sys.*;
+import com.hzg.tools.*;
+import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
+ * 文件名: ErpService.java
+ * 类的详细说明
+ *
+ * @author smjie
+ * @version 1.00
+ * @Date 2017/6/28
+ */
+@Service
+public class FinanceService {
+
+    Logger logger = Logger.getLogger(FinanceService.class);
+
+    @Autowired
+    private FinanceDao financeDao;
+
+    @Autowired
+    private SysClient sysClient;
+
+    @Autowired
+    private Writer writer;
+
+    @Autowired
+    public ObjectToSql objectToSql;
+
+    @Autowired
+    public SessionFactory sessionFactory;
+
+    public String launchAuditFlow(String entity, Integer entityId, String auditName, String content, User user) {
+        String result = CommonConstant.fail;
+
+        logger.info("launchAuditFlow start:" + result);
+
+        /**
+         * 创建审核流程第一个节点，发起审核流程
+         */
+        Audit audit = new Audit();
+        audit.setEntity(entity);
+        audit.setEntityId(entityId);
+        audit.setName(auditName);
+        audit.setContent(content);
+
+        Post post = (Post)(((List<User>)financeDao.query(user)).get(0)).getPosts().toArray()[0];
+        audit.setCompany(post.getDept().getCompany());
+
+        Map<String, String> result1 = writer.gson.fromJson(sysClient.launchAuditFlow(writer.gson.toJson(audit)),
+                new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
+
+        result = result1.get(CommonConstant.result);
+
+        logger.info("launchAuditFlow end, result:" + result);
+
+        return result;
+    }
+
+    public String saveVoucherDetail(Voucher voucher) {
+        String result = CommonConstant.fail;
+
+        if (voucher.getDetails() != null && !voucher.getDetails().isEmpty()) {
+            for (VoucherDetail detail : voucher.getDetails()) {
+                if (detail.getVoucherItem() != null){
+                    VoucherItem voucherItem = detail.getVoucherItem();
+                    if (voucherItem.getId() == null){
+                        result += financeDao.save(voucherItem);
+                    }
+                    detail.setVoucher(voucher);
+                    result += financeDao.save(detail);
+                }
+            }
+        }
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    public List privateQuery(String entity, String json, int position, int rowNum) {
+
+        if (entity.equalsIgnoreCase(Voucher.class.getSimpleName())) {
+            Class[] clazzs = {Voucher.class, VoucherCategory.class,User.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getVoucherComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> vouchers = results.get(Voucher.class.getName());
+            List<Object> voucherCategorys = results.get(VoucherCategory.class.getName());
+            List<Object> users = results.get(User.class.getName());
+
+            int i = 0;
+            for (Object voucher : vouchers) {
+                ((Voucher)voucher).setVoucherCategory((VoucherCategory) voucherCategorys.get(i));
+                ((Voucher)voucher).setChartMaker((User) users.get(i));
+
+                i++;
+            }
+            return vouchers;
+        }
+
+        return new ArrayList();
+    }
+
+    private String getVoucherComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String voucherSql = objectToSql.generateComplexSqlByAnnotation(Voucher.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get(Voucher.class.getSimpleName().toLowerCase())),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(voucherSql, Voucher.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = sqlParts[3];
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", VoucherCategory.class);
+            fromSql += ", " + objectToSql.getTableName(VoucherCategory.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t11." + objectToSql.getColumn(VoucherCategory.class.getDeclaredField("id")) +
+                        " = t." + objectToSql.getColumn(Voucher.class.getDeclaredField("voucherCategory"));
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", User.class);
+            fromSql += ", " + objectToSql.getTableName(User.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(Voucher.class.getDeclaredField("chartMaker"))+
+                    " and t12." + objectToSql.getColumn(User.class.getDeclaredField("name")) +
+                    " like '%" + ((Map)(queryParameters.get("chartMaker"))).get("name")+"%'";
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
+    public BigInteger privateRecordNum(String entity, String json){
+        String sql = "";
+
+        if (entity.equalsIgnoreCase(Voucher.class.getSimpleName())) {
+            sql = getVoucherComplexSql(json, 0, -1);
+        }
+
+        sql = "select count(t.id) from " + sql.split(" from ")[1];
+        return (BigInteger)sessionFactory.getCurrentSession().createSQLQuery(sql).uniqueResult();
+    }
+
+}

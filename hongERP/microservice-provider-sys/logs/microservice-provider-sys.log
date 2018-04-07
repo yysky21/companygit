@@ -1,0 +1,47 @@
+[2017-12-07 11:18:24.705] boot - 6552  INFO [http-nio-8000-exec-1] --- SysController: audit start, parameter:{"name":"请审核凭证编号为0007的凭证","content":"请审核凭证编号为0007的凭证","entity":"voucherAuditNotify","entityId":86,"company":{"id":11}}
+[2017-12-07 11:18:24.724] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:24.785] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:24.804] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:24.828] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:24.830] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:24.832] boot - 6552  INFO [http-nio-8000-exec-1] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:24.872] boot - 6552  INFO [http-nio-8000-exec-1] --- SysDao: generate no:AU171207044
+[2017-12-07 11:18:25.092] boot - 6552  INFO [http-nio-8000-exec-1] --- Writer: the string to response:{"result":"fail", "auditResult":"fail"}
+[2017-12-07 11:18:25.101] boot - 6552  INFO [http-nio-8000-exec-1] --- SysController: audit end
+[2017-12-07 11:18:25.352] boot - 6552  INFO [http-nio-8000-exec-2] --- SysController: audit start, parameter:{"name":"请审核凭证编号为0007的凭证","content":"请审核凭证编号为0007的凭证","entity":"voucherAuditNotify","entityId":87,"company":{"id":11}}
+[2017-12-07 11:18:25.355] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:25.358] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:25.363] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:25.368] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:25.369] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:25.371] boot - 6552  INFO [http-nio-8000-exec-2] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:25.375] boot - 6552  INFO [http-nio-8000-exec-2] --- SysDao: generate no:AU171207045
+[2017-12-07 11:18:25.421] boot - 6552  INFO [http-nio-8000-exec-2] --- Writer: the string to response:{"result":"fail", "auditResult":"fail"}
+[2017-12-07 11:18:25.422] boot - 6552  INFO [http-nio-8000-exec-2] --- SysController: audit end
+[2017-12-07 11:18:26.107] boot - 6552  INFO [http-nio-8000-exec-3] --- SysController: audit start, parameter:{"name":"请审核凭证编号为0007的凭证","content":"请审核凭证编号为0007的凭证","entity":"voucherAuditNotify","entityId":88,"company":{"id":11}}
+[2017-12-07 11:18:26.108] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:26.111] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:26.115] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:26.118] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:18:26.119] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:18:26.122] boot - 6552  INFO [http-nio-8000-exec-3] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:18:26.125] boot - 6552  INFO [http-nio-8000-exec-3] --- SysDao: generate no:AU171207046
+[2017-12-07 11:18:26.134] boot - 6552  INFO [http-nio-8000-exec-3] --- Writer: the string to response:{"result":"fail", "auditResult":"fail"}
+[2017-12-07 11:18:26.135] boot - 6552  INFO [http-nio-8000-exec-3] --- SysController: audit end
+[2017-12-07 11:24:14.051] boot - 6552  INFO [http-nio-8000-exec-4] --- SysController: audit start, parameter:{"name":"请审核凭证编号为0007的凭证","content":"请审核凭证编号为0007的凭证","entity":"voucherAuditNotify","entityId":89,"company":{"id":11}}
+[2017-12-07 11:24:14.052] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:24:14.053] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:24:14.054] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:24:14.056] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t where t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 order by t.id desc 
+[2017-12-07 11:24:14.058] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_company t where t.id=11 order by t.id desc 
+[2017-12-07 11:24:14.061] boot - 6552  INFO [http-nio-8000-exec-4] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit_flow t, hzg_sys_audit_flow_node t1 where t.id=34 and t.name='提示审核凭证' and t.inputDate='2017-12-01 17:16:02.0' and t.state=0 and t.entity='voucherAuditNotify' and t.companyId=11 and t.id = t1.auditFlowId order by t.id desc 
+[2017-12-07 11:24:14.065] boot - 6552  INFO [http-nio-8000-exec-4] --- SysDao: generate no:AU171207047
+[2017-12-07 11:24:14.087] boot - 6552  INFO [http-nio-8000-exec-4] --- Writer: the string to response:{"result":"success", "auditResult":"Y"}
+[2017-12-07 11:24:14.087] boot - 6552  INFO [http-nio-8000-exec-4] --- SysController: audit end
+[2017-12-07 11:24:56.166] boot - 6552  INFO [http-nio-8000-exec-6] --- SysController: complexQuery start, parameter:audit:{"state":"0","post":" in (19,20,16)","user":"26"},0,30
+[2017-12-07 11:24:56.178] boot - 6552  INFO [http-nio-8000-exec-6] --- ObjectToSql: selectSql:select t.*  from hzg_sys_audit t where t.state = 0 and t.postId in (19,20,16) order by t.id desc  limit 0,30
+[2017-12-07 11:24:56.182] boot - 6552  INFO [http-nio-8000-exec-6] --- Writer: the string to response:[]
+[2017-12-07 11:24:56.182] boot - 6552  INFO [http-nio-8000-exec-6] --- SysController: complexQuery end
+[2017-12-07 11:24:56.194] boot - 6552  INFO [http-nio-8000-exec-7] --- SysController: recordsSum start, parameter:audit:{"state":"0","post":" in (19,20,16)","user":"26"}
+[2017-12-07 11:24:56.195] boot - 6552  INFO [http-nio-8000-exec-7] --- Writer: the string to response:{"recordsSum":-1}
+[2017-12-07 11:24:56.195] boot - 6552  INFO [http-nio-8000-exec-7] --- SysController: recordsSum end
