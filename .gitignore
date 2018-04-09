@@ -1,10 +1,11 @@
 *.class
-*/.idea/
-*/.svn/
+.idea/
+.svn/
 logs/
 target/
 *.iml
 *.ipr
 *.iws
 *.log
+*.bat
 */README.md
