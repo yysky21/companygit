@@ -1,7 +1,0 @@
-[2017-09-12 09:17:09.476] boot - 8840  INFO [http-nio-8080-exec-8] --- SysController: user start, name:signIn, json:{"username":"admin","encryptPassword":"74C23F36317034059D35BB24343F5565","sessionId":"15051790169583wXSNkkSOhG2ZpaVWJsNkTFr0ztar3Ku","oldSessionId":""}
-[2017-09-12 09:17:12.111] boot - 8840  INFO [http-nio-8080-exec-8] --- SysController: user signIn end
-[2017-09-12 09:17:13.427] boot - 8840  INFO [http-nio-8080-exec-1] --- SysController: privateQuery start, entity:audit, json:{"state":"0"}
-[2017-09-12 09:17:13.443] boot - 8840  INFO [http-nio-8080-exec-1] --- Controller: complexQuery start, entity:audit, dataTableParameters:[{"name":"sEcho","value":1},{"name":"iColumns","value":3},{"name":"sColumns","value":",,"},{"name":"iDisplayStart","value":0},{"name":"iDisplayLength","value":30},{"name":"mDataProp_0","value":0},{"name":"mDataProp_1","value":1},{"name":"mDataProp_2","value":2}], json:{"state":"0","post":" in (20,19,16)","user":"26"},recordsSum-1
-[2017-09-12 09:17:13.538] boot - 8840  INFO [http-nio-8080-exec-1] --- Writer: the string to response:{"iTotalRecords":"-1","aaData":"[]","iTotalDisplayRecords":"-1","sEcho":"2"}
-[2017-09-12 09:17:13.539] boot - 8840  INFO [http-nio-8080-exec-1] --- Controller: complexQuery end
-[2017-09-12 09:17:13.539] boot - 8840  INFO [http-nio-8080-exec-1] --- SysController: privateQuery audit end
