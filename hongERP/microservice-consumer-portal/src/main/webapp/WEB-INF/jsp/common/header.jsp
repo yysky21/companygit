@@ -22,16 +22,16 @@
 <div class="col-md-3 left_col">
     <div class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;">
-            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Gentelella Alela!</span></a>
+            <a href="<%=request.getContextPath()%>/" class="site_title"><i class="fa fa-paw"></i> <span>红掌柜 ERP</span></a>
         </div>
 
         <div class="clearfix"></div>
 
         <!-- menu profile quick info -->
         <div class="profile clearfix">
-            <div class="profile_pic">
+            <%--<div class="profile_pic">
                 <img src="../../../res/gentelella/production/images/img.jpg" alt="..." class="img-circle profile_img">
-            </div>
+            </div>--%>
             <div class="profile_info">
                 <span>欢迎,</span>
                 <h2>${username}</h2>
@@ -44,7 +44,7 @@
         <!-- sidebar menu -->
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
             <div class="menu_section">
-                <h3>General</h3>
+                <%--<h3>General</h3>--%>
                 <ul class="nav side-menu">
                     <li><a id="auditA" href="#/sys/list/<%=Audit.class.getSimpleName().toLowerCase()%>/%7B%22state%22:%220%22%7D" onclick="render('/sys/list/<%=Audit.class.getSimpleName().toLowerCase()%>/%7B%22state%22:%220%22%7D');"><i class="fa fa-home"></i> 待办事宜 <span class="fa fa-chevron-right"></span></a></li>
 
@@ -200,7 +200,7 @@
                                     </li>
                                     <li><a><i class="fa fa-edit"></i>报表<span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
-                                            <li><a href="#/finance/list/<%=Subject.class.getSimpleName().toLowerCase()%>/{}">报表管理</a></li>
+                                            <li><a href="#/finance/list/grossProfit/%7b%22grossProfit%22%3a%7b%7d%2c%22chartMaker%22%3a%7b%22name%22%3a%22%22%7d%7d">报表管理</a></li>
                                             <c:if test="${fn:contains(resources, '/finance/save/subject')}">
                                                 <li><a href="#/finance/view/subject/-1">生成报表</a></li>
                                             </c:if>
@@ -234,7 +234,7 @@
         <!-- /sidebar menu -->
 
         <!-- /menu footer buttons -->
-        <div class="sidebar-footer hidden-small">
+        <%--<div class="sidebar-footer hidden-small">
             <a data-toggle="tooltip" data-placement="top" title="Settings">
                 <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
             </a>
@@ -247,7 +247,7 @@
             <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
             </a>
-        </div>
+        </div>--%>
         <!-- /menu footer buttons -->
     </div>
 </div>
@@ -263,18 +263,18 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="">
                     <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <img src="../../../res/gentelella/production/images/img.jpg" alt="">${username}
+                        <%--<img src="../../../res/gentelella/production/images/img.jpg" alt="">--%>${username}
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        <li><a href="javascript:;"> Profile</a></li>
+                        <li><a href="javascript:;"> 资料</a></li>
                         <li>
                             <a href="javascript:;">
-                                <span class="badge bg-red pull-right">50%</span>
-                                <span>Settings</span>
+                                <span class="badge bg-red pull-right">*****</span>
+                                <span>修改密码</span>
                             </a>
                         </li>
-                        <li><a href="javascript:;">Help</a></li>
+                        <li><a href="javascript:;">帮助</a></li>
                         <li><a href="#" id="signOut"><i class="fa fa-sign-out pull-right"></i> 注销 </a></li>
                         <form action="<%=request.getContextPath()%>/sys/user/signOut" id="signOutForm" method="post">
                             <input type="hidden" id="json" name="json" value='{"sessionId":"${sessionId}"}' />
@@ -286,9 +286,9 @@
                 <li role="presentation" class="dropdown">
                     <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                         <i class="fa fa-envelope-o"></i>
-                        <span class="badge bg-green">1</span>
+                        <%--<span class="badge bg-green">1</span>--%>
                     </a>
-                    <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    <%--<ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
                         <li>
                             <a>
                                 <span class="image"><img src="../../../res/gentelella/production/images/img.jpg" alt="Profile Image" /></span>
@@ -310,7 +310,7 @@
                                 </a>
                             </div>
                         </li>
-                    </ul>
+                    </ul>--%>
                 </li>
 
             </ul>

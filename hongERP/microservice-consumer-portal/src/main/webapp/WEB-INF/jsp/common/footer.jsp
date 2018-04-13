@@ -12,7 +12,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <footer>
     <div class="pull-right">
-        Gentelella - Bootstrap Admin Template by Colorlib. More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
+        www.hong6.com - 红掌柜珠宝有限公司珠宝销售官网. 前往访问 <a href="http://www.hong6.com/" target="_blank" title="红掌柜珠宝官网">红掌柜珠宝官网</a>
     </div>
     <div class="clearfix"></div>
 </footer>

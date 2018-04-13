@@ -30,7 +30,7 @@
                 <h3><c:choose><c:when test="${entity != null}">查看</c:when><c:otherwise>填写</c:otherwise></c:choose>采购单</h3>
             </div>
 
-            <div class="title_right">
+            <div class="title_right hidden">
                 <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for...">
@@ -282,13 +282,13 @@
                     <div class="x_content" style="overflow: auto">
                         <table id="productList" class="table-sheet" width="100%">
                             <thead><tr><c:if test="${entity.details != null}"><th>状态</th></c:if><th>商品名称</th><th>商品编号</th><th>种类</th><th>用途</th><th>数量</th><th>计量单位</th><th>制作</th>
-                                <th data-property-name="th-mountMaterial">镶嵌材质</th><th data-property-name="th-quality">特性</th>
-                                <th data-property-name="th-color">颜色</th><th data-property-name="th-type">种类</th>
+                                <th data-property-name="th-mountMaterial">镶嵌材质</th><th id="quantityTitle" data-property-name="th-quality">特性</th>
+                                <th id="colorTitle" data-property-name="th-color">颜色</th><th data-property-name="th-type">种类</th>
                                 <th data-property-name="th-theme">题材</th><th data-property-name="th-style">款式</th>
                                 <th data-property-name="th-transparency">透明度</th><th data-property-name="th-flaw">瑕疵</th>
-                                <th data-property-name="th-size">尺寸</th><th data-property-name="th-weight">重量</th>
+                                <th id="sizeTitle" data-property-name="th-size">尺寸</th><th data-property-name="th-weight">重量</th>
                                 <th data-property-name="th-shape">形状</th><th data-property-name="th-carver">雕工</th>
-                                <th data-property-name="th-originPlace">产地</th><th>证书</th><th>采购价</th>
+                                <th id="originPlaceTitle" data-property-name="th-originPlace">产地</th><th>证书</th><th>采购价</th>
                                 <th>采购单价</th><th>市场价</th><th>结缘价</th><th>图片</th><th>图片上传情况</th></tr>
                             </thead>
                             <tbody>
@@ -333,7 +333,7 @@
                                     <td><input type="text" value="${detail.product.stateName}" class="readonly" readonly></td>
                                     <td><input type="text" name="details[][product[name]]:string" value="${detail.product.name}" required></td>
                                     <td><input type="text" name="details[][product[no]]:string" value="${detail.product.no}" required></td>
-                                    <td><select name="details[][product[type[id]]]:number" required><%=typeOptions%></select></td>
+                                    <td><select data-property-name="productType" name="details[][product[type[id]]]:number" required><%=typeOptions%></select></td>
                                     <td><select name="details[][product[useType]]:string" required><%=useType%></select></td>
                                     <td><input type="text" name="details[][quantity]:number" value="${detail.quantity}" required></td>
                                     <td><select name="details[][unit]:string" required><%=unitOptions%></select></td>
@@ -423,7 +423,7 @@
                                     <td><input type="text" name="details[][product[name]]:string" required></td>
                                     <td><input type="text" name="details[][product[no]]:string" required></td>
                                     <td>
-                                        <select name="details[][product[type[id]]]:number" required>
+                                        <select data-property-name="productType" name="details[][product[type[id]]]:number" required>
                                             <c:forEach items="${productTypes}" var="productType">
                                                 <option value="${productType.id}">${productType.name}</option>
                                             </c:forEach>

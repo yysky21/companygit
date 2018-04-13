@@ -1,5 +1,8 @@
 package com.hzg.finance;
 
+import com.hzg.customer.Customer;
+import com.hzg.erp.ProductType;
+import com.hzg.erp.Supplier;
 import com.hzg.erp.Warehouse;
 import com.hzg.sys.*;
 import com.hzg.tools.*;
@@ -298,6 +301,63 @@ public class FinanceService {
                 });
             }
             return voucherItemSourceList;
+
+        } else if (entity.equalsIgnoreCase(GrossProfit.class.getSimpleName())) {
+            Class[] clazzs = {GrossProfit.class,User.class, Customer.class, ProductType.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getGrossProfitComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> grossProfits = results.get(GrossProfit.class.getName());
+            List<Object> users = results.get(User.class.getName());
+            List<Object> customers = results.get(Customer.class.getName());
+            List<Object> types = results.get(ProductType.class.getName());
+
+            int i = 0;
+            for (Object grossProfit : grossProfits) {
+                ((GrossProfit)grossProfit).setChartMaker((User) users.get(i));
+                ((GrossProfit)grossProfit).setCustomer((Customer) customers.get(i));
+                ((GrossProfit)grossProfit).setType((ProductType) types.get(i));
+
+                i++;
+            }
+            return grossProfits;
+
+        } else if (entity.equalsIgnoreCase(SupplierContact.class.getSimpleName())) {
+            Class[] clazzs = {SupplierContact.class,Supplier.class,DocType.class,User.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getSupplierContactComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> supplierContacts = results.get(SupplierContact.class.getName());
+            List<Object> suppliers = results.get(Supplier.class.getName());
+            List<Object> docTypes = results.get(DocType.class.getName());
+            List<Object> users = results.get(User.class.getName());
+
+            int i = 0;
+            for (Object supplierContact : supplierContacts) {
+                ((SupplierContact)supplierContact).setSupplier((Supplier) suppliers.get(i));
+                ((SupplierContact)supplierContact).setDocType((DocType) docTypes.get(i));
+                ((SupplierContact)supplierContact).setChartMaker((User) users.get(i));
+                i++;
+            }
+            return supplierContacts;
+
+        } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
+            Class[] clazzs = {CustomerContact.class,Customer.class,DocType.class,User.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getCustomerContactComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> customerContacts = results.get(CustomerContact.class.getName());
+            List<Object> customers = results.get(Customer.class.getName());
+            List<Object> docTypes = results.get(DocType.class.getName());
+            List<Object> users = results.get(User.class.getName());
+
+            int i = 0;
+            for (Object customerContact : customerContacts) {
+                ((CustomerContact)customerContact).setCustomer((Customer) customers.get(i));
+                ((CustomerContact)customerContact).setDocType((DocType) docTypes.get(i));
+                ((CustomerContact)customerContact).setChartMaker((User) users.get(i));
+
+                i++;
+            }
+            return customerContacts;
+
         }
 
         return new ArrayList();
@@ -601,11 +661,182 @@ public class FinanceService {
         return sql;
     }
 
+    private String getGrossProfitComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String grossProfitSql = objectToSql.generateComplexSqlByAnnotation(GrossProfit.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("grossProfit")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(grossProfitSql, GrossProfit.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = sqlParts[3];
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", User.class);
+            fromSql += ", " + objectToSql.getTableName(User.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t11." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(GrossProfit.class.getDeclaredField("chartMaker"));
+
+            String chartMaker = (String)((Map)queryParameters.get("chartMaker")).get("name");
+            if (chartMaker != null && !chartMaker.equals("")){
+                whereSql += " and t11." + objectToSql.getColumn(User.class.getDeclaredField("name")) + " in(";
+                // 得到制单员数组
+                String[] chartMakers = chartMaker.split(";");
+                for (int i = 0;i<chartMakers.length;i++){
+                    whereSql += "'"+ chartMakers[i] + "'";
+                    if (i != chartMakers.length-1){
+                        whereSql += ",";
+                    }
+                }
+                whereSql += ")";
+            }
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", Customer.class);
+            fromSql += ", " + objectToSql.getTableName(Customer.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(Customer.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(GrossProfit.class.getDeclaredField("customer"));
+
+            selectSql += ", " + financeDao.getSelectColumns("t13", ProductType.class);
+            fromSql += ", " + objectToSql.getTableName(ProductType.class) + " t13 ";
+            whereSql += " and t13." + objectToSql.getColumn(ProductType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(GrossProfit.class.getDeclaredField("type"));
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
+    private String getSupplierContactComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String supplierContactSql = objectToSql.generateComplexSqlByAnnotation(SupplierContact.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("supplierContact")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(supplierContactSql, SupplierContact.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = "t.id asc limit " + position + "," + rowNum;
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", Supplier.class);
+            fromSql += ", " + objectToSql.getTableName(Supplier.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " and t11." + objectToSql.getColumn(Supplier.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("supplier"))+
+                    " and t11." + objectToSql.getColumn(Supplier.class.getDeclaredField("name")) +
+                    "='" + ((Map)(queryParameters.get("supplier"))).get("name") + "'";
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", DocType.class);
+            fromSql += ", " + objectToSql.getTableName(DocType.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("docType"));
+
+            selectSql += ", " + financeDao.getSelectColumns("t13", User.class);
+            fromSql += ", " + objectToSql.getTableName(User.class) + " t13 ";
+            whereSql += " and t13." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("chartMaker"));
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
+    private String getCustomerContactComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String customerContactSql = objectToSql.generateComplexSqlByAnnotation(CustomerContact.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("customerContact")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(customerContactSql, CustomerContact.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = "t.id asc limit " + position + "," + rowNum;
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", Customer.class);
+            fromSql += ", " + objectToSql.getTableName(Customer.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " and t11." + objectToSql.getColumn(Customer.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("customer"))+
+                    " and t11." + objectToSql.getColumn(Customer.class.getDeclaredField("name")) +
+                    "='" + ((Map)(queryParameters.get("customer"))).get("name") + "'";
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", DocType.class);
+            fromSql += ", " + objectToSql.getTableName(DocType.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("docType"));
+
+            selectSql += ", " + financeDao.getSelectColumns("t13", User.class);
+            fromSql += ", " + objectToSql.getTableName(User.class) + " t13 ";
+            whereSql += " and t13." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("chartMaker"));
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
     public BigInteger privateRecordNum(String entity, String json){
         String sql = "";
 
         if (entity.equalsIgnoreCase(Voucher.class.getSimpleName())) {
             sql = getVoucherComplexSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(GrossProfit.class.getSimpleName())){
+            sql = getGrossProfitComplexSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(SupplierContact.class.getSimpleName())){
+            sql = getSupplierContactComplexSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())){
+            sql = getCustomerContactComplexSql(json, 0, -1);
         }
 
         sql = "select count(t.id) from " + sql.split(" from ")[1];

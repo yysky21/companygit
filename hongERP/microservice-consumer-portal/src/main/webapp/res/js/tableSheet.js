@@ -43,6 +43,14 @@ var tableSheet = (function ($) {
         }
         $("#" + tableId + " tbody").append(tbodyHtml);
 
+        $("[data-property-name=\"productType\"]").change(function(){
+            var productType = $(this).find("option:selected").text();
+            $("#quantityTitle").html(getChildPropertyName("quality", productType));
+            $("#colorTitle").html(getChildPropertyName("color", productType));
+            $("#sizeTitle").html(getChildPropertyName("size", productType));
+            $("#originPlaceTitle").html(getChildPropertyName("originPlace", productType));
+        });
+
         suggests(null, "mountMaterial", contextPath);
         suggests(null, "quality", contextPath);
         suggests(null, "color", contextPath);
@@ -75,6 +83,13 @@ var tableSheet = (function ($) {
         $.each($(trs[trs.length-1]).find("input"), function(ci, item){
             var propertyName = item.dataset.propertyName;
             if (propertyName != undefined) {
+                $(item).change(function(){
+                    var productType = $(this).find("option:selected").text();
+                    $("#quantityTitle").html(getChildPropertyName("quality", productType));
+                    $("#colorTitle").html(getChildPropertyName("color", productType));
+                    $("#sizeTitle").html(getChildPropertyName("size", productType));
+                    $("#originPlaceTitle").html(getChildPropertyName("originPlace", productType));
+                });
                 suggests($(item), propertyName, contextPath);
             }
 
@@ -125,7 +140,7 @@ var tableSheet = (function ($) {
     }
 
     function getQueryData(inputElement, propertyName, paramName) {
-        var queryJson = suggestsProperties[propertyName]["json"];
+        var queryJson = JSON.parse(JSON.stringify(suggestsProperties[propertyName]["json"]));//克隆一个对象
         if ($.trim(inputElement.value) != "") {
             if ($(inputElement).data("input-type") == undefined || $(inputElement).data("input-type") == null ||
                 ($(inputElement).data("input-type") != undefined && $(inputElement).data("input-type") != "multiple")){

@@ -159,7 +159,7 @@ public class ErpController extends com.hzg.base.Controller {
         logger.info("privateQuery start, entity:" + entity + ", json:" + json);
 
         if (entity.equalsIgnoreCase(ProductProperty.class.getSimpleName())) {
-            writer.writeStringToJson(response, client.complexQuery(entity, json, 0, 30));
+            writer.writeStringToJson(response, client.complexQuery(entity, json, 0, -1));
 
         } else if (entity.equalsIgnoreCase(Product.class.getSimpleName())) {
             writer.writeStringToJson(response, client.suggest(entity, json));

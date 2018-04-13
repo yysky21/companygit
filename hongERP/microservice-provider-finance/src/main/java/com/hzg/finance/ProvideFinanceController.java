@@ -2,6 +2,7 @@ package com.hzg.finance;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.hzg.customer.Customer;
 import com.hzg.erp.ProductType;
 import com.hzg.erp.Purchase;
 import com.hzg.erp.Supplier;
@@ -312,6 +313,14 @@ public class ProvideFinanceController {
         }else if (entity.equalsIgnoreCase(Account.class.getSimpleName())){
             Account account = writer.gson.fromJson(json, Account.class);
             writer.writeObjectToJson(response, financeDao.suggest(account, null));
+
+        } else if (entity.equalsIgnoreCase(Supplier.class.getSimpleName())){
+            Supplier supplier = writer.gson.fromJson(json, Supplier.class);
+            writer.writeObjectToJson(response, financeDao.suggest(supplier, null));
+
+        } else if (entity.equalsIgnoreCase(Customer.class.getSimpleName())){
+            Customer customer = writer.gson.fromJson(json, Customer.class);
+            writer.writeObjectToJson(response, financeDao.suggest(customer, null));
         }
         logger.info("suggest end");
     }
@@ -377,6 +386,15 @@ public class ProvideFinanceController {
             writer.writeObjectToJson(response, accounts);
 
         } else if (entity.equalsIgnoreCase(VoucherItemSource.class.getSimpleName())) {
+            writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(GrossProfit.class.getSimpleName())) {
+            writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(SupplierContact.class.getSimpleName())) {
+            writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
             writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
 
         }
@@ -676,6 +694,16 @@ public class ProvideFinanceController {
 
         } else if (entity.equalsIgnoreCase(Account.class.getSimpleName())){
             recordsSum =  financeDao.recordsSum(Account.class, queryParameters);
+
+        } else if (entity.equalsIgnoreCase(GrossProfit.class.getSimpleName())) {
+            recordsSum = financeService.privateRecordNum(entity, json);
+
+        } else if (entity.equalsIgnoreCase(SupplierContact.class.getSimpleName())) {
+            recordsSum = financeService.privateRecordNum(entity, json);
+
+        } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
+            recordsSum = financeService.privateRecordNum(entity, json);
+
         }
 
         writer.writeStringToJson(response, "{\"" + CommonConstant.recordsSum + "\":" + recordsSum + "}");

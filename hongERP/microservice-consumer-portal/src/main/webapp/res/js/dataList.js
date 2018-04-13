@@ -44,7 +44,10 @@ var dataList = (function ($) {
         "customerUser": "用户",
         "voucher":"凭证",
         "voucherCategory":"凭证类别",
-        "subject":"科目"
+        "subject":"科目",
+        "grossProfit":"销售毛利分析",
+        "supplierContact":"供应商往来对账",
+        "customerContact":"客户往来对账"
     };
 
     var dateTitles = {
@@ -82,7 +85,10 @@ var dataList = (function ($) {
         "customerUser": "注册时间",
         "voucher": "制单日期",
         "voucherCategory": "创建时间",
-        "subject": "创建时间"
+        "subject":"创建时间",
+        "grossProfit": "销售日期",
+        "supplierContact": "单据日期",
+        "customerContact": "单据日期"
     };
 
     var dateInputName = {
@@ -119,7 +125,11 @@ var dataList = (function ($) {
         "customer": "inputDate",
         "customerUser": "inputDate",
         "voucher": "voucher[makeDate]",
-        "voucherCategory": "inputDate"
+        "voucherCategory": "inputDate",
+        "subject":"inputDate",
+        "grossProfit": "grossProfit[date]",
+        "supplierContact": "supplierContact[date]",
+        "customerContact": "customerContact[date]"
     };
 
     var selectTitles = {
@@ -156,7 +166,10 @@ var dataList = (function ($) {
         "customerUser": "类别",
         "voucher": "类别",
         "voucherCategory": "类别",
-        "subject": "类别"
+        "subject": "类别",
+        "grossProfit": "类别",
+        "supplierContact": "类别",
+        "customerContact": "类别"
     };
 
     var addActions = {
@@ -247,13 +260,18 @@ var dataList = (function ($) {
         "voucher": "/finance",
         "voucherCategory": "/finance",
         "subject": "/finance",
-        "docType": "/finance"
+        "grossProfit": "/finance",
+        "supplierContact": "/finance",
+        "customerContact": "/finance"
     };
 
     var childModules = {
         "voucher": "/voucher",
         "voucherCategory": "/voucher",
-        "subject": "/subject"
+        "subject": "/subject",
+        "grossProfit": "/form",
+        "supplierContact": "/form",
+        "customerContact": "/form"
     };
 
     var queryActions = {
@@ -292,7 +310,9 @@ var dataList = (function ($) {
         "voucher": "/complexQuery",
         "voucherCategory": "/complexQuery",
         "subject": "/complexQuery",
-        "docType": "/complexQuery"
+        "grossProfit": "/complexQuery",
+        "supplierContact": "/complexQuery",
+        "customerContact": "/complexQuery"
     };
 
     var viewActions = {
@@ -369,7 +389,9 @@ var dataList = (function ($) {
         "voucher": "<th>凭证编号</th><th>凭证类别</th><th>制单日期</th><th>制单人</th><th>借方合计</th><th>贷方合计</th>",
         "voucherCategory": "<th>凭证类别</th><th>凭证字</th><th>创建时间</th>",
         "subject": "<th>科目编码</th><th>编码规则</th><th>科目名称</th><th>科目类型</th><th>余额方向</th><th>辅助核算项</th><th>停用</th><th>账面格式</th><th>创建时间</th>",
-        "docType": "<th>单据类型id</th><th>单据类型名称</th>"
+        "grossProfit": "<th>销售日期</th><th>销售订单号</th><th>业务类型</th><th>业务员</th><th>客户</th><th>计量单位</th><th>商品分类</th><th>商品编号</th><th>商品名称</th><th>数量</th><th>单价</th><th>折扣</th><th>销售金额</th><th>成本金额</th><th>毛利</th><th>毛利率</th><th>加工费收入</th><th>加工费成本</th><th>加工毛利</th><th>加工毛利率</th>",
+        "supplierContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>业务员</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应付金额</th><th>已付金额</th><th>应付余额</th>",
+        "customerContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>业务员</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应收金额</th><th>已收金额</th><th>应收余额</th>"
     };
 
     var propertiesShowSequences = {
@@ -408,7 +430,9 @@ var dataList = (function ($) {
         "voucher": ["no", "voucherCategory[name]", "makeDate", "chartMaker[name]", "debit", "credit"],
         "voucherCategory": ["name", "voucherWord","inputDate"],
         "subject": ["no","codeRule", "name", "type", "direction", "accountItems[]", "state","paperFormat","inputDate"],
-        "docType": ["id", "name"]
+        "grossProfit": ["date","no","businessType","chartMaker[name]","customer[name]","unit","type[name]","productNo","productName","quantity","unitPrice","discount","saleAmount","cost","grossProfit","grossProfitRate","processIncome","processCost","processGrossProfit","processGrossProfitRate"],
+        "supplierContact": ["date","docType[name]","no","chartMaker[name]","productNo","productName","unit","quantity","unitPrice","payable","paid","remainder"],
+        "customerContact": ["date","docType[name]","no","chartMaker[name]","productNo","productName","unit","quantity","unitPrice","receivable","received","remainder"]
     };
 
     var linkTitles = {
@@ -624,7 +648,10 @@ var dataList = (function ($) {
         "customerUser": "customerUser",
         "voucher": "voucher",
         "voucherCategory": "voucherCategory",
-        "subject": "subject"
+        "subject": "subject",
+        "grossProfit": "grossProfit",
+        "supplierContact": "supplierContact",
+        "customerContact": "customerContact"
     };
 
     var totalTableData = [];
@@ -640,8 +667,8 @@ var dataList = (function ($) {
         $("#htitle").empty().html(title);
         $("#stitle").empty().html(title);
         if(entity=="article"){
-            $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">名称</label>' +
-                '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="title" name="title" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>');
+            $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">标题</label>' +
+                '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="title" name="title" class="form-control col-md-7 col-xs-12" placeholder="输入标题" /></div></div>');
         }else{
             $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">名称</label>' +
                 '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>');
@@ -802,9 +829,9 @@ var dataList = (function ($) {
                 .append(visitEntitiesOptions["voucher"])
                 .append(visitEntitiesOptions["voucherCategory"]);
             if (entity == "voucher") {
-                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">凭证编号</label>' +
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="voucher[no]">凭证编号</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="voucher[no]" name="voucher[no]" class="form-control col-md-7 col-xs-12" placeholder="输入编号" /></div></div>'+
-                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="chartMaker">制单人</label>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="chartMaker[name]">制单人</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="chartMaker[name]" name="chartMaker[name]" class="form-control col-md-7 col-xs-12" placeholder="输入名字" /></div></div>');
             }
         } else if (childModules[entity] == "/subject"){
@@ -817,14 +844,44 @@ var dataList = (function ($) {
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>');
             }
 
-        } else if (childModules[entity] == "/"){
+        } else if (childModules[entity] == "/form"){
             $("#entity").empty()
-                .append(visitEntitiesOptions["subject"]);
-            if (entity == "subject") {
-                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">科目编码</label>' +
-                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="no" name="no" class="form-control col-md-7 col-xs-12" placeholder="输入编码" /></div></div>'+
-                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">科目名称</label>' +
-                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="name" name="name" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>');
+                .append(visitEntitiesOptions["grossProfit"])
+                .append(visitEntitiesOptions["supplierContact"])
+                .append(visitEntitiesOptions["customerContact"]);
+            if (entity == "grossProfit") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="grossProfit[no]">销售订单号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="grossProfit[no]" name="grossProfit[no]" class="form-control col-md-7 col-xs-12" placeholder="输入订单号" /></div></div>'+
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="grossProfit[productNo]">商品编号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="grossProfit[productNo]" name="grossProfit[productNo]" class="form-control col-md-7 col-xs-12" placeholder="输入商品编号" /></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="chartMaker[name]">业务员</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><div class="input-prepend input-group" ><input type="text" id="chartMaker[name]" name="chartMaker[name]" class="form-control col-md-7 col-xs-12" readonly />' +
+                    '<span id="chartMaker" class="add-on input-group-addon"><i class="glyphicon glyphicon-zoom-in"></i></span></div></div></div>');
+                $("#form").after('<div id="chartMakerChooseDiv"><br>'+
+                    '<table class="table table-bordered table-striped" width="100%" style="margin: 0px">'+
+                    '<thead><tr><th style="width:60px;"><input type="checkbox"> 全选</th>'+
+                    '<th width="50px">序号</th><th>制单人名称</th><th>岗位</th> <th>所属部门</th></tr>'+
+                    '</thead><tbody></tbody></table>'+
+                    '<div style="text-align: right;padding-right: 10px;background-color: lightblue">'+
+                    '<div style="padding: 4px">共 <span class="recordsSum" style="font-weight: bold"></span> 条记录,已加载 <span class="loadSum" style="font-weight: bold"></span> 条记录</div></div></div>')
+                $(".ui-dialog").remove();
+                finance.initChartMaker();
+
+            } else if (entity == "supplierContact") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="supplier[name]"><span class="required">*</span>供应商</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="supplier[name]" name="supplier[name]" class="form-control col-md-7 col-xs-12" placeholder="输入供应商名称" required /></div></div>');
+                $(document.getElementById("supplier[name]")).coolautosuggest({
+                    url:rootPath + "/finance/suggest/supplier/name/",
+                    showProperty: 'name',
+                });
+
+            } else if (entity == "customerContact") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="customer[name]"><span class="required">*</span>客户</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="customer[name]" name="customer[name]" class="form-control col-md-7 col-xs-12" placeholder="输入客户名字" required /></div></div>');
+                $(document.getElementById("customer[name]")).coolautosuggest({
+                    url:rootPath + "/finance/suggest/customer/name/",
+                    showProperty: 'name',
+                });
             }
         }
 

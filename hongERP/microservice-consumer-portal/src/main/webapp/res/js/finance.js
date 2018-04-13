@@ -587,7 +587,8 @@ var finance = (function ($) {
 
     return {
         saveVoucher: saveVoucher,
-        init: init
+        init: init,
+        initChartMaker: initChartMaker
     }
 
 })(jQuery);

@@ -18,7 +18,7 @@
                 <h3><c:choose><c:when test="${entity != null}">修改</c:when><c:otherwise>添加</c:otherwise></c:choose>文章标签</h3>
             </div>
 
-            <div class="title_right">
+            <div class="title_right hidden">
                 <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for...">

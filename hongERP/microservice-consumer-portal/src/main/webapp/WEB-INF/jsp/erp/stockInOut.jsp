@@ -28,7 +28,7 @@
                     <c:if test="${entity == null}">入库单/出库单填写</c:if></h3>
             </div>
 
-            <div class="title_right" id="search">
+            <div class="title_right hidden" id="search">
                 <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Search for...">

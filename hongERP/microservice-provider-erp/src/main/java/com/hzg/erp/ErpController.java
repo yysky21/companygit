@@ -1216,10 +1216,14 @@ public class ErpController {
             writer.writeObjectToJson(response, erpService.privateQuery(entity, json, position, rowNum));
 
         } else if (entity.equalsIgnoreCase(ProductType.class.getSimpleName())) {
-            writer.writeObjectToJson(response, erpDao.complexQuery(ProductType.class, queryParameters, position, rowNum));
+            List types = erpDao.complexQuery(ProductType.class, queryParameters, position, rowNum);
+            Collections.reverse(types);
+            writer.writeObjectToJson(response, types);
 
         } else if (entity.equalsIgnoreCase(ProductProperty.class.getSimpleName())) {
-            writer.writeObjectToJson(response, erpDao.complexQuery(ProductProperty.class, queryParameters, position, rowNum));
+            List properties = erpDao.complexQuery(ProductProperty.class, queryParameters, position, rowNum);
+            Collections.reverse(properties);
+            writer.writeObjectToJson(response, properties);
 
         } else if (entity.equalsIgnoreCase(StockInOut.class.getSimpleName())) {
             Map<Integer, String> uniqueActionCodes = new HashMap();

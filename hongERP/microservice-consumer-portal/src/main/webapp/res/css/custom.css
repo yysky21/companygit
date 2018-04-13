@@ -185,3 +185,7 @@ table {
 #stockInOutProductList > tbody > tr > td {
     width: 12%;
 }
+
+.hidden {
+    display: none;
+}
