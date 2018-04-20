@@ -260,4 +260,5 @@ public class InOutDetail implements Serializable {
     public void setEndAmount(Float endAmount) {
         this.endAmount = endAmount;
     }
+
 }

@@ -135,4 +135,19 @@ public class CapitalFlowMeter implements Serializable {
     public void setEnding(Float ending) {
         this.ending = ending;
     }
+
+    @Override
+    public String toString() {
+        return "CapitalFlowMeter{" +
+                "id=" + id +
+                ", account=" + account +
+                ", date=" + date +
+                ", docType=" + docType +
+                ", no='" + no + '\'' +
+                ", beginning=" + beginning +
+                ", income=" + income +
+                ", spending=" + spending +
+                ", ending=" + ending +
+                '}';
+    }
 }

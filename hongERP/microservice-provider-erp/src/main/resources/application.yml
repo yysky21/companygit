@@ -72,7 +72,7 @@ sfExpress:
   orderUri: /rest/v1.0/order/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单下单 uri
   orderQueryUri: /rest/v1.0/order/query/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单查询 uri
   imageUri: /rest/v1.0/waybill/image/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单图片下载 uri
-  bspUrl: http://bsp-oisp.sf-express.com/bsp-oisp/sfexpressService    # 顺丰 bsp 快递接口
+  bspUrl: /bsp-oisp/sfexpressService    # 顺丰 bsp 快递接口
   custCode: YNHZJZB    # 顺丰 bsp 快递接口顾客编码(clientCode)
   bspCheckWord: EMLL5YL1B3Asp3pGDbLLxP3rmZp6tfLr    # 顺丰 bsp 快递接口校验码(checkWord)
 

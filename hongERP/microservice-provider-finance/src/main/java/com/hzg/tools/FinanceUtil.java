@@ -659,6 +659,7 @@ public class FinanceUtil {
         }
         List<Order> orders = financeDao.complexQuery(Order.class, queryParameters, 0, -1);
         if (orders != null && !orders.isEmpty()){
+            sortOfOrder(orders);
             for (Order order:orders) {
                 if (order != null) {
                     Integer type = order.getType();
@@ -769,6 +770,7 @@ public class FinanceUtil {
         String date1 = dayFormat.format(dateUtil.getForwardDay(1));
         String date2 = dayFormat.format(new Date(System.currentTimeMillis()));
         String date = date1 + " - " + date2;
+        String flag = "";
 
         //查询订单
         String json = "{\"soldDate\":\"" + date + "\"}";
@@ -780,6 +782,7 @@ public class FinanceUtil {
         }
         List<Order> orders = financeDao.complexQuery(Order.class, queryParameters, 0, -1);
         if (orders != null && !orders.isEmpty()){
+            sortOfOrder(orders);
             for (Order order:orders) {
                 if (order != null) {
                     Set<OrderDetail> orderDetails = order.getDetails();
@@ -791,7 +794,6 @@ public class FinanceUtil {
                         docType.setId(3);
                         customerContact.setDocType(docType);
                         customerContact.setNo(order.getNo());
-                        customerContact.setChartMaker(order.getSaler());
                         customerContact.setProductNo(orderDetail.getProductNo());
                         OrderDetail orderDetail1 = (OrderDetail) financeDao.queryById(orderDetail.getId(),OrderDetail.class);
                         // 获取关联商品,为的是得到每一条明细中商品的名称
@@ -812,15 +814,9 @@ public class FinanceUtil {
                         customerContact1.setCustomer(customerContact.getCustomer());
                         // 得到数据库中customer为当前需要保存的这条客户往来对账记录的customer的所有客户往来对账记录
                         List<CustomerContact> customerContacts = financeDao.query(customerContact1);
-                        /*如果记录不为空,则当前这条客户往来对账记录的应收余额就是数据库中
-                        最新保存的一条客户往来对账记录的应收余额+当前这条对账记录的应收金额*/
-                        if (customerContacts != null && !customerContacts.isEmpty()){
-                            //获取数据库中最新保存的一条客户往来对账记录
-                            customerContact1 = customerContacts.get(0);
-                            customerContact.setRemainder(customerContact1.getRemainder() + customerContact.getReceivable());
-                        } else { //如果记录为空，则当前这条客户往来对账记录的应收余额就是它的应收金额
-                            customerContact.setRemainder(customerContact.getReceivable());
-                        }
+                        // 客户往来对账记录表的记录是应还是已的标志
+                        flag = FinanceConstant.SHOULD;
+                        setBeginAndReceivableOrReceivedOfCustomerContact(customerContacts,customerContact,flag);
                         financeDao.save(customerContact);
                     }
                 }
@@ -837,6 +833,7 @@ public class FinanceUtil {
         }
         List<Pay> pays = financeDao.complexQuery(Pay.class, queryParameters, 0, -1);
         if (pays != null && !pays.isEmpty()){
+            sortOfPay(pays);
             for (Pay pay:pays) {
                 if (pay != null) {
                     if (pay.getBalanceType() == 0){
@@ -852,14 +849,8 @@ public class FinanceUtil {
                         customerContact1.setCustomer(customerContact.getCustomer());
                         // 得到数据库中customer为当前需要保存的这条客户往来对账记录的customer的所有客户往来对账记录
                         List<CustomerContact> customerContacts = financeDao.query(customerContact1);
-                        /*如果记录不为空,则当前这条客户往来对账记录的应收余额就是数据库中
-                        最新保存的一条客户往来对账记录的应收余额-当前这条对账记录的已收金额*/
-                        if (customerContacts != null && !customerContacts.isEmpty()){
-                            customerContact1 = customerContacts.get(0);
-                            customerContact.setRemainder(customerContact1.getRemainder() - customerContact.getReceived());
-                        } else { //如果记录为空，则当前这条客户往来对账记录的应收余额就是它的已收金额的相反数
-                            customerContact.setRemainder(-customerContact.getReceived());
-                        }
+                        flag = FinanceConstant.ALREADY;
+                        setBeginAndReceivableOrReceivedOfCustomerContact(customerContacts,customerContact,flag);
                         financeDao.save(customerContact);
                     }
                 }
@@ -876,6 +867,7 @@ public class FinanceUtil {
         }
         List<ReturnProduct> returnProducts = financeDao.complexQuery(ReturnProduct.class, queryParameters, 0, -1);
         if (returnProducts != null && !returnProducts.isEmpty()){
+            sortOfReturnProduct(returnProducts);
             for (ReturnProduct returnProduct:returnProducts) {
                 if (returnProduct != null) {
                     // 对应的实体为销售订单
@@ -908,12 +900,8 @@ public class FinanceUtil {
                             CustomerContact customerContact1 = new CustomerContact();
                             customerContact1.setCustomer(customerContact.getCustomer());
                             List<CustomerContact> customerContacts = financeDao.query(customerContact1);
-                            if (customerContacts != null && !customerContacts.isEmpty()){
-                                customerContact1 = customerContacts.get(0);
-                                customerContact.setRemainder(customerContact1.getRemainder() + customerContact.getReceivable());
-                            } else {
-                                customerContact.setRemainder(customerContact.getReceivable());
-                            }
+                            flag = FinanceConstant.SHOULD;
+                            setBeginAndReceivableOrReceivedOfCustomerContact(customerContacts,customerContact,flag);
                             financeDao.save(customerContact);
                         }
                     }
@@ -931,6 +919,7 @@ public class FinanceUtil {
         }
         List<Refund> refunds = financeDao.complexQuery(Refund.class, queryParameters, 0, -1);
         if (refunds != null && !refunds.isEmpty()){
+            sortOfRefund(refunds);
             for (Refund refund:refunds) {
                 if (refund != null) {
                     // 收支类型为支出
@@ -949,12 +938,8 @@ public class FinanceUtil {
                         CustomerContact customerContact1 = new CustomerContact();
                         customerContact1.setCustomer(customerContact.getCustomer());
                         List<CustomerContact> customerContacts = financeDao.query(customerContact1);
-                        if (customerContacts != null && !customerContacts.isEmpty()){
-                            customerContact1 = customerContacts.get(0);
-                            customerContact.setRemainder(customerContact1.getRemainder() - customerContact.getReceived());
-                        } else {
-                            customerContact.setRemainder(-customerContact.getReceived());
-                        }
+                        flag = FinanceConstant.ALREADY;
+                        setBeginAndReceivableOrReceivedOfCustomerContact(customerContacts,customerContact,flag);
                         financeDao.save(customerContact);
                     }
                 }
@@ -973,6 +958,7 @@ public class FinanceUtil {
         String date1 = dayFormat.format(dateUtil.getForwardDay(1));
         String date2 = dayFormat.format(new Date(System.currentTimeMillis()));
         String date = date1 + " - " + date2;
+        String flag = "";
 
         //查询采购单
         String json = "{\"inputDate\":\"" + date + "\"}";
@@ -984,6 +970,7 @@ public class FinanceUtil {
         }
         List<Purchase> purchases = financeDao.complexQuery(Purchase.class, queryParameters, 0, -1);
         if (purchases != null && !purchases.isEmpty()){
+            sortOfPurchase(purchases);
             for (Purchase purchase:purchases) {
                 if (purchase != null) {
                     if (purchase.getState() == 1) {
@@ -996,7 +983,6 @@ public class FinanceUtil {
                             docType.setId(1);
                             supplierContact.setDocType(docType);
                             supplierContact.setNo(purchase.getNo());
-                            supplierContact.setChartMaker(purchase.getInputer());
                             supplierContact.setProductNo(purchaseDetail.getProductNo());
                             PurchaseDetail purchaseDetail1 = (PurchaseDetail) financeDao.queryById(purchaseDetail.getId(), PurchaseDetail.class);
                             // 获取关联商品，为的是得到每一条明细中商品的名称
@@ -1017,15 +1003,8 @@ public class FinanceUtil {
                             supplierContact1.setSupplier(supplierContact.getSupplier());
                             // 得到数据库中supplier为当前需要保存的这条供应商往来对账记录的supplier的所有供应商往来对账记录
                             List<SupplierContact> supplierContacts = financeDao.query(supplierContact1);
-                            /*如果记录不为空,则当前这条供应商往来对账记录的应付余额就是数据库中
-                            最新保存的一条供应商往来对账记录的应付余额+当前这条对账记录的应付金额*/
-                            if (supplierContacts != null && !supplierContacts.isEmpty()) {
-                                //获取数据库中最新保存的一条供应商往来对账记录
-                                supplierContact1 = supplierContacts.get(0);
-                                supplierContact.setRemainder(supplierContact1.getRemainder() + supplierContact.getPayable());
-                            } else { //如果记录为空，则当前这条供应商往来对账记录的应付余额就是它的应付金额
-                                supplierContact.setRemainder(supplierContact.getPayable());
-                            }
+                            flag = FinanceConstant.SHOULD;
+                            setBeginAndPayableOrPaidOfSupplierContact(supplierContacts,supplierContact,flag);
                             financeDao.save(supplierContact);
                         }
                     } else {
@@ -1045,6 +1024,7 @@ public class FinanceUtil {
         }
         List<Pay> pays = financeDao.complexQuery(Pay.class, queryParameters, 0, -1);
         if (pays != null && !pays.isEmpty()){
+            sortOfPay(pays);
             for (Pay pay:pays) {
                 if (pay != null) {
                     if (pay.getBalanceType() == 1){
@@ -1064,15 +1044,8 @@ public class FinanceUtil {
                         supplierContact1.setSupplier(supplierContact.getSupplier());
                         // 得到数据库中supplier为当前需要保存的这条供应商往来对账记录的supplier的所有供应商往来对账记录
                         List<SupplierContact> supplierContacts = financeDao.query(supplierContact1);
-                        /*如果记录不为空,则当前这条供应商往来对账记录的应付余额就是数据库中
-                            最新保存的一条供应商往来对账记录的应付余额-当前这条对账记录的已付金额*/
-                        if (supplierContacts != null && !supplierContacts.isEmpty()){
-                            supplierContact1 = supplierContacts.get(0);
-                            supplierContact.setRemainder(supplierContact1.getRemainder() - supplierContact.getPaid());
-                        } else {
-                            //如果记录为空，则当前这条供应商往来对账记录的应付余额就是它的已付金额的相反数
-                            supplierContact.setRemainder(-supplierContact.getPaid());
-                        }
+                        flag = FinanceConstant.ALREADY;
+                        setBeginAndPayableOrPaidOfSupplierContact(supplierContacts,supplierContact,flag);
                         financeDao.save(supplierContact);
                     }
                 }
@@ -1089,6 +1062,7 @@ public class FinanceUtil {
         }
         List<ReturnProduct> returnProducts = financeDao.complexQuery(ReturnProduct.class, queryParameters, 0, -1);
         if (returnProducts != null && !returnProducts.isEmpty()){
+            sortOfReturnProduct(returnProducts);
             for (ReturnProduct returnProduct:returnProducts) {
                 if (returnProduct != null) {
                     // 对应的实体为采购单
@@ -1125,12 +1099,8 @@ public class FinanceUtil {
                             SupplierContact supplierContact1 = new SupplierContact();
                             supplierContact1.setSupplier(supplierContact.getSupplier());
                             List<SupplierContact> supplierContacts = financeDao.query(supplierContact1);
-                            if (supplierContacts != null && !supplierContacts.isEmpty()){
-                                supplierContact1 = supplierContacts.get(0);
-                                supplierContact.setRemainder(supplierContact1.getRemainder() + supplierContact.getPayable());
-                            } else {
-                                supplierContact.setRemainder(supplierContact.getPayable());
-                            }
+                            flag = FinanceConstant.SHOULD;
+                            setBeginAndPayableOrPaidOfSupplierContact(supplierContacts,supplierContact,flag);
                         }
                         financeDao.save(supplierContact);
                     }
@@ -1148,6 +1118,7 @@ public class FinanceUtil {
         }
         List<Refund> refunds = financeDao.complexQuery(Refund.class, queryParameters, 0, -1);
         if (refunds != null && !refunds.isEmpty()){
+            sortOfRefund(refunds);
             for (Refund refund:refunds) {
                 if (refund != null) {
                     // 收支类型为收入
@@ -1178,12 +1149,8 @@ public class FinanceUtil {
                         SupplierContact supplierContact1 = new SupplierContact();
                         supplierContact1.setSupplier(supplierContact.getSupplier());
                         List<SupplierContact> supplierContacts = financeDao.query(supplierContact1);
-                        if (supplierContacts != null && !supplierContacts.isEmpty()){
-                            supplierContact1 = supplierContacts.get(0);
-                            supplierContact.setRemainder(supplierContact1.getRemainder() - supplierContact.getPaid());
-                        } else {
-                            supplierContact.setRemainder(-supplierContact.getPaid());
-                        }
+                        flag = FinanceConstant.ALREADY;
+                        setBeginAndPayableOrPaidOfSupplierContact(supplierContacts,supplierContact,flag);
                         financeDao.save(supplierContact);
                     }
                 }
@@ -1213,6 +1180,7 @@ public class FinanceUtil {
         }
         List<Pay> pays = financeDao.complexQuery(Pay.class, queryParameters, 0, -1);
         if (pays != null && !pays.isEmpty()) {
+            sortOfPay(pays);
             for (Pay pay : pays) {
                 if (pay != null) {
                     CapitalFlowMeter capitalFlowMeter = new CapitalFlowMeter();
@@ -1242,8 +1210,7 @@ public class FinanceUtil {
                             capitalFlowMeter1 = capitalFlowMeters.get(0);
                             capitalFlowMeter.setBeginning(capitalFlowMeter1.getEnding());
                         } else {
-                            String accountNo = pay.getReceiptAccount();
-                            setBeginingAmountByPay(pays,accountNo,queryParameters,capitalFlowMeter,account);
+                            capitalFlowMeter.setBeginning(getBeginingAmountByPay(pays,queryParameters,account));
                         }
                         capitalFlowMeter.setIncome(pay.getAmount());
                         capitalFlowMeter.setEnding(capitalFlowMeter.getBeginning() + capitalFlowMeter.getIncome());
@@ -1264,8 +1231,7 @@ public class FinanceUtil {
                             capitalFlowMeter1 = capitalFlowMeters.get(0);
                             capitalFlowMeter.setBeginning(capitalFlowMeter1.getEnding());
                         } else {
-                            String accountNo = pay.getPayAccount();
-                            setBeginingAmountByPay(pays,accountNo,queryParameters,capitalFlowMeter,account);
+                            capitalFlowMeter.setBeginning(getBeginingAmountByPay(pays,queryParameters,account));
                         }
                         capitalFlowMeter.setSpending(pay.getAmount());
                         capitalFlowMeter.setEnding(capitalFlowMeter.getBeginning() - capitalFlowMeter.getSpending());
@@ -1285,6 +1251,7 @@ public class FinanceUtil {
         }
         List<Refund> refunds = financeDao.complexQuery(Refund.class, queryParameters, 0, -1);
         if (refunds != null && !refunds.isEmpty()) {
+            sortOfRefund(refunds);
             for (Refund refund : refunds) {
                 if (refund != null) {
                     CapitalFlowMeter capitalFlowMeter = new CapitalFlowMeter();
@@ -1315,8 +1282,7 @@ public class FinanceUtil {
                             capitalFlowMeter1 = capitalFlowMeters.get(0);
                             capitalFlowMeter.setBeginning(capitalFlowMeter1.getEnding());
                         } else {
-                            String accountNo = pay.getReceiptAccount();
-                            setBeginingAmountByRefund(refunds,accountNo,queryParameters,capitalFlowMeter,account);
+                            capitalFlowMeter.setBeginning(getBeginingAmountByRefund(refunds,queryParameters,account));
                         }
                         capitalFlowMeter.setSpending(refund.getAmount());
                         capitalFlowMeter.setEnding(capitalFlowMeter.getBeginning() - capitalFlowMeter.getSpending());
@@ -1338,8 +1304,7 @@ public class FinanceUtil {
                             capitalFlowMeter1 = capitalFlowMeters.get(0);
                             capitalFlowMeter.setBeginning(capitalFlowMeter1.getEnding());
                         } else {
-                            String accountNo = pay.getPayAccount();
-                            setBeginingAmountByRefund(refunds,accountNo,queryParameters,capitalFlowMeter,account);
+                            capitalFlowMeter.setBeginning(getBeginingAmountByRefund(refunds,queryParameters,account));
                         }
                         capitalFlowMeter.setIncome(refund.getAmount());
                         capitalFlowMeter.setEnding(capitalFlowMeter.getBeginning() + capitalFlowMeter.getIncome());
@@ -1372,6 +1337,7 @@ public class FinanceUtil {
         }
         List<StockInOut> stockInOuts = financeDao.complexQuery(StockInOut.class, queryParameters, 0, -1);
         if (stockInOuts != null && !stockInOuts.isEmpty()) {
+            sortOfStockInOut(stockInOuts);
             for (StockInOut stockInOut : stockInOuts) {
                 if (stockInOut != null) {
                     Set<StockInOutDetail> stockInOutDetails = stockInOut.getDetails();
@@ -1418,7 +1384,11 @@ public class FinanceUtil {
                             inOutDetail.setInAmount(inOutDetail.getInUnitPrice() * inOutDetail.getInQuantity());
                             inOutDetail.setEndQuantity(inOutDetail.getBeginQuantity() + inOutDetail.getInQuantity());
                             inOutDetail.setEndAmount(inOutDetail.getBeginAmount()+inOutDetail.getInAmount());
-                            inOutDetail.setEndUnitPrice(inOutDetail.getEndAmount()/inOutDetail.getEndQuantity());
+                            if (inOutDetail.getEndQuantity() == 0 ){
+                                inOutDetail.setEndUnitPrice(null);
+                            } else {
+                                inOutDetail.setEndUnitPrice(inOutDetail.getEndAmount() / inOutDetail.getEndQuantity());
+                            }
                         } else {
                             docType.setId(4);
                             inOutDetail.setDocType(docType);
@@ -1427,7 +1397,11 @@ public class FinanceUtil {
                             inOutDetail.setOutAmount(inOutDetail.getOutUnitPrice() * inOutDetail.getOutQuantity());
                             inOutDetail.setEndQuantity(inOutDetail.getBeginQuantity() - inOutDetail.getOutQuantity());
                             inOutDetail.setEndAmount(inOutDetail.getBeginAmount()+inOutDetail.getOutQuantity());
-                            inOutDetail.setEndUnitPrice(inOutDetail.getEndAmount()/inOutDetail.getEndQuantity());
+                            if (inOutDetail.getEndQuantity() == 0 ){
+                                inOutDetail.setEndUnitPrice(null);
+                            } else {
+                                inOutDetail.setEndUnitPrice(inOutDetail.getEndAmount() / inOutDetail.getEndQuantity());
+                            }
                         }
                         financeDao.save(inOutDetail);
                     }
@@ -1438,80 +1412,319 @@ public class FinanceUtil {
 
 
     /**
-     * 设置期初余额根据付款单或者收款单
+     * 设置供应商往来对账记录的期初余额和应付余额或已付余额
+     * @param supplierContacts
+     * @param supplierContact
+     * @param flag
      */
-    public void setBeginingAmountByPay(List<Pay> pays,String accountNo,Map<String, String> queryParameters,CapitalFlowMeter capitalFlowMeter,Account account){
+    public void setBeginAndPayableOrPaidOfSupplierContact(List<SupplierContact> supplierContacts,SupplierContact supplierContact,String flag){
+        /*如果记录不为空,则当前这条供应商往来对账记录的期初余额就是数据库中
+        最新保存的一条供应商往来对账记录的余额*/
+        if (supplierContacts != null && !supplierContacts.isEmpty()) {
+            //获取数据库中最新保存的一条供应商往来对账记录
+            SupplierContact supplierContact1 = supplierContacts.get(0);
+            supplierContact.setBeginning(supplierContact1.getRemainder());
+            /*如果为应付则当前这条供应商往来对账记录的应付余额就是数据库中
+            最新保存的一条供应商往来对账记录的应付余额加上当前这条供应商往来对账记录的应付金额，如果为已付就是减*/
+            if (flag.equals(FinanceConstant.SHOULD)){
+                supplierContact.setRemainder(supplierContact1.getRemainder() + supplierContact.getPayable());
+            } else {
+                supplierContact.setRemainder(supplierContact1.getRemainder() - supplierContact.getPaid());
+            }
+        } else { //如果记录为空，则当前这条供应商往来对账记录的期初余额就是0
+            supplierContact.setBeginning(0.0f);
+            if (flag.equals(FinanceConstant.SHOULD)){
+                supplierContact.setRemainder(supplierContact.getPayable());
+            } else {
+                supplierContact.setRemainder(-supplierContact.getPaid());
+            }
+        }
+    }
+
+    /**
+     * 设置客户往来对账记录的期初余额和应收余额或已收余额
+     * @param customerContacts
+     * @param customerContact
+     * @param flag
+     */
+    public void setBeginAndReceivableOrReceivedOfCustomerContact(List<CustomerContact> customerContacts,CustomerContact customerContact,String flag){
+        /*如果记录不为空,则当前这条客户往来对账记录的期初余额就是数据库中
+        最新保存的一条客户往来对账记录的余额*/
+        if (customerContacts != null && !customerContacts.isEmpty()) {
+            //获取数据库中最新保存的一条客户往来对账记录
+            CustomerContact customerContact1 = customerContacts.get(0);
+            customerContact.setBeginning(customerContact1.getRemainder());
+            /*如果为应付则当前这条供应商往来对账记录的应付余额就是数据库中
+            最新保存的一条供应商往来对账记录的应付余额加上当前这条供应商往来对账记录的应付金额，如果为已付就是减*/
+            if (flag.equals(FinanceConstant.SHOULD)){
+                customerContact.setRemainder(customerContact1.getRemainder() + customerContact.getReceivable());
+            } else {
+                customerContact.setRemainder(customerContact1.getRemainder() - customerContact.getReceived());
+            }
+        } else { //如果记录为空，则当前这条客户往来对账记录的期初余额就是0
+            customerContact.setBeginning(0.0f);
+            if (flag.equals(FinanceConstant.SHOULD)){
+                customerContact.setRemainder(customerContact.getReceivable());
+            } else {
+                customerContact.setRemainder(-customerContact.getReceived());
+            }
+        }
+    }
+
+    /**
+     * 获取账户的期初余额根据付款单或者收款单
+     * @param pays
+     * @param queryParameters
+     * @param account
+     * @return
+     */
+    public Float getBeginingAmountByPay(List<Pay> pays,Map<String, String> queryParameters,Account account){
         Float amount = 0.0f;
         for (Pay pay : pays){
-            amount += setInOutSumByPay(pay,accountNo,amount);
+            amount += getInOutByPay(pay,account);
         }
         List<Refund> refunds = financeDao.complexQuery(Refund.class, queryParameters, 0, -1);
         if (refunds != null && !refunds.isEmpty()){
             for(Refund refund : refunds){
                 if (refund != null){
                     Pay pay = (Pay) financeDao.queryById(refund.getPay().getId(),Pay.class);
-                    amount += setInOutSumByRefund(refund,pay,accountNo,amount);
+                    amount += getInOutByRefund(refund,pay,account);
                 }
             }
         }
-        capitalFlowMeter.setBeginning(account.getAmount() + amount);
+        return (account.getAmount() + amount);
     }
 
     /**
-     * 设置期初余额根据退款单
+     * 获取账户的期初余额根据退款单
+     * @param refunds
+     * @param queryParameters
+     * @param account
+     * @return
      */
-    public void setBeginingAmountByRefund(List<Refund> refunds,String accountNo,Map<String, String> queryParameters,CapitalFlowMeter capitalFlowMeter,Account account){
+    public Float getBeginingAmountByRefund(List<Refund> refunds,Map<String, String> queryParameters,Account account){
         Float amount = 0.0f;
         for (Refund refund : refunds){
             Pay pay = (Pay) financeDao.queryById(refund.getPay().getId(),Pay.class);
-            amount += setInOutSumByRefund(refund,pay,accountNo,amount);
+            amount += getInOutByRefund(refund,pay,account);
         }
         List<Pay> pays = financeDao.complexQuery(Pay.class, queryParameters, 0, -1);
         if (pays != null && !pays.isEmpty()){
             for(Pay pay : pays){
                 if (pay != null){
-                    amount += setInOutSumByPay(pay,accountNo,amount);
+                    amount += getInOutByPay(pay,account);
                 }
             }
         }
-        capitalFlowMeter.setBeginning(account.getAmount() + amount);
+        return (account.getAmount() + amount);
     }
 
     /**
-     * 设置收入和支出总额根据收款单或者付款单
+     * 获取收入或支出根据收款单或者付款单
+     * @param pay
+     * @param account
+     * @return
      */
-    public Float setInOutSumByPay(Pay pay,String accountNo,Float amount){
-        if ("purchase".equals(pay.getEntity())){
-            if (pay.getPayAccount().equals(accountNo)){
-                amount += pay.getAmount();
+    public Float getInOutByPay(Pay pay,Account account){
+        Float amount = 0.0f;
+        if (1 == pay.getBalanceType()){
+            if (pay.getPayAccount().equals(account.getAccount())){
+                amount = pay.getAmount();
             }
         } else {
-            if (pay.getReceiptAccount().equals(accountNo)){
-                amount -= pay.getAmount();
+            if (pay.getReceiptAccount().equals(account.getAccount())){
+                amount = -pay.getAmount();
             }
         }
         return amount;
     }
 
     /**
-     * 设置收入和支出总额根据退款单
+     * 获取收入或支出根据退款单
+     * @param refund
+     * @param pay
+     * @param account
+     * @return
      */
-    public Float setInOutSumByRefund(Refund refund,Pay pay,String accountNo,Float amount){
+    public Float getInOutByRefund(Refund refund,Pay pay,Account account){
+        Float amount = 0.0f;
         if (refund.getBalanceType() == 0){
-            if (pay.getReceiptAccount().equals(accountNo)){
-                amount += refund.getAmount();
+            if (pay.getReceiptAccount().equals(account.getAccount())){
+                amount = refund.getAmount();
             }
         } else {
-            if (pay.getPayAccount().equals(accountNo)){
-                amount -= refund.getAmount();
+            if (pay.getPayAccount().equals(account.getAccount())){
+                amount = -refund.getAmount();
             }
         }
         return amount;
     }
 
+    /**
+     * 对支付记录进行排序
+     * @param pays
+     */
+    public void sortOfPay(List<Pay> pays){
+        pays.sort(new Comparator<Pay>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(Pay o1, Pay o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
 
-    public static void main(String[] args) {
-        FinanceUtil financeUtil = new FinanceUtil();
-        financeUtil.generateInOutDetail();
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * 对采购单单进行排序
+     * @param purchases
+     */
+    public void sortOfPurchase(List<Purchase> purchases){
+        purchases.sort(new Comparator<Purchase>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(Purchase o1, Purchase o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * 对销售订单进行排序
+     * @param orders
+     */
+    public void sortOfOrder(List<Order> orders){
+        orders.sort(new Comparator<Order>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(Order o1, Order o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * 对退货记录进行排序
+     * @param returnProducts
+     */
+    public void sortOfReturnProduct(List<ReturnProduct> returnProducts){
+        returnProducts.sort(new Comparator<ReturnProduct>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(ReturnProduct o1, ReturnProduct o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * 对退款记录进行排序
+     * @param refunds
+     */
+    public void sortOfRefund(List<Refund> refunds){
+        refunds.sort(new Comparator<Refund>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(Refund o1, Refund o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        });
+    }
+
+    /**
+     * 对出入库单进行排序
+     * @param stockInOuts
+     */
+    public void sortOfStockInOut(List<StockInOut> stockInOuts){
+        stockInOuts.sort(new Comparator<StockInOut>() {
+            /**
+             * 如果要按照升序排序，
+             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+             * 如果要按照降序排序
+             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+             * @param o1
+             * @param o2
+             * @return
+             */
+            @Override
+            public int compare(StockInOut o1, StockInOut o2) {
+                if (o1.getId().compareTo(o2.getId()) > 0) {
+                    return 1;
+                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                    return -1;
+                }
+
+                return 0;
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.hzg.tools;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,9 @@ public class SfExpress {
     private String bspUrl;
     private String bspCheckWord;
     private String custCode;
+
+    @Autowired
+    private HttpProxyDiscovery httpProxyDiscovery;
 
     public String getAppId() {
         return appId;
@@ -103,7 +107,7 @@ public class SfExpress {
     }
 
     public String getBspUrl() {
-        return bspUrl;
+        return httpProxyDiscovery.getHttpProxyAddress() + bspUrl;
     }
 
     public void setBspUrl(String bspUrl) {

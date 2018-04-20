@@ -34,7 +34,7 @@
             </div>--%>
             <div class="profile_info">
                 <span>欢迎,</span>
-                <h2>${username}</h2>
+                <h2>${user.username}</h2>
             </div>
         </div>
         <!-- /menu profile quick info -->
@@ -204,6 +204,16 @@
                                             <c:if test="${fn:contains(resources, '/finance/save/subject')}">
                                                 <li><a href="#/finance/view/subject/-1">生成报表</a></li>
                                             </c:if>
+                                            <%--<li><a><i class="fa fa-edit"></i>特殊报表管理<span class="fa fa-chevron-down"></span></a>
+                                                <ul class="nav child_menu">
+                                                    <c:if test="${fn:contains(resources, '/finance/complexQuery/inOutDetail')}">
+                                                        <li><a href="#/finance/view/inOutDetail/-1">进销存明细账</a></li>
+                                                    </c:if>
+                                                    <c:if test="${fn:contains(resources, '/finance/complexQuery/capitalFlowMeter')}">
+                                                        <li><a href="#/finance/view/subject/-1">资金流水表</a></li>
+                                                    </c:if>
+                                                </ul>
+                                            </li>--%>
                                         </ul>
                                     </li>
                                 </ul>
@@ -263,17 +273,10 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="">
                     <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <%--<img src="../../../res/gentelella/production/images/img.jpg" alt="">--%>${username}
+                        <%--<img src="../../../res/gentelella/production/images/img.jpg" alt="">--%>${user.username}
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        <li><a href="javascript:;"> 资料</a></li>
-                        <li>
-                            <a href="javascript:;">
-                                <span class="badge bg-red pull-right">*****</span>
-                                <span>修改密码</span>
-                            </a>
-                        </li>
                         <li><a href="javascript:;">帮助</a></li>
                         <li><a href="#" id="signOut"><i class="fa fa-sign-out pull-right"></i> 注销 </a></li>
                         <form action="<%=request.getContextPath()%>/sys/user/signOut" id="signOutForm" method="post">

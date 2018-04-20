@@ -4,6 +4,7 @@ import com.hzg.customer.Customer;
 import com.hzg.erp.ProductType;
 import com.hzg.erp.Supplier;
 import com.hzg.erp.Warehouse;
+import com.hzg.pay.Account;
 import com.hzg.sys.*;
 import com.hzg.tools.*;
 import org.apache.log4j.Logger;
@@ -322,41 +323,71 @@ public class FinanceService {
             return grossProfits;
 
         } else if (entity.equalsIgnoreCase(SupplierContact.class.getSimpleName())) {
-            Class[] clazzs = {SupplierContact.class,Supplier.class,DocType.class,User.class};
+            Class[] clazzs = {SupplierContact.class,Supplier.class,DocType.class};
             Map<String, List<Object>> results = financeDao.queryBySql(getSupplierContactComplexSql(json, position, rowNum), clazzs);
 
             List<Object> supplierContacts = results.get(SupplierContact.class.getName());
             List<Object> suppliers = results.get(Supplier.class.getName());
             List<Object> docTypes = results.get(DocType.class.getName());
-            List<Object> users = results.get(User.class.getName());
 
             int i = 0;
             for (Object supplierContact : supplierContacts) {
                 ((SupplierContact)supplierContact).setSupplier((Supplier) suppliers.get(i));
                 ((SupplierContact)supplierContact).setDocType((DocType) docTypes.get(i));
-                ((SupplierContact)supplierContact).setChartMaker((User) users.get(i));
                 i++;
             }
             return supplierContacts;
 
         } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
-            Class[] clazzs = {CustomerContact.class,Customer.class,DocType.class,User.class};
+            Class[] clazzs = {CustomerContact.class,Customer.class,DocType.class};
             Map<String, List<Object>> results = financeDao.queryBySql(getCustomerContactComplexSql(json, position, rowNum), clazzs);
 
             List<Object> customerContacts = results.get(CustomerContact.class.getName());
             List<Object> customers = results.get(Customer.class.getName());
             List<Object> docTypes = results.get(DocType.class.getName());
-            List<Object> users = results.get(User.class.getName());
 
             int i = 0;
             for (Object customerContact : customerContacts) {
                 ((CustomerContact)customerContact).setCustomer((Customer) customers.get(i));
                 ((CustomerContact)customerContact).setDocType((DocType) docTypes.get(i));
-                ((CustomerContact)customerContact).setChartMaker((User) users.get(i));
 
                 i++;
             }
             return customerContacts;
+
+        } else if (entity.equalsIgnoreCase(InOutDetail.class.getSimpleName())) {
+            Class[] clazzs = {InOutDetail.class,ProductType.class,DocType.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getInOutDetailComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> inOutDetails = results.get(InOutDetail.class.getName());
+            List<Object> types = results.get(ProductType.class.getName());
+            List<Object> docTypes = results.get(DocType.class.getName());
+
+            int i = 0;
+            for (Object inOutDetail : inOutDetails) {
+                ((InOutDetail)inOutDetail).setType((ProductType) types.get(i));
+                ((InOutDetail)inOutDetail).setDocType((DocType) docTypes.get(i));
+
+                i++;
+            }
+            return inOutDetails;
+
+        } else if (entity.equalsIgnoreCase(CapitalFlowMeter.class.getSimpleName())) {
+            Class[] clazzs = {CapitalFlowMeter.class,Account.class,DocType.class};
+            Map<String, List<Object>> results = financeDao.queryBySql(getCapitalFlowMeterComplexSql(json, position, rowNum), clazzs);
+
+            List<Object> capitalFlowMeters = results.get(CapitalFlowMeter.class.getName());
+            List<Object> accounts = results.get(Account.class.getName());
+            List<Object> docTypes = results.get(DocType.class.getName());
+
+            int i = 0;
+            for (Object capitalFlowMeter : capitalFlowMeters) {
+                ((CapitalFlowMeter)capitalFlowMeter).setAccount((Account) accounts.get(i));
+                ((CapitalFlowMeter)capitalFlowMeter).setDocType((DocType) docTypes.get(i));
+
+                i++;
+            }
+            return capitalFlowMeters;
 
         }
 
@@ -739,14 +770,18 @@ public class FinanceService {
             selectSql = sqlParts[0];
             fromSql = sqlParts[1];
             whereSql = sqlParts[2];
-            sortNumSql = "t.id asc limit " + position + "," + rowNum;
+            if (rowNum != -1){
+                sortNumSql = "t.id asc limit " + position + "," + rowNum;
+            } else {
+                sortNumSql = "t.id asc";
+            }
 
             selectSql += ", " + financeDao.getSelectColumns("t11", Supplier.class);
             fromSql += ", " + objectToSql.getTableName(Supplier.class) + " t11 ";
             if (!whereSql.trim().equals("")) {
                 whereSql += " and ";
             }
-            whereSql += " and t11." + objectToSql.getColumn(Supplier.class.getDeclaredField("id")) +
+            whereSql += " t11." + objectToSql.getColumn(Supplier.class.getDeclaredField("id")) +
                     " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("supplier"))+
                     " and t11." + objectToSql.getColumn(Supplier.class.getDeclaredField("name")) +
                     "='" + ((Map)(queryParameters.get("supplier"))).get("name") + "'";
@@ -755,11 +790,6 @@ public class FinanceService {
             fromSql += ", " + objectToSql.getTableName(DocType.class) + " t12 ";
             whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
                     " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("docType"));
-
-            selectSql += ", " + financeDao.getSelectColumns("t13", User.class);
-            fromSql += ", " + objectToSql.getTableName(User.class) + " t13 ";
-            whereSql += " and t13." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
-                    " = t." + objectToSql.getColumn(SupplierContact.class.getDeclaredField("chartMaker"));
 
             if (whereSql.indexOf(" and") == 0) {
                 whereSql = whereSql.substring(" and".length());
@@ -789,14 +819,18 @@ public class FinanceService {
             selectSql = sqlParts[0];
             fromSql = sqlParts[1];
             whereSql = sqlParts[2];
-            sortNumSql = "t.id asc limit " + position + "," + rowNum;
+            if (rowNum != -1){
+                sortNumSql = "t.id asc limit " + position + "," + rowNum;
+            } else {
+                sortNumSql = "t.id asc";
+            }
 
             selectSql += ", " + financeDao.getSelectColumns("t11", Customer.class);
             fromSql += ", " + objectToSql.getTableName(Customer.class) + " t11 ";
             if (!whereSql.trim().equals("")) {
                 whereSql += " and ";
             }
-            whereSql += " and t11." + objectToSql.getColumn(Customer.class.getDeclaredField("id")) +
+            whereSql += " t11." + objectToSql.getColumn(Customer.class.getDeclaredField("id")) +
                     " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("customer"))+
                     " and t11." + objectToSql.getColumn(Customer.class.getDeclaredField("name")) +
                     "='" + ((Map)(queryParameters.get("customer"))).get("name") + "'";
@@ -806,10 +840,101 @@ public class FinanceService {
             whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
                     " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("docType"));
 
-            selectSql += ", " + financeDao.getSelectColumns("t13", User.class);
-            fromSql += ", " + objectToSql.getTableName(User.class) + " t13 ";
-            whereSql += " and t13." + objectToSql.getColumn(User.class.getDeclaredField("id")) +
-                    " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("chartMaker"));
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
+    private String getInOutDetailComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String inOutDetailSql = objectToSql.generateComplexSqlByAnnotation(InOutDetail.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("inOutDetail")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(inOutDetailSql, InOutDetail.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            if (rowNum != -1){
+                sortNumSql = "t.productNo asc limit " + position + "," + rowNum;
+            } else {
+                sortNumSql = "t.productNo asc";
+            }
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", ProductType.class);
+            fromSql += ", " + objectToSql.getTableName(ProductType.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t11." + objectToSql.getColumn(ProductType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(InOutDetail.class.getDeclaredField("type"));
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", DocType.class);
+            fromSql += ", " + objectToSql.getTableName(DocType.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CustomerContact.class.getDeclaredField("docType"));
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return sql;
+    }
+
+    private String getCapitalFlowMeterComplexSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String capitalFlowMeterSql = objectToSql.generateComplexSqlByAnnotation(CapitalFlowMeter.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("capitalFlowMeter")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = financeDao.getSqlPart(capitalFlowMeterSql, CapitalFlowMeter.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            if (rowNum != -1){
+                sortNumSql = "t.id asc limit " + position + "," + rowNum;
+            } else {
+                sortNumSql = "t.id asc";
+            }
+
+            selectSql += ", " + financeDao.getSelectColumns("t11", Account.class);
+            fromSql += ", " + objectToSql.getTableName(Account.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t11." + objectToSql.getColumn(Account.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CapitalFlowMeter.class.getDeclaredField("account"))+
+                    " and t11." + objectToSql.getColumn(Account.class.getDeclaredField("name")) +
+                    "='" + ((Map)(queryParameters.get("account"))).get("name") + "'";
+
+            selectSql += ", " + financeDao.getSelectColumns("t12", DocType.class);
+            fromSql += ", " + objectToSql.getTableName(DocType.class) + " t12 ";
+            whereSql += " and t12." + objectToSql.getColumn(DocType.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(CapitalFlowMeter.class.getDeclaredField("docType"));
 
             if (whereSql.indexOf(" and") == 0) {
                 whereSql = whereSql.substring(" and".length());
@@ -837,6 +962,12 @@ public class FinanceService {
 
         } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())){
             sql = getCustomerContactComplexSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(InOutDetail.class.getSimpleName())){
+            sql = getInOutDetailComplexSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(CapitalFlowMeter.class.getSimpleName())){
+            sql = getCapitalFlowMeterComplexSql(json, 0, -1);
         }
 
         sql = "select count(t.id) from " + sql.split(" from ")[1];

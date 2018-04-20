@@ -1,6 +1,7 @@
 package com.hzg;
 
 import com.hzg.base.Dao;
+import com.hzg.sys.User;
 import com.hzg.tools.CommonConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +52,7 @@ public class Index {
         }
 
         model.put(CommonConstant.sessionId, sessionId);
-        model.put(CommonConstant.username, username);
+        model.put(CommonConstant.user, dao.getFromRedis(username));
         model.put(CommonConstant.resources, dao.getFromRedis(username + CommonConstant.underline + CommonConstant.resources));
 
         return CommonConstant.index;

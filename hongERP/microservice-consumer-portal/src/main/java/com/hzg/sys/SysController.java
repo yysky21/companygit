@@ -253,8 +253,7 @@ public class SysController extends com.hzg.base.Controller {
     }
 
     @RequestMapping(value = "/doBusiness/{name}", method = {RequestMethod.GET, RequestMethod.POST})
-    public void doBusiness(javax.servlet.http.HttpServletRequest request, HttpServletResponse response,
-                           @PathVariable("name") String name, String json, String sessionId) {
+    public void doBusiness(HttpServletResponse response, @PathVariable("name") String name, String json) {
         logger.info("doBusiness start, name:" + name + ", json:" + json);
         writer.writeStringToJson(response, sysClient.business(name, json));
         logger.info("doBusiness " + name + " end");

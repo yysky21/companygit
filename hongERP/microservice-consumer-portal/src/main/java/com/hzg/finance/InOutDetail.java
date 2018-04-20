@@ -1,6 +1,5 @@
 package com.hzg.finance;
 
-import com.hzg.customer.Customer;
 import com.hzg.erp.ProductType;
 import org.hibernate.annotations.Type;
 
@@ -20,7 +19,7 @@ import java.sql.Timestamp;
 @Entity(name = "hzg_finance_form_inoutdetail")
 public class InOutDetail implements Serializable {
 
-    private static final long serialVersionUID = 1913063386384933265L;
+    private static final long serialVersionUID = -2411446950616734298L;
 
     public InOutDetail() {
         super();

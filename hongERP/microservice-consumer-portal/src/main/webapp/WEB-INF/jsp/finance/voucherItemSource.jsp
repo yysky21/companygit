@@ -45,14 +45,14 @@
         vertical-align: middle;
     }
 
-    #payTypeChooseDiv table tbody tr td:first-child {
+    /*#payTypeChooseDiv table tbody tr td:first-child {
         width:60px;
         padding-left: 23px;
     }
     #payTypeChooseDiv table tbody tr td:nth-child(2) {
         width: 50px;
         text-align: center
-    }
+    }*/
 
 </style>
 <!-- page content -->

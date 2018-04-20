@@ -46,10 +46,6 @@ public class SupplierContact implements Serializable {
     @Column(name="no",length=16)
     private String no; // 单据编号
 
-    @ManyToOne(cascade=CascadeType.DETACH, fetch = FetchType.LAZY)
-    @JoinColumn(name = "chartMakerId")
-    private User chartMaker; // 业务员id
-
     @Column(name="productNo",length=16)
     private String productNo; // 商品编号
 
@@ -65,6 +61,10 @@ public class SupplierContact implements Serializable {
     @Column(name="unitPrice", length = 32)
     @Type(type = "com.hzg.tools.FloatDesType")
     private Float unitPrice; // 单价
+
+    @Column(name="beginning", length = 32)
+    @Type(type = "com.hzg.tools.FloatDesType")
+    private Float beginning; // 期初余额
 
     @Column(name="payable", length = 32)
     @Type(type = "com.hzg.tools.FloatDesType")
@@ -122,14 +122,6 @@ public class SupplierContact implements Serializable {
         this.no = no;
     }
 
-    public User getChartMaker() {
-        return chartMaker;
-    }
-
-    public void setChartMaker(User chartMaker) {
-        this.chartMaker = chartMaker;
-    }
-
     public String getProductNo() {
         return productNo;
     }
@@ -168,6 +160,14 @@ public class SupplierContact implements Serializable {
 
     public void setUnitPrice(Float unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public Float getBeginning() {
+        return beginning;
+    }
+
+    public void setBeginning(Float beginning) {
+        this.beginning = beginning;
     }
 
     public Float getPayable() {

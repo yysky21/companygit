@@ -134,12 +134,5 @@ public class DateUtil {
         return simpleDateFormat;
     }
 
-
-    public static void main(String[] args) {
-        DateUtil dateUtil = new DateUtil();
-        Date date = dateUtil.getForwardDay(1);
-        String d = dateUtil.simpleDateFormat.format(date);
-        System.out.println(d);
-    }
 }
 

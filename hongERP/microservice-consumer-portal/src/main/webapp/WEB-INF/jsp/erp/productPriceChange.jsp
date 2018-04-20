@@ -112,20 +112,35 @@
     $("#send").click(function(){
         $("#id").attr("disabled",true);
         $('#form').submitForm('<%=request.getContextPath()%>/erp/save/productPriceChange',
-        function(result) {
-            if (result.result.indexOf("success") != -1) {
-                $("#id").val(result.id);
-            }
-        });
+            function(result) {
+                if (result.result.indexOf("success") != -1) {
+                    $("#id").val(result.id);
+                }
+            });
     });
 
     $("#doBusiness").click(function(){
         if (confirm("点击申请后将不再可以修改价格变动，确定申请吗？")) {
-            $("#id").attr("disabled",false);
-            $("#state").val("<%=ErpConstant.product_price_change_state_apply%>");
-            $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productPriceChange');
+            if ($.trim($("#id").val()) == "") {
+                $("#id").attr("disabled",true);
+                $('#form').submitForm('<%=request.getContextPath()%>/erp/save/productPriceChange',
+                    function(result) {
+                        if (result.result.indexOf("success") != -1) {
+                            $("#id").val(result.id);
+                            updateProductPriceChange();
+                        }
+                    }, false);
+            } else {
+                updateProductPriceChange();
+            }
         }
     });
+
+    function updateProductPriceChange(){
+        $("#id").attr("disabled",false);
+        $("#state").val("<%=ErpConstant.product_price_change_state_apply%>");
+        $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productPriceChange');
+    }
 
     $("#text").coolautosuggestm({
         url:"<%=request.getContextPath()%>/erp/privateQuery/<%=Product.class.getSimpleName().toLowerCase()%>",

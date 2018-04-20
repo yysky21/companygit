@@ -219,6 +219,7 @@ function renderAudit(element, url){
                 element.find(".page-title").css("display", "none");
                 element.find(".clearfix").css("display", "none");
                 element.find(".x_title").css("display", "none");
+                element.find(".btn").css("display", "none");
 
                 $('#result').attr("readonly", false).css("border", "1px solid #ccc");
 

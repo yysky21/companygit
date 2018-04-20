@@ -217,7 +217,7 @@
         "<%=AuditFlowConstant.business_price_change_manager%>":"<option  value=''>无</option><option value='<%=AuditFlowConstant.action_price_change_set_state_use%>'><%=AuditFlowConstant.action_names.get(AuditFlowConstant.action_price_change_set_state_use)%></option>",
         "<%=AuditFlowConstant.business_price_change_director%>":"<option  value=''>无</option><option value='<%=AuditFlowConstant.action_price_change_set_state_use%>'><%=AuditFlowConstant.action_names.get(AuditFlowConstant.action_price_change_set_state_use)%></option>",
         "<%=AuditFlowConstant.business_orderPersonal%>":"<option  value=''>无</option>",
-        "<%=AuditFlowConstant.business_voucherAudit%>":"<option  value=''>无</option>"
+        "<%=AuditFlowConstant.business_voucherAudit%>":"<option  value=''>无</option><option value='<%=AuditFlowConstant.action_voucher_verify_pass_modify_state%>'><%=AuditFlowConstant.action_names.get(AuditFlowConstant.action_voucher_verify_pass_modify_state)%></option>"
     };
 
     var businessNodeRefusedActionOptions = {

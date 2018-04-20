@@ -86,6 +86,7 @@
         </div>
 
         <div class="row">
+        <c:if test="${entity.state == 0}">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_content">
@@ -132,6 +133,20 @@
                     </div>
                 </div>
             </div>
+        </c:if>
+        <c:if test="${entity.state == 1}">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_content">
+                            <div class="form-group">
+                                <div class="col-md-8 col-md-offset-1">
+                                    <button id="return" type="button" class="btn btn-primary">返回</button>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </c:if>
         </div>
     </div>
 </div>
@@ -139,6 +154,8 @@
 <script type="text/javascript">
     var entity = dataList.entityRelations["${entity.entity}"];
     renderAudit($("#entityDiv"), "<%=request.getContextPath()%>" + dataList.modules[entity] + dataList.viewActions[entity] + "/" + entity + "/${entity.entityId}");
+
+    console.log( "<%=request.getContextPath()%>" + dataList.modules[entity] + dataList.viewActions[entity] + "/" + entity + "/${entity.entityId}");
 
     if (${entity.state == 0}) {
         $("#deal").click(function(){

@@ -73,6 +73,8 @@ public class AuditFlowConstant {
 
     public final static String action_stockOut_product_breakage = "stockOutProductBreakage";
 
+    public final static String action_voucher_verify_pass_modify_state = "voucherVerifyPassModifyState";
+
     public final static Map<String, String> action_names = new HashMap<>();
     static {
         action_names.put(AuditFlowConstant.business_stockIn_notify, "提示入库商品");
@@ -97,6 +99,8 @@ public class AuditFlowConstant {
         action_names.put(AuditFlowConstant.action_price_change_modify, "可以修改调整后价格");
 
         action_names.put(AuditFlowConstant.action_stockOut_product_breakage, "商品报损出库");
+
+        action_names.put(AuditFlowConstant.action_voucher_verify_pass_modify_state, "审核通过凭证后修改凭证状态");
 
         action_names.put(null, "无");
     }

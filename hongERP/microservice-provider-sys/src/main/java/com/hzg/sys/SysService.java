@@ -30,6 +30,9 @@ public class SysService {
     private ErpClient erpClient;
 
     @Autowired
+    private FinanceClient financeClient;
+
+    @Autowired
     private Writer writer;
 
     @Autowired
@@ -273,11 +276,16 @@ public class SysService {
         if (action != null) {
             String realAction = audit.getAction();
             audit.setAction(action);
-
-            Map<String, String> result1 = writer.gson.fromJson(erpClient.auditAction(writer.gson.toJson(audit)),
-                    new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
-            result = result1.get(CommonConstant.result);
-
+            if (action.equals("voucherVerifyPassModifyState")){
+                Map<String, String> result1 = writer.gson.fromJson(financeClient.auditAction(writer.gson.toJson(audit)),
+                        new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
+                result = result1.get(CommonConstant.result);
+            } else {
+                Map<String, String> result1 = writer.gson.fromJson(erpClient.auditAction(writer.gson.toJson(audit)),
+                        new com.google.gson.reflect.TypeToken<Map<String, String>>() {
+                        }.getType());
+                result = result1.get(CommonConstant.result);
+            }
             audit.setAction(realAction);
         } else {
             result = CommonConstant.success;

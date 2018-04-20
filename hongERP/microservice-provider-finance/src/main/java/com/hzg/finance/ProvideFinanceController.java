@@ -3,10 +3,7 @@ package com.hzg.finance;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hzg.customer.Customer;
-import com.hzg.erp.ProductType;
-import com.hzg.erp.Purchase;
-import com.hzg.erp.Supplier;
-import com.hzg.erp.Warehouse;
+import com.hzg.erp.*;
 import com.hzg.pay.Account;
 import com.hzg.sys.*;
 import com.hzg.tools.*;
@@ -397,6 +394,13 @@ public class ProvideFinanceController {
         } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
             writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
 
+        } else if (entity.equalsIgnoreCase(InOutDetail.class.getSimpleName())) {
+            writer.writeObjectToJson(response, financeService.privateQuery(entity, json, position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(CapitalFlowMeter.class.getSimpleName())) {
+            List<CapitalFlowMeter> capitalFlowMeters = financeService.privateQuery(entity, json, position, rowNum);
+            writer.writeObjectToJson(response,capitalFlowMeters);
+
         }
 
         logger.info("complexQuery end");
@@ -704,6 +708,12 @@ public class ProvideFinanceController {
         } else if (entity.equalsIgnoreCase(CustomerContact.class.getSimpleName())) {
             recordsSum = financeService.privateRecordNum(entity, json);
 
+        } else if (entity.equalsIgnoreCase(InOutDetail.class.getSimpleName())) {
+            recordsSum = financeService.privateRecordNum(entity, json);
+
+        } else if (entity.equalsIgnoreCase(CapitalFlowMeter.class.getSimpleName())) {
+            recordsSum = financeService.privateRecordNum(entity, json);
+
         }
 
         writer.writeStringToJson(response, "{\"" + CommonConstant.recordsSum + "\":" + recordsSum + "}");
@@ -798,6 +808,40 @@ public class ProvideFinanceController {
 
         writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\"}");
         logger.info("delete end");
+    }
+
+    /**
+     * 流程审核动作
+     * @param response
+     * @param json
+     */
+    @Transactional
+    @RequestMapping(value = "/auditAction", method = {RequestMethod.GET, RequestMethod.POST})
+    public void auditAction(HttpServletResponse response, @RequestBody String json){
+        logger.info("auditAction start, parameter:" + json);
+        String result = CommonConstant.fail;
+
+        try {
+            Audit audit = writer.gson.fromJson(json, Audit.class);
+            switch (audit.getAction()) {
+                case AuditFlowConstant.action_voucher_verify_pass_modify_state:{
+                    Voucher voucher = new Voucher();
+                    voucher.setId(audit.getEntityId());
+                    voucher.setState(FinanceConstant.voucher_state_verify);
+
+                    result += financeDao.updateById(voucher.getId(), voucher);
+                }
+                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result += CommonConstant.fail;
+        } finally {
+            result = transcation.dealResult(result);
+        }
+
+        writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\"}");
+        logger.info("auditAction end");
     }
 
 }

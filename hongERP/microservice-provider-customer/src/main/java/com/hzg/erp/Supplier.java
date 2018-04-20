@@ -54,7 +54,7 @@ public class Supplier implements Serializable {
     @Column(name="cooperateDate")
     private Timestamp cooperateDate;
 
-    @Column(name="account",length=20)
+    @Column(name="account",length=25)
     private String account;
 
     @Column(name="branch",length=30)

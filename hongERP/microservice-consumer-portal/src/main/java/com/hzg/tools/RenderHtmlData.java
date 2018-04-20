@@ -1,10 +1,9 @@
 package com.hzg.tools;
 
 import com.google.gson.reflect.TypeToken;
-import com.hzg.erp.ErpClient;
-import com.hzg.erp.Product;
-import com.hzg.erp.ProductDescribe;
-import com.hzg.erp.Purchase;
+import com.hzg.erp.*;
+import com.hzg.finance.FinanceClient;
+import com.hzg.finance.Voucher;
 import com.hzg.sys.Audit;
 import com.hzg.sys.SysClient;
 import com.hzg.sys.User;
@@ -32,6 +31,9 @@ public class RenderHtmlData {
     private ErpClient erpClient;
 
     @Autowired
+    private FinanceClient financeClient;
+
+    @Autowired
     private Writer writer;
 
     public String getRefuseUserOptions(User currentUser, List<Audit> audits, String refuseUserOptions, int deep) {
@@ -49,7 +51,7 @@ public class RenderHtmlData {
          * 添加发起人
          */
         if (audits.get(0).getEntity().equals(AuditFlowConstant.business_purchase) ||
-                audits.get(0).getEntity().equals(AuditFlowConstant.business_purchaseEmergency)) {
+                audits.get(0).getEntity().equalsIgnoreCase(AuditFlowConstant.business_purchaseEmergency)) {
 
             List<Purchase> purchases = writer.gson.fromJson(erpClient.query(Purchase.class.getSimpleName().toLowerCase(),
                     "{\"id\":" + audits.get(0).getEntityId() + "}"),
@@ -74,6 +76,32 @@ public class RenderHtmlData {
                     describes.get(0).getPhotographer().getId().compareTo(currentUser.getId()) != 0) {
                 refuseUserOptions = "<option value='" + describes.get(0).getPhotographer().getId() + "'>" +
                         describes.get(0).getPhotographer().getName() + "</option>"
+                        + refuseUserOptions;
+            }
+
+        } else if (audits.get(0).getEntity().equals(AuditFlowConstant.business_price_change_saler) ||
+                audits.get(0).getEntity().equals(AuditFlowConstant.business_price_change_charger) ||
+                audits.get(0).getEntity().equals(AuditFlowConstant.business_price_change_manager) ||
+                audits.get(0).getEntity().equals(AuditFlowConstant.business_price_change_director)) {
+            List<ProductPriceChange> productPriceChanges = writer.gson.fromJson(erpClient.query(ProductPriceChange.class.getSimpleName().toLowerCase(),
+                    "{\"id\":" + audits.get(0).getEntityId() + "}"),
+                    new TypeToken<List<ProductPriceChange>>() {}.getType());
+
+            if (!refuseUserOptions.contains("'" +  productPriceChanges.get(0).getUser().getId() + "'") &&
+                    productPriceChanges.get(0).getUser().getId().compareTo(currentUser.getId()) != 0) {
+                refuseUserOptions = "<option value='" + productPriceChanges.get(0).getUser().getId() + "'>" +
+                        productPriceChanges.get(0).getUser().getName() + "</option>"
+                        + refuseUserOptions;
+            }
+        } else if (audits.get(0).getEntity().equals(AuditFlowConstant.business_voucherAudit)){
+            List<Voucher> vouchers = writer.gson.fromJson(financeClient.query(Voucher.class.getSimpleName().toLowerCase(),
+                    "{\"id\":" + audits.get(0).getEntityId() + "}"),
+                    new TypeToken<List<Voucher>>() {}.getType());
+
+            if (!refuseUserOptions.contains("'" +  vouchers.get(0).getChartMaker().getId() + "'") &&
+                    vouchers.get(0).getChartMaker().getId().compareTo(currentUser.getId()) != 0) {
+                refuseUserOptions = "<option value='" + vouchers.get(0).getChartMaker().getId() + "'>" +
+                        vouchers.get(0).getChartMaker().getName() + "</option>"
                         + refuseUserOptions;
             }
         }

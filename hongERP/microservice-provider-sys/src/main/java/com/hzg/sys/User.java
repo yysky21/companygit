@@ -65,6 +65,9 @@ public class User  implements Serializable {
             , inverseJoinColumns = {@JoinColumn(name = "postId")})
     private Set<Post> posts;
 
+    @Transient
+    private String sessionId;
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -165,5 +168,13 @@ public class User  implements Serializable {
 
     public void setPosts(Set<Post> posts) {
         this.posts = posts;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

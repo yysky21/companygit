@@ -47,7 +47,9 @@ var dataList = (function ($) {
         "subject":"科目",
         "grossProfit":"销售毛利分析",
         "supplierContact":"供应商往来对账",
-        "customerContact":"客户往来对账"
+        "customerContact":"客户往来对账",
+        "inOutDetail":"进销存明细账",
+        "capitalFlowMeter":"资金流水表"
     };
 
     var dateTitles = {
@@ -88,7 +90,9 @@ var dataList = (function ($) {
         "subject":"创建时间",
         "grossProfit": "销售日期",
         "supplierContact": "单据日期",
-        "customerContact": "单据日期"
+        "customerContact": "单据日期",
+        "inOutDetail": "单据日期",
+        "capitalFlowMeter": "单据日期"
     };
 
     var dateInputName = {
@@ -129,7 +133,9 @@ var dataList = (function ($) {
         "subject":"inputDate",
         "grossProfit": "grossProfit[date]",
         "supplierContact": "supplierContact[date]",
-        "customerContact": "customerContact[date]"
+        "customerContact": "customerContact[date]",
+        "inOutDetail": "inOutDetail[date]",
+        "capitalFlowMeter": "capitalFlowMeter[date]"
     };
 
     var selectTitles = {
@@ -169,7 +175,9 @@ var dataList = (function ($) {
         "subject": "类别",
         "grossProfit": "类别",
         "supplierContact": "类别",
-        "customerContact": "类别"
+        "customerContact": "类别",
+        "inOutDetail": "类别",
+        "capitalFlowMeter": "类别"
     };
 
     var addActions = {
@@ -262,7 +270,9 @@ var dataList = (function ($) {
         "subject": "/finance",
         "grossProfit": "/finance",
         "supplierContact": "/finance",
-        "customerContact": "/finance"
+        "customerContact": "/finance",
+        "inOutDetail": "/finance",
+        "capitalFlowMeter": "/finance"
     };
 
     var childModules = {
@@ -271,7 +281,9 @@ var dataList = (function ($) {
         "subject": "/subject",
         "grossProfit": "/form",
         "supplierContact": "/form",
-        "customerContact": "/form"
+        "customerContact": "/form",
+        "inOutDetail": "/form",
+        "capitalFlowMeter": "/form"
     };
 
     var queryActions = {
@@ -312,7 +324,9 @@ var dataList = (function ($) {
         "subject": "/complexQuery",
         "grossProfit": "/complexQuery",
         "supplierContact": "/complexQuery",
-        "customerContact": "/complexQuery"
+        "customerContact": "/complexQuery",
+        "inOutDetail": "/complexQuery",
+        "capitalFlowMeter": "/complexQuery"
     };
 
     var viewActions = {
@@ -390,8 +404,10 @@ var dataList = (function ($) {
         "voucherCategory": "<th>凭证类别</th><th>凭证字</th><th>创建时间</th>",
         "subject": "<th>科目编码</th><th>编码规则</th><th>科目名称</th><th>科目类型</th><th>余额方向</th><th>辅助核算项</th><th>停用</th><th>账面格式</th><th>创建时间</th>",
         "grossProfit": "<th>销售日期</th><th>销售订单号</th><th>业务类型</th><th>业务员</th><th>客户</th><th>计量单位</th><th>商品分类</th><th>商品编号</th><th>商品名称</th><th>数量</th><th>单价</th><th>折扣</th><th>销售金额</th><th>成本金额</th><th>毛利</th><th>毛利率</th><th>加工费收入</th><th>加工费成本</th><th>加工毛利</th><th>加工毛利率</th>",
-        "supplierContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>业务员</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应付金额</th><th>已付金额</th><th>应付余额</th>",
-        "customerContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>业务员</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应收金额</th><th>已收金额</th><th>应收余额</th>"
+        "supplierContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应付金额</th><th>已付金额</th><th>应付余额</th>",
+        "customerContact": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>数量</th><th>单价</th><th>应收金额</th><th>已收金额</th><th>应收余额</th>",
+        "inOutDetail": "<th>商品分类</th><th>商品编号</th><th>商品名称</th><th>计量单位</th><th>单据日期</th><th>单据类型</th><th>单据编号</th><th>期初数量</th><th>期初单价</th><th>期初金额</th><th>本期收入数量</th><th>本期收入单价</th><th>本期收入金额</th><th>本期发出数量</th><th>本期发出单价</th><th>本期发出金额</th><th>结存数量</th><th>结存单价</th><th>结存金额</th>",
+        "capitalFlowMeter": "<th>单据日期</th><th>单据类型</th><th>单据编号</th><th>收入金额</th><th>支出金额</th><th>期末余额</th>"
     };
 
     var propertiesShowSequences = {
@@ -431,8 +447,10 @@ var dataList = (function ($) {
         "voucherCategory": ["name", "voucherWord","inputDate"],
         "subject": ["no","codeRule", "name", "type", "direction", "accountItems[]", "state","paperFormat","inputDate"],
         "grossProfit": ["date","no","businessType","chartMaker[name]","customer[name]","unit","type[name]","productNo","productName","quantity","unitPrice","discount","saleAmount","cost","grossProfit","grossProfitRate","processIncome","processCost","processGrossProfit","processGrossProfitRate"],
-        "supplierContact": ["date","docType[name]","no","chartMaker[name]","productNo","productName","unit","quantity","unitPrice","payable","paid","remainder"],
-        "customerContact": ["date","docType[name]","no","chartMaker[name]","productNo","productName","unit","quantity","unitPrice","receivable","received","remainder"]
+        "supplierContact": ["date","docType[name]","no","productNo","productName","unit","quantity","unitPrice","payable","paid","remainder"],
+        "customerContact": ["date","docType[name]","no","productNo","productName","unit","quantity","unitPrice","receivable","received","remainder"],
+        "inOutDetail": ["type[name]","productNo","productName","unit","date","docType[name]","no","beginQuantity","beginUnitPrice","beginAmount","inQuantity","inUnitPrice","inAmount","outQuantity","outUnitPrice","outAmount","endQuantity","endUnitPrice","endAmount"],
+        "capitalFlowMeter": ["date","docType[name]","no","income","spending","ending"]
     };
 
     var linkTitles = {
@@ -651,7 +669,10 @@ var dataList = (function ($) {
         "subject": "subject",
         "grossProfit": "grossProfit",
         "supplierContact": "supplierContact",
-        "customerContact": "customerContact"
+        "customerContact": "customerContact",
+        "inOutDetail": "customerContact",
+        "capitalFlowMeter": "capitalFlowMeter",
+        "voucherAuditNotify": "voucher"
     };
 
     var totalTableData = [];
@@ -848,15 +869,18 @@ var dataList = (function ($) {
             $("#entity").empty()
                 .append(visitEntitiesOptions["grossProfit"])
                 .append(visitEntitiesOptions["supplierContact"])
-                .append(visitEntitiesOptions["customerContact"]);
+                .append(visitEntitiesOptions["customerContact"])
+                .append(visitEntitiesOptions["inOutDetail"])
+                .append(visitEntitiesOptions["capitalFlowMeter"]);
             if (entity == "grossProfit") {
-                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="grossProfit[no]">销售订单号</label>' +
+                $("#inputItems").empty().append('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="grossProfit[no]">销售订单号</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="grossProfit[no]" name="grossProfit[no]" class="form-control col-md-7 col-xs-12" placeholder="输入订单号" /></div></div>'+
                     '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="grossProfit[productNo]">商品编号</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="grossProfit[productNo]" name="grossProfit[productNo]" class="form-control col-md-7 col-xs-12" placeholder="输入商品编号" /></div></div>' +
                     '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="chartMaker[name]">业务员</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><div class="input-prepend input-group" ><input type="text" id="chartMaker[name]" name="chartMaker[name]" class="form-control col-md-7 col-xs-12" readonly />' +
                     '<span id="chartMaker" class="add-on input-group-addon"><i class="glyphicon glyphicon-zoom-in"></i></span></div></div></div>');
+                $("#chartMakerChooseDiv").remove();
                 $("#form").after('<div id="chartMakerChooseDiv"><br>'+
                     '<table class="table table-bordered table-striped" width="100%" style="margin: 0px">'+
                     '<thead><tr><th style="width:60px;"><input type="checkbox"> 全选</th>'+
@@ -880,6 +904,18 @@ var dataList = (function ($) {
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="customer[name]" name="customer[name]" class="form-control col-md-7 col-xs-12" placeholder="输入客户名字" required /></div></div>');
                 $(document.getElementById("customer[name]")).coolautosuggest({
                     url:rootPath + "/finance/suggest/customer/name/",
+                    showProperty: 'name',
+                });
+
+            } else if (entity == "inOutDetail") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="inOutDetail[productNo]">商品编号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="inOutDetail[productNo]" name="inOutDetail[productNo]" class="form-control col-md-7 col-xs-12" placeholder="输入商品编号" /></div></div>');
+
+            } else if (entity == "capitalFlowMeter") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="account[name]"><span class="required">*</span>账户</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="account[name]" name="account[name]" class="form-control col-md-7 col-xs-12" placeholder="输入账户名" required /></div></div>');
+                $(document.getElementById("account[name]")).coolautosuggest({
+                    url:rootPath + "/finance/suggest/account/name/",
                     showProperty: 'name',
                 });
             }
@@ -908,6 +944,28 @@ var dataList = (function ($) {
         if (entity == "") {
             alert("请选择类型");
             return false;
+        }
+
+        var json = JSON.parse(queryJson);
+        if (entity == "supplierContact"){
+            if (json.supplier.name == ""){
+                alert("供应商名称不能为空！");
+                return false;
+            }
+        }
+
+        if (entity == "customerContact"){
+            if (json.customer.name == ""){
+                alert("客户名字不能为空！");
+                return false;
+            }
+        }
+
+        if (entity == "capitalFlowMeter"){
+            if (json.account.name == ""){
+                alert("账户名不能为空！");
+                return false;
+            }
         }
 
         if (!isLocalSearch) {
@@ -951,6 +1009,15 @@ var dataList = (function ($) {
         if (document.getElementById("dataList_filter") == null) {
             // 设置本地搜索框
             table.before('<div id="dataList_filter" class="dataTables_filter"><label>Search&nbsp;<input value="' + searchStr + '" id="columnSearch" class="" placeholder="" aria-controls="dataList" type="search"></label></div>');
+        }
+
+        if (entity == "capitalFlowMeter" || entity == "supplierContact" || entity == "customerContact"){
+            var docNode = document.getElementById("beginningAmount");
+            if (judgeDocNodeIsExist(docNode) == false){
+                table.before('<span id="beginningAmount" style="display: none" ><span style="font-size: 15px;font-weight: bold">期初余额：</span><span id="amountValue" style="font-size: 15px;"></span></span>')
+            }
+        } else {
+            $("#beginningAmount").remove();
         }
 
         table.initDataTable(contextPath + modules[entity] + queryActions[entity] + "/" + getActualEntity(entity),
@@ -1044,6 +1111,13 @@ var dataList = (function ($) {
                             var dataList = [];
                             if (resp.aaData != null && resp.aaData != undefined) {
                                 dataList = $.parseJSON(resp.aaData);
+                                if (resp.aaData != '[]'){
+                                    var docNode = document.getElementById("beginningAmount");
+                                    if (judgeDocNodeIsExist(docNode) == true){
+                                        $("#beginningAmount").show();
+                                        $("#amountValue").html(dataList[0].beginning);
+                                    }
+                                }
                             }
 
                             for (var key in dataList) {
@@ -1286,6 +1360,13 @@ var dataList = (function ($) {
         }
 
         return entity;
+    }
+
+    function judgeDocNodeIsExist(docNode){
+        if(docNode)
+            return true;
+        else
+            return false;
     }
 
 

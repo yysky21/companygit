@@ -280,7 +280,7 @@ public class SysController {
                 Action action = writer.gson.fromJson(json, Action.class);
                 User user = (User) sysDao.queryById(action.getEntityId(), User.class);
 
-                Object sessionUser = sysService.getUserBySessionId(action.getSessionId());
+                User sessionUser = sysService.getUserBySessionId(action.getSessionId());
                 if (sessionUser != null) {
                     if (user.getPassword().equals(action.getOldPassword())) {
                         user.setPassword(action.getNewPassword());
@@ -288,10 +288,7 @@ public class SysController {
 
                         action.setEntity(SysConstant.user);
                         action.setType(SysConstant.user_action_modifyPassword);
-                        /**
-                         * 前台用户和后台用户类型不一致，这里如果是前台用户，则把前台用户简单转换为后台用户对象里进行保存
-                         */
-                        action.setInputer(writer.gson.fromJson(writer.gson.toJson(sessionUser), com.hzg.sys.User.class));
+                        action.setInputer(sessionUser);
                         action.setInputDate(dateUtil.getSecondCurrentTimestamp());
                         result += sysDao.save(action);
 
@@ -327,6 +324,31 @@ public class SysController {
                 } else {
                     result += CommonConstant.fail + ",用户没有登录或会话已过期，不能重置密码";
                 }
+
+            } else if (name.equalsIgnoreCase(SysConstant.user_action_name_privateModifyPassword)) {
+                Action action = writer.gson.fromJson(json, Action.class);
+                User user = (User) sysDao.queryById(action.getEntityId(), User.class);
+
+                User sessionUser = sysService.getUserBySessionId(action.getSessionId());
+                if (sessionUser != null && sessionUser.getId().compareTo(user.getId()) == 0) {
+                    if (user.getPassword().equals(action.getOldPassword())) {
+                        user.setPassword(action.getNewPassword());
+                        result += sysDao.updateById(user.getId(), user);
+
+                        action.setEntity(SysConstant.user);
+                        action.setType(SysConstant.user_action_privateModifyPassword);
+                        action.setInputer(sessionUser);
+                        action.setInputDate(dateUtil.getSecondCurrentTimestamp());
+                        result += sysDao.save(action);
+
+                    } else {
+                        result += CommonConstant.fail + ",旧密码不对，不能修改密码";
+                    }
+
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能修改密码";
+                }
+
             }
 
         } catch (Exception e) {

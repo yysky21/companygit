@@ -49,4 +49,10 @@ public class FinanceConstant {
     // 科目名称
     public final static String processRepair = "加工费/修补费";
 
+    public final static Integer voucher_state_verify = 1;
+
+    //判断客户往来对账和供应商往来对账中是应(供应商为应付，客户为应收)还是已(供应商为已付，客户为已收)的标志,
+    public final static String SHOULD = "SHOULD";
+    public final static String ALREADY = "ALREADY";
+
 }

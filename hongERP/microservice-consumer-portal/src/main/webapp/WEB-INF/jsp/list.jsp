@@ -545,6 +545,12 @@
     <c:if test="${fn:contains(resources, '/customerContact')}">
     visitEntitiesOptions["customerContact"] = '<option value="customerContact">客户往来对账表</option>';
     </c:if>
+    <c:if test="${fn:contains(resources, '/inOutDetail')}">
+    visitEntitiesOptions["inOutDetail"] = '<option value="inOutDetail">进销存明细账</option>';
+    </c:if>
+    <c:if test="${fn:contains(resources, '/capitalFlowMeter')}">
+    visitEntitiesOptions["capitalFlowMeter"] = '<option value="capitalFlowMeter">资金流水表</option>';
+    </c:if>
     </c:if>
     visitEntitiesOptions["audit"] = '<option value="audit">事宜</option>';
 
