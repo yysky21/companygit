@@ -271,7 +271,7 @@
     <c:if test="${fn:contains(resources, '/orderManagement/cancel')}">
         $("#cancelOrder").click(function(){
             if (confirm("订单取消后不可进行支付等后续操作，确认取消订单吗？")) {
-                $("#form").sendData('<%=request.getContextPath()%>/orderManagement/cancel', '{"id":"${entity.id}","sessionId":"${sessionId}"}');
+                $("#form").sendData('<%=request.getContextPath()%>/orderManagement/cancel', '{"id":${entity.id},"sessionId":"${sessionId}"}');
             }
         });
     </c:if>
@@ -280,7 +280,12 @@
         <c:if test="${entity.type != 0}">
             $("#paid").click(function(){
                 if (confirm("确认收款后将出库及寄送商品，确定订单已付款吗？")) {
-                    $("#form").sendData('<%=request.getContextPath()%>/orderManagement/paid', '{"id":"${entity.id}","sessionId":"${sessionId}"}');
+                    $("#form").sendData('<%=request.getContextPath()%>/orderManagement/paid', '{"id":${entity.id},"sessionId":"${sessionId}"}',
+                    function(){
+                        if (document.getElementById("orderBookPaid")) {
+                            $("#orderBookPaid").attr("disabled", "disabled");
+                        }
+                    });
                 }
             });
         </c:if>
@@ -290,7 +295,7 @@
         <c:if test="${entity.type == 3 && entity.orderBook.state == 0}">
             $("#orderBookPaid").click(function(){
                 if (confirm("确认订金已付款吗？")) {
-                    $("#form").sendData('<%=request.getContextPath()%>/orderManagement/doBusiness/orderBookPaid', '{"id":"${entity.id}","sessionId":"${sessionId}","type":"orderBookPaid"}');
+                    $("#form").sendData('<%=request.getContextPath()%>/orderManagement/doBusiness/orderBookPaid', '{"id":${entity.id},"sessionId":"${sessionId}"}');
                 }
             });
         </c:if>

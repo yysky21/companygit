@@ -55,7 +55,7 @@ public class Writer {
             out = response.getWriter();
             out.print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 out.close();
@@ -73,7 +73,7 @@ public class Writer {
             out = response.getWriter();
             out.print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 out.close();

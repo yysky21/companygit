@@ -414,7 +414,10 @@ var tableSheet = (function ($) {
             }
         }
 
-        if (totalPayItemAmount != Math.formatFloat(parseFloat($("#amount").val()), 2)) {
+        /**
+         * 押金采购不比较采购单金额
+         */
+        if (parseInt($("#type").val()) != 4 && totalPayItemAmount != Math.formatFloat(parseFloat($("#amount").val()), 2)) {
             alert("填写的支付金额与采购单实际支付金额不一致");
             $(payItemAmounts[0]).focus();
             return false;

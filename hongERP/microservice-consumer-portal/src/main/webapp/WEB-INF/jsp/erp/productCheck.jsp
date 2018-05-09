@@ -98,8 +98,7 @@
                                 </div>
                             </div>
                             <div class="item form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="remark">备注： <span class="required">*</span>
-                                </label>
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="remark">备注：</label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <textarea id="remark" name="remark" class="form-control col-md-7 col-xs-12" <c:if test="${entity.state == 1}">readonly</c:if>>${entity.remark}</textarea>
                                 </div>
@@ -114,7 +113,7 @@
                             <div class="x_content" style="overflow: auto">
                                 <table id="productList" class="table-sheet" width="100%">
                                     <thead>
-                                    <tr><th>存货编码</th><th>存货名称</th><th>计量单位</th><th>单价</th><th>盘点数量</th><th>账面数量</th><th>盈亏数量</th><th>盘点金额</th><th>账面金额</th><th>盈亏金额</th></tr>
+                                    <tr><th>商品编码</th><th>存货名称</th><th>计量单位</th><th>单价</th><th>盘点数量</th><th>账面数量</th><th>盈亏数量</th><th>盘点金额</th><th>账面金额</th><th>盈亏金额</th></tr>
                                     </thead>
                                     <tbody>
                                     <c:if test="${entity.details != null}">
@@ -152,6 +151,10 @@
                                     <c:if test="${entity.state == 0}">
                                         <button id="send" type="button" class="btn btn-success">修改</button>
                                         <button id="check" type="button" class="btn btn-danger">盘点</button>
+                                        <button id="delete" type="button" class="btn btn-danger">作废</button>
+                                    </c:if>
+                                    <c:if test="${entity.state == 1}">
+                                        <button id="delete" type="button" class="btn btn-danger">作废</button>
                                     </c:if>
                                 </div>
                             </div>
@@ -163,7 +166,6 @@
     </div>
 </div>
 <script type="text/javascript">
-
     $("#cancel").unbind("click").click(function(){
         render(getPreUrls());
         returnPage = true;
@@ -178,7 +180,22 @@
             return false;
         };
         $("#state").val(1);
-        $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productCheck');
+        $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productCheck',function (result) {
+            if (result.result.indexOf("success") != -1) {
+                $("#check").attr("disabled","disabled");
+            }
+        });
+    })
+    $("#delete").click(function () {
+        if (confirm("作废之后不能恢复，你确定要作废该盘点单吗！")==false){
+            return false;
+        };
+        $("#state").val(2);
+        $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productCheck',function (result) {
+            if (result.result.indexOf("success") != -1) {
+                $("#delete").attr("disabled","disabled");
+            }
+        });
     })
     document.title = "查看商品盘点";
 </script>

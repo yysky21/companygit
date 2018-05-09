@@ -20,6 +20,7 @@ import com.boyuanitsm.pay.alipay.config.AlipayConfig;
 import com.boyuanitsm.pay.alipay.sign.RSA;
 import com.hzg.tools.CommonConstant;
 import com.hzg.tools.HttpProxyDiscovery;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -47,6 +48,8 @@ import java.util.Map;
  */
 @Component
 public class AlipaySubmit {
+
+    Logger logger = Logger.getLogger(AlipaySubmit.class);
 
     @Autowired
     private HttpProxyDiscovery httpProxyDiscovery;
@@ -221,7 +224,7 @@ public class AlipaySubmit {
         try {
             result = new String(httpRequest.post(ALIPAY_GATEWAY_NEW, data), AlipayConfig.input_charset);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result = CommonConstant.fail + "," + e.getMessage();
         }
 

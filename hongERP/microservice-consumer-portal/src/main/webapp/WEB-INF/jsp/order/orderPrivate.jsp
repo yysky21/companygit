@@ -10,6 +10,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <style>
     .table-sheet > tbody > tr > td{
         width: 200px;
@@ -134,7 +135,9 @@
                                 <div class="col-md-6 col-md-offset-3">
                                     <button id="cancel" type="button" class="btn btn-primary">返回</button>
                                     <c:if test="${entity.detail.state == 0}">
+                                    <c:if test="${fn:contains(resources, '/orderManagement/doBusiness/authorizeOrderPrivateAmount')}">
                                     <button id="send" type="button" class="btn btn-success">核定</button>
+                                    </c:if>
                                     </c:if>
                                 </div>
                             </div>
@@ -153,6 +156,8 @@
     init(<c:out value="${entity == null}"/>);
     $('#authorizeAmount, #authorizeDescribes').attr("readonly",false).css("border", "1px solid #ccc");
     $('#send').attr("disabled", false);
+    <c:if test="${fn:contains(resources, '/orderManagement/doBusiness/authorizeOrderPrivateAmount')}">
     $("#send").click(function(){$('#form').submitForm('<%=request.getContextPath()%>/orderManagement/doBusiness/authorizeOrderPrivateAmount');});
+    </c:if>
     <c:choose><c:when test="${entity != null}">document.title = "加工费、私人订制费用核定";</c:when><c:otherwise> document.title = "加工费、私人订制费用核定";</c:otherwise></c:choose>
 </script>

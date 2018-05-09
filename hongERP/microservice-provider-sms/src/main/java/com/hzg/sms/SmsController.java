@@ -70,7 +70,7 @@ public class SmsController {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result = CommonConstant.fail;
         }
 

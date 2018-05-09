@@ -35,7 +35,7 @@ public class Writer {
             out = response.getWriter();
             out.print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 out.close();
@@ -55,13 +55,13 @@ public class Writer {
             out = response.getOutputStream();
             out.write(bytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                     out = null;
                 }
             }
@@ -111,7 +111,7 @@ public class Writer {
             out = response.getWriter();
             out.print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 out.close();
@@ -127,7 +127,7 @@ public class Writer {
             out = response.getWriter();
             out.print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (out != null) {
                 out.close();

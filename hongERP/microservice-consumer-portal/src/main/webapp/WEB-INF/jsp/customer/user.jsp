@@ -8,7 +8,6 @@
 * @version 1.00
 *
 --%>
-<%@ page import="com.hzg.customer.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!-- page content -->
@@ -69,7 +68,7 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="describes">描述 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <textarea id="describes" name="describes" class="form-control col-md-7 col-xs-12" data-validate-length-range="6,256" data-validate-words="1"required>${entity.describes}</textarea>
+                                    <textarea id="describes" name="describes" class="form-control col-md-7 col-xs-12" data-validate-length-range="6,256" required>${entity.describes}</textarea>
                                 </div>
                             </div>
                             <c:if test="${entity == null}">
@@ -85,7 +84,7 @@
                                     <input id="password2" type="password" name="password2" data-validate-linked="password1" class="form-control col-md-7 col-xs-12" required>
                                 </div>
                             </div>
-                            <input type="hidden" id="password" name="users[][password]">
+                            <input type="hidden" id="password" name="password">
                             </c:if>
                             <c:if test="${entity != null}">
                                 <div class="item form-group">
@@ -96,11 +95,20 @@
                                     </div>
                                 </div>
                             </c:if>
+                            <c:if test="${entity.state != null}">
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="stateName">状态 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <input id="stateName" name="stateName" value="${entity.stateName}" class="form-control col-md-7 col-xs-12" data-validate-length-range="6，20" data-validate-words="1" readonly type="text">
+                                </div>
+                            </div>
+                            </c:if>
+                            <div class="item form-group">
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="text1">所属客户 <span class="required">*</span></label>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <input type="text" id="text1" name="text1" value="${entity.customer.name}" class="form-control col-md-7 col-xs-12" style="width:40%" placeholder="输入姓名" required />
+                                    <input type="hidden" id="customer[id]" name="customer[id]" value="${entity.customer.id}">
                                 </div>
                             </div>
 
@@ -119,39 +127,9 @@
                                 </div>
                             </div>
                             <c:if test="${entity != null}"><input type="hidden" id="id" name="id" value="${entity.id}"></c:if>
+                            <input type="hidden" name="sessionId" value="${sessionId}">
                         </form>
                     </div>
-
-                    <c:if test="${entity != null}">
-                        <div id="modifyPasswordDiv">
-                            <div class="item form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="oldPassword1">旧密码 <span class="required">*</span></label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="oldPassword1" type="password"  data-validate-length="6,32" class="form-control col-md-7 col-xs-12" required>
-                                </div>
-                            </div>
-                            <div class="clearfix" style="margin-bottom: 15px"></div>
-                            <div class="item form-group">
-                                <label for="newPassword1" class="control-label col-md-3">新密码 <span class="required">*</span></label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="newPassword1" type="password" name="newPassword1" data-validate-length="6,32" class="form-control col-md-7 col-xs-12" required>
-                                </div>
-                            </div>
-                            <div class="clearfix" style="margin-bottom: 15px"></div>
-                            <div class="item form-group">
-                                <label for="confirmNewPassword1" class="control-label col-md-3 col-sm-3 col-xs-12">确认密码 <span class="required">*</span></label>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="confirmNewPassword1" type="password"  data-validate-linked="newPassword1" class="form-control col-md-7 col-xs-12" required>
-                                </div>
-                            </div>
-                            <form id="modifyPasswordForm">
-                                <input type="hidden" name="entityId" value="${entity.id}">
-                                <input type="hidden" id="oldPassword" name="oldPassword">
-                                <input type="hidden" id="newPassword" name="newPassword">
-                                <input type="hidden" name="sessionId" value="${sessionId}">
-                            </form>
-                        </div>
-                    </c:if>
                 </div>
             </div>
         </div>
@@ -180,6 +158,16 @@
         console.log(start.toISOString(), end.toISOString(), label);
     });
 
+    $("#text1").coolautosuggest({
+        url:"<%=request.getContextPath()%>/customerManagement/unlimitedSuggest/customer/name/",
+        showProperty: 'name',
+        onSelected:function(result){
+            if(result!=null){
+                $(document.getElementById("customer[id]")).val(result.id);
+            }
+        }
+    });
+
     $("#send").click(function(){
         <c:if test="${entity == null}">
         if ($("#form").isFullSet()) {
@@ -190,40 +178,67 @@
         }
         </c:if>
 
-        $("#form").submitForm('<%=request.getContextPath()%>/customerManagement/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/<%=User.class.getSimpleName().toLowerCase()%>');
+        $("#form").submitForm('<%=request.getContextPath()%>/customerManagement/doBusiness/<c:choose><c:when test="${entity != null}">userAdminUpdate</c:when><c:otherwise>userAdminSave</c:otherwise></c:choose>');
     });
 
     <c:if test="${entity != null}">
         $("#modifyPasswordA").click(function(){
-            $('#modifyPasswordDiv').dialog('open');
+            $('<div id="modifyPasswordDiv">'+
+                '<div class="item form-group">'+
+                '<label class="control-label col-md-3 col-sm-3 col-xs-12"  for="oldPassword1">旧密码 <span class="required">*</span></label>'+
+                '<div class="col-md-6 col-sm-6 col-xs-12">'+
+                '<input id="oldPassword1" type="password"  data-validate-length="6,32" class="form-control col-md-7 col-xs-12" required>'+
+           '</div>'+
+            '</div>'+
+            '<div class="clearfix" style="margin-bottom: 15px"></div>'+
+                '<div class="item form-group">'+
+                '<label for="newPassword1" class="control-label col-md-3">新密码 <span class="required">*</span></label>'+
+                '<div class="col-md-6 col-sm-6 col-xs-12">'+
+                '<input id="newPassword1" type="password" name="newPassword1" data-validate-length="6,32" class="form-control col-md-7 col-xs-12" required>'+
+            '</div>'+
+            '</div>'+
+            '<div class="clearfix" style="margin-bottom: 15px"></div>'+
+                '<div class="item form-group">'+
+                '<label for="confirmNewPassword1" class="control-label col-md-3 col-sm-3 col-xs-12">确认密码 <span class="required">*</span></label>'+
+                '<div class="col-md-6 col-sm-6 col-xs-12">'+
+                '<input id="confirmNewPassword1" type="password"  data-validate-linked="newPassword1" class="form-control col-md-7 col-xs-12" required>'+
+            '</div>'+
+            '</div>'+
+            '<form id="modifyPasswordForm">'+
+                '<input type="hidden" name="entityId" value="${entity.id}">'+
+                '<input type="hidden" id="oldPassword" name="oldPassword">'+
+                '<input type="hidden" id="newPassword" name="newPassword">'+
+                '<input type="hidden" name="sessionId" value="${sessionId}">'+
+                '</form>'+
+                '</div>').dialog({
+                title: "修改密码",
+                autoOpen: false,
+                width: 400,
+                height:310,
+                buttons: {
+                    "确定": function () {
+                        var modifyPasswordForm = $("#modifyPasswordForm");
+                        if (!modifyPasswordForm.isFullSet()) {
+                            return false;
+                        }
+
+                        var oldPassword1 = $("#oldPassword1");
+                        $("#oldPassword").val(faultylabs.MD5(jQuery.trim(oldPassword1.val())));
+                        var newPassword1 = $("#newPassword1");
+                        $("#newPassword").val(faultylabs.MD5(jQuery.trim(newPassword1.val())));
+
+                        modifyPasswordForm.submitForm('<%=request.getContextPath()%>/customerManagement/doBusiness/modifyPassword');
+                    },
+
+                    "取消": function () {
+                        $(this).dialog ('destroy').remove();
+                    }
+                }
+            }).dialog('open');
             return false;
         });
 
-        $("#modifyPasswordDiv").dialog({
-            title: "修改",
-            autoOpen: false,
-            width: 400,
-            height:310,
-            buttons: {
-                "确定": function () {
-                    var modifyPasswordForm = $("#modifyPasswordForm");
-                    if (!modifyPasswordForm.isFullSet()) {
-                        return false;
-                    }
-
-                    var oldPassword1 = $("#oldPassword1");
-                    $("#oldPassword").val(faultylabs.MD5(jQuery.trim(oldPassword1.val())));
-                    var newPassword1 = $("#newPassword1");
-                    $("#newPassword").val(faultylabs.MD5(jQuery.trim(newPassword1.val())));
-
-                    modifyPasswordForm.submitForm('<%=request.getContextPath()%>/customerManagement/doBusiness/modifyPassword');
-                },
-
-                "取消": function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
+;
 
         $("#resetPasswordA").click(function(){
             $("#modifyPasswordForm").sendData('<%=request.getContextPath()%>/customerManagement/doBusiness/resetPassword',

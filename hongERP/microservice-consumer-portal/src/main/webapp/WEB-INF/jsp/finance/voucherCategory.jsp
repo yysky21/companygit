@@ -1,10 +1,10 @@
-<%@ page import="com.hzg.sys.ArticleCate" %><%--
+<%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
-* 文件名: articleCate.jsp
+* 文件名: voucherCategory.jsp
 *
 * @author yuanyun
-* @Date  2017/10/06
+* @Date  2017/11/27
 * @version 1.00
 *
 --%>
@@ -42,7 +42,7 @@
                         <form class="form-horizontal form-label-left" novalidate id="form">
                             <span class="section">凭证类别信息</span>
                             <div class="item form-group">
-                                <label for="voucherWord" class="control-label col-md-3 col-sm-3 col-xs-12">分类名称简写 <span class="required">*</span></label>
+                                <label for="voucherWord" class="control-label col-md-3 col-sm-3 col-xs-12">凭证字 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <input id="voucherWord" type="text" name="voucherWord" value="${entity.voucherWord}" data-validate-length="0,10" data-validate-words="0" class="form-control col-md-7 col-xs-12" required>
                                 </div>

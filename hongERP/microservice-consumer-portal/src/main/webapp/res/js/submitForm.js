@@ -9,7 +9,7 @@
  */
 (function($){
     "use strict";
-    var preFormJson = "", preJson = "";
+    var preFormJson = "", preJson = "", preUrl = "";
     var submitSucc = false;
 
     $.fn.submitForm = function (url) {
@@ -26,7 +26,7 @@
             dataType: "json",
 
             beforeSend: function(){
-                if (preFormJson == formJson && submitSucc) {
+                if (preFormJson == formJson && preUrl == url && submitSucc) {
                     alert("不能重复提交");
                     return false;
                 }
@@ -44,6 +44,7 @@
         });
 
         preFormJson = formJson;
+        preUrl = url;
     },
 
     $.fn.submitForm = function (url, callBack, isShowResult) {
@@ -60,7 +61,7 @@
             dataType: "json",
 
             beforeSend: function(){
-                if (preFormJson == formJson && submitSucc) {
+                if (preFormJson == formJson && preUrl == url && submitSucc) {
                     alert("不能重复提交");
                     return false;
                 }
@@ -98,6 +99,7 @@
         });
 
         preFormJson = formJson;
+        preUrl = url;
     },
 
     $.fn.sendData = function (url, json, callBack, isShowResult) {
@@ -110,7 +112,7 @@
             dataType: "json",
 
             beforeSend: function(){
-                if (preJson == json && submitSucc) {
+                if (preJson == json && preUrl == url && submitSucc) {
                     alert("不能重复提交");
                     return false;
                 }
@@ -146,6 +148,7 @@
         });
 
         preJson = json;
+        preUrl = url;
     },
 
     $.fn.ajaxPost = function (url, json, callback) {

@@ -28,6 +28,9 @@ public interface ErpClient extends Client {
     @RequestMapping(value = "/getSimpleNo", method = RequestMethod.POST)
     String getSimpleNo(@RequestParam("length") Integer length);
 
+    @RequestMapping(value = "/getPriceChangeNo", method = RequestMethod.POST)
+    String getPriceChangeNo(@RequestParam("length") Integer length);
+
     @RequestMapping(value = "/entitiesSuggest", method = RequestMethod.POST)
     String entitiesSuggest(@RequestParam("targetEntities") String targetEntities, @RequestParam("entities") String entities,
                            @RequestBody String json);
@@ -55,6 +58,12 @@ public interface ErpClient extends Client {
         @Override
         public String getSimpleNo(Integer length) {
             log.info("getSimpleNo 异常发生，进入fallback方法，接收的参数：" + length);
+            return "[]";
+        }
+
+        @Override
+        public String getPriceChangeNo(Integer length) {
+            log.info("getPriceChangeNo 异常发生，进入fallback方法，接收的参数：" + length);
             return "[]";
         }
 

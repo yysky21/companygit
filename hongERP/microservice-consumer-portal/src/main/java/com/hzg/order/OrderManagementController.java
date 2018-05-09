@@ -55,15 +55,14 @@ public class OrderManagementController extends com.hzg.base.Controller {
         if (entity.equalsIgnoreCase(Order.class.getSimpleName())) {
             entities = writer.gson.fromJson(orderClient.unlimitedQuery(entity, json), new TypeToken<List<Order>>() {}.getType());
 
-            model.put(CommonConstant.resources, dao.getFromRedis((String)dao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + sessionId) +
-                    CommonConstant.underline + CommonConstant.resources));
-
         } else if (entity.equalsIgnoreCase(OrderPrivate.class.getSimpleName())) {
             entities = writer.gson.fromJson(orderClient.unlimitedQuery(entity, json), new TypeToken<List<OrderPrivate>>() {}.getType());
         }
 
         model.put(CommonConstant.sessionId, sessionId);
         model.put(CommonConstant.entity, entities.isEmpty() ? null : entities.get(0));
+        model.put(CommonConstant.resources, dao.getFromRedis((String)dao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + sessionId) +
+                CommonConstant.underline + CommonConstant.resources));
         logger.info("viewById end");
 
         return "/order/" + entity;

@@ -227,7 +227,7 @@ public class FinanceUtil {
                         voucherItemSource.setDocNo(stockInOut.getNo());
                         Float amount = 0.0f;
                         Set<StockInOutDetail> stockInOutDetails = stockInOut.getDetails();
-                        StockInOutDetailProduct stockInOutDetailProduct = null;
+                        StockInOutDetailProduct stockInOutDetailProduct = new StockInOutDetailProduct();
                         if (type == 4){
                             amount += stockInOut.getDeposit().getAmount();
                         } else {
@@ -259,6 +259,7 @@ public class FinanceUtil {
                             VoucherItemSourceDetail voucherItemSourceDetail = new VoucherItemSourceDetail();
                             voucherItemSourceDetail.setVoucherItemSource(voucherItemSource);
                             for (StockInOutDetail stockInOutDetail : stockInOutDetails){
+                                stockInOutDetail = (StockInOutDetail) financeDao.query(stockInOutDetail).get(0);
                                 Set<StockInOutDetailProduct> stockInOutDetailProducts = stockInOutDetail.getStockInOutDetailProducts();
                                 Iterator<StockInOutDetailProduct> iterator = stockInOutDetailProducts.iterator();
                                 while (iterator.hasNext()){
@@ -312,6 +313,8 @@ public class FinanceUtil {
                         voucherItemSource.setBusinessType("预定");
                     } else if (type == 4) {
                         voucherItemSource.setBusinessType("代下单加工");
+                    } else if (type == 5) {
+                        voucherItemSource.setBusinessType("换货订单");
                     }
                     // 设置单据编号
                     voucherItemSource.setDocNo(order.getNo());
@@ -359,7 +362,7 @@ public class FinanceUtil {
                                 voucherItemSourceDetail.setEntityId(payType);
                                 financeDao.save(voucherItemSourceDetail);
                                 // 获取收款账号
-                                String receiptAccount = pay1.getPayAccount();
+                                String receiptAccount = pay1.getReceiptAccount();
                                 // 查询收款账号所对应的账户
                                 Account account = new Account();
                                 account.setAccount(receiptAccount);
@@ -389,13 +392,13 @@ public class FinanceUtil {
             Order order = new Order();
             OrderBook orderBook = new OrderBook();
             for (Pay pay:pays) {
-                if (pay != null) {
+                if (pay != null && !pay.getEntity().equals("changeProduct")) {
                     VoucherItemSource voucherItemSource = new VoucherItemSource();
                     // 设置单据日期
                     voucherItemSource.setDate(pay.getPayDate());
                     String entity = pay.getEntity();
                     Integer id = pay.getEntityId();
-                    if (entity.equals("purchase")){
+                    if (pay.getBalanceType() == 1){
                         // 设置单据类型为付款单
                         docType.setId(5);
                         voucherItemSource.setDocType(docType);
@@ -415,13 +418,17 @@ public class FinanceUtil {
                         // 设置单据类型为收款单
                         docType.setId(6);
                         voucherItemSource.setDocType(docType);
-                        order.setId(id);
-                        orderBook.setOrder(order);
-                        List<OrderBook> orderBooks = financeDao.query(orderBook);
-                        if (orderBooks != null && !orderBooks.isEmpty()){
-                            voucherItemSource.setBusinessType("预收款");
+                        if (entity.equals("order")) {
+                            order.setId(id);
+                            orderBook.setOrder(order);
+                            List<OrderBook> orderBooks = financeDao.query(orderBook);
+                            if (orderBooks != null && !orderBooks.isEmpty()) {
+                                voucherItemSource.setBusinessType("预收款");
+                            } else {
+                                voucherItemSource.setBusinessType("普通收款");
+                            }
                         } else {
-                            voucherItemSource.setBusinessType("普通收款");
+                            voucherItemSource.setBusinessType("修补货品");
                         }
                         Customer customer = pay.getUser().getCustomer();
                         // 获取客户的名字
@@ -477,10 +484,12 @@ public class FinanceUtil {
                         action.setEntity("returnProduct");
                         action.setEntityId(returnProduct.getId());
                         List<Action> actions = financeDao.query(action);
-                        action = actions.get(actions.size()-1);
-                        voucherItemSource.setChartMaker(action.getInputer());
+                        if (actions != null && !actions.isEmpty()){
+                            action = actions.get(actions.size()-1);
+                            voucherItemSource.setChartMaker(action.getInputer());
+                        }
                         Set<ReturnProductDetail> returnProductDetails = returnProduct.getDetails();
-                        ReturnProductDetailProduct returnProductDetailProduct = null;
+                        ReturnProductDetailProduct returnProductDetailProduct = new ReturnProductDetailProduct();
                         if (returnProduct.getEntity().equals(FinanceConstant.returnproduct_purchase)){
                             // 设置单据类型为采购单
                             docType.setId(1);
@@ -589,7 +598,6 @@ public class FinanceUtil {
                     VoucherItemSource voucherItemSource = new VoucherItemSource();
                     // 设置单据日期
                     voucherItemSource.setDate(refund.getRefundDate());
-                    String entity = refund.getEntity();
                     if (refund.getBalanceType() == 1){
                         // 设置单据类型为付款单
                         docType.setId(5);
@@ -1125,7 +1133,7 @@ public class FinanceUtil {
                     if (refund.getBalanceType() == 1){
                         SupplierContact supplierContact = new SupplierContact();
                         /*收支类型为收入的可能是正常的采购退货，也有可能是押金采购退货，如果是正常的采购退货则退款单中对应的实体是退货单，
-                        而退货单中对应的实体是采购单，如果是押金采购退货则退款单对应的实体是采购类型为押金采购的采购单*/
+                        而退货单中对应的实体是采购单，如果是押金采购退货则退款单对应的实体是入库类型为押金入库的入库单*/
                         if (refund.getEntity().equals("returnProduct")){
                             ReturnProduct returnProduct = (ReturnProduct) financeDao.queryById(refund.getEntityId(),ReturnProduct.class);
                             Purchase purchase = (Purchase) financeDao.queryById(returnProduct.getEntityId(),Purchase.class);
@@ -1134,7 +1142,9 @@ public class FinanceUtil {
                                 break;
                             }
                         } else {
-                            Purchase purchase = (Purchase) financeDao.queryById(refund.getEntityId(),Purchase.class);
+                            StockInOut stockInOut = (StockInOut) financeDao.queryById(refund.getEntityId(),StockInOut.class);
+                            Purchase purchase = new Purchase();
+                            purchase = (Purchase) financeDao.queryById(stockInOut.getDeposit().getPurchase().getId(),Purchase.class);
                             for (PurchaseDetail purchaseDetail : purchase.getDetails()){
                                 supplierContact.setSupplier(purchaseDetail.getSupplier());
                                 break;

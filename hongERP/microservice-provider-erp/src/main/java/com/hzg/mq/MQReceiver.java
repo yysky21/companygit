@@ -45,7 +45,7 @@ public class MQReceiver {
         try {
             queueName = queue.getQueueName();
         } catch (JMSException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         logger.info("receive message from " + queueName + ":" + message);
 

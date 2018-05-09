@@ -19,6 +19,7 @@ package com.boyuanitsm.pay.wxpay.protocol.reverse_protocol;
 import com.boyuanitsm.pay.wxpay.common.RandomStringGenerator;
 import com.boyuanitsm.pay.wxpay.common.Configure;
 import com.boyuanitsm.pay.wxpay.common.Signature;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import java.util.Map;
  * Time: 16:42
  */
 public class ReverseReqData {
+    Logger logger = Logger.getLogger(ReverseReqData.class);
+
     //每个字段具体的意思请查看API文档
     private String appid = "";
     private String mch_id = "";
@@ -132,9 +135,9 @@ public class ReverseReqData {
                     map.put(field.getName(), obj);
                 }
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         return map;

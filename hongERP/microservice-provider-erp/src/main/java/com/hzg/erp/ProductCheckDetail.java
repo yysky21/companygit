@@ -36,10 +36,10 @@ public class ProductCheckDetail implements Serializable {
     @JoinColumn(name = "checkId")
     private ProductCheck productCheck;  //盘点单id
 
-    @Column(name="itemNo")
+    @Column(name="itemNo",length = 16)
     private String itemNo;  //存货编码
 
-    @Column(name="itemName")
+    @Column(name="itemName",length = 30)
     private String itemName;  //存货名称
 
     @Column(name="checkQuantity", length = 8, precision = 2)

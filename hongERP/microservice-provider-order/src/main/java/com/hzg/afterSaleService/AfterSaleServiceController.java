@@ -78,7 +78,7 @@ public class AfterSaleServiceController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -239,7 +239,7 @@ public class AfterSaleServiceController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -269,7 +269,7 @@ public class AfterSaleServiceController {
             result += afterSaleServiceDao.save(action);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);

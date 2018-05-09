@@ -19,6 +19,7 @@ package com.boyuanitsm.pay.alipay.util;
 import com.boyuanitsm.pay.alipay.config.AlipayConfig;
 import com.boyuanitsm.pay.alipay.sign.RSA;
 import com.hzg.tools.HttpProxyDiscovery;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +46,8 @@ import java.util.Map;
  */
 @Component
 public class AlipayNotify {
+
+    static Logger logger = Logger.getLogger(AlipayNotify.class);
 
     @Autowired
     private HttpProxyDiscovery httpProxyDiscovery;
@@ -166,7 +169,7 @@ public class AlipayNotify {
                 .getInputStream()));
             inputLine = in.readLine().toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             inputLine = "";
         }
 

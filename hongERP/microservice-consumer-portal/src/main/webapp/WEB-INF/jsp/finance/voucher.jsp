@@ -1,10 +1,10 @@
 <%@ page import="com.hzg.tools.FinanceConstant" %><%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
-* 文件名: productCheck.jsp
+* 文件名: voucher.jsp
 *
 * @author yuanyun
-* @Date  2017/10/25
+* @Date  2017/11/25
 * @version 1.00
 *
 --%>
@@ -86,26 +86,26 @@
                                     <tbody>
                                     <c:if test="${entity == null}">
                                         <tr>
-                                            <td><input type="text" name='details[][voucherItem[summary]]:string' /></td>
-                                            <td><input type="text" class="text1" name='details[][voucherItem[subject[name]]]:string' />
+                                            <td><input type="text" name='details[][voucherItem[summary]]:string' required /></td>
+                                            <td><input type="text" class="text1" name='details[][voucherItem[subject[name]]]:string' required />
                                                 <input type="hidden" name='details[][voucherItem[subject[id]]]:number' />
                                             </td>
                                             <td><input type="text" class="text2" name='details[][voucherItem[assistant]]:string' /></td>
-                                            <td><input type="text" name='details[][voucherItem[debit]]' /></td>
-                                            <td><input type="text" name='details[][voucherItem[credit]]' /></td>
+                                            <td><input type="text" name='details[][voucherItem[debit]]:number' data-debit="debit"/></td>
+                                            <td><input type="text" name='details[][voucherItem[credit]]:number' data-credit="credit" /></td>
                                         </tr>
                                     </c:if>
                                     <c:if test="${entity != null &&entity.details != null}">
                                         <c:forEach items="${entity.details}" var="detail">
                                                 <tr>
-                                                    <td><input type="text" name='details[][voucherItem[summary]]:string' value='${detail.voucherItem.summary}' /></td>
+                                                    <td><input type="text" name='details[][voucherItem[summary]]:string' value='${detail.voucherItem.summary}' required /></td>
                                                     <td>
-                                                        <input type="text" class="text1" name='details[][voucherItem[subject[name]]]:string' value='${detail.voucherItem.subject.name}' />
+                                                        <input type="text" class="text1" name='details[][voucherItem[subject[name]]]:string' value='${detail.voucherItem.subject.name}' required />
                                                         <input type="hidden" name='details[][voucherItem[subject[id]]]:number'value="${detail.voucherItem.subject.id}" />
                                                     </td>
-                                                    <td><input type="text" name='details[][voucherItem[assistant]]:string' value='${detail.voucherItem.assistant}' readonly /></td>
-                                                    <td><input type="text" name='details[][voucherItem[debit]]' value='${detail.voucherItem.debit}' /></td>
-                                                    <td><input type="text" name='details[][voucherItem[credit]]' value='${detail.voucherItem.credit}' /></td>
+                                                    <td><input type="text" class="text2" name='details[][voucherItem[assistant]]:string' value='${detail.voucherItem.assistant}' readonly /></td>
+                                                    <td><input type="text" name='details[][voucherItem[debit]]:number' data-debit="debit" value='${detail.voucherItem.debit}' /></td>
+                                                    <td><input type="text" name='details[][voucherItem[credit]]:number' data-credit="credit" value='${detail.voucherItem.credit}' /></td>
                                                 </tr>
                                         </c:forEach>
                                     </c:if>
@@ -119,8 +119,8 @@
                                             <td><input type="text"  value='合计' readonly  /></td>
                                             <td><input type="text"  value='<c:if test="${entity != null}">大写合计</c:if>' readonly  /></td>
                                             <td><input type="text" name='totalCapital' data-skip-falsy="true" data-validate-length-range="2，30" data-validate-words="1" value='${entity.totalCapital}' <c:if test="${entity == null}">readonly</c:if> /></td>
-                                            <td><input type="text" name='debit' value='${entity.debit}' /></td>
-                                            <td><input type="text" name='credit' value='${entity.credit}' /></td>
+                                            <td><input type="text"id="debit" name='debit:number' value='${entity.debit}' required /></td>
+                                            <td><input type="text" id="credit" name='credit:number' value='${entity.credit}' required /></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -178,12 +178,19 @@
                             <div class="form-group" id="submitDiv">
                                 <div class="col-md-6 col-md-offset-9">
                                     <button id="cancel" type="button" class="btn btn-primary">取消</button>
-                                    <button id="send" type="button" class="btn btn-success"><c:choose><c:when test="${entity != null}">更新</c:when><c:otherwise>保存</c:otherwise></c:choose></button>
-                                    <c:if test="${entity != null}">
-                                        <button id="edit" type="button" class="btn btn-primary">编辑</button>
-                                        <button id="delete" type="button" class="btn btn-danger">删除</button>
-                                        <button class="btn btn-default" id="printVoucherBtn"><i class="fa fa-print"></i> 打印凭证</button>
-                                    </c:if>
+                                    <c:choose>
+                                        <c:when test="${entity != null}">
+                                            <c:if test="${entity.state != 1}">
+                                                <button id="edit" type="button" class="btn btn-primary">编辑</button>
+                                                <button id="send" type="button" class="btn btn-success">修改</button>
+                                                <button id="delete" type="button" class="btn btn-danger">删除</button>
+                                            </c:if>
+                                            <button class="btn btn-default" id="printVoucherBtn"><i class="fa fa-print"></i> 打印凭证</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button id="send" type="button" class="btn btn-success">保存</button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </div>
@@ -253,7 +260,7 @@
                         });
                     }else if (a[i]==4){
                         $(".text2").coolautosuggest({
-                            url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+                            url:"<%=request.getContextPath()%>/finance/suggest/customer/name/",
                             showProperty: 'name'
                         });
                     }
@@ -328,15 +335,49 @@
                     text: "增行",
                     func: function(){
                         var tr = "<tr>"+
-                            "<td><input name='details[][voucherItem[summary]]:string' /></td>"+
-                            "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' />"+
+                            "<td><input name='details[][voucherItem[summary]]:string' required /></td>"+
+                            "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' required />"+
                             "<input type='hidden' name='details[][voucherItem[subject[id]]]:number' />"+
                             "</td>"+
-                            "<td><input name='details[][voucherItem[assistant]]:string' /></td>"+
-                            "<td><input name='details[][voucherItem[debit]]' /></td>"+
-                            "<td><input name='details[][voucherItem[credit]]' /></td>"+
+                            "<td><input class='text2' name='details[][voucherItem[assistant]]:string' /></td>"+
+                            "<td><input name='details[][voucherItem[debit]]:number' data-debit='debit' /></td>"+
+                            "<td><input name='details[][voucherItem[credit]]:number' data-credit='credit' /></td>"+
                             "</tr>"
                         $(this).after(tr);
+                        $('[data-debit="debit"]').blur(function () {
+                            var inputs = $('[data-debit="debit"]');
+                            for (var i = 0; i<inputs.length;i++){
+                                if (inputs[i].value != ""){
+                                    var reg = /^\d+(\.\d+)?$/;
+                                    if (reg.test(inputs[i].value) == false){
+                                        alert("借方必须为纯数字，包括小数");
+                                        $("#debit").val(debitTotal);
+                                        debitTotal = 0;
+                                        return false;
+                                    }
+                                    debitTotal += parseInt(inputs[i].value);
+                                }
+                            }
+                            $("#debit").val(debitTotal);
+                            debitTotal = 0;
+                        })
+                        $('[data-credit="credit"]').blur(function () {
+                            var inputs = $('[data-credit="credit"]');
+                            for (var i = 0; i<inputs.length;i++){
+                                if (inputs[i].value != ""){
+                                    var reg = /^\d+(\.\d+)?$/;
+                                    if (reg.test(inputs[i].value) == false){
+                                        alert("贷方必须为纯数字，包括小数");
+                                        $("#credit").val(creditTotal);
+                                        creditTotal = 0;
+                                        return false;
+                                    }
+                                    creditTotal += parseInt(inputs[i].value);
+                                }
+                            }
+                            $("#credit").val(creditTotal);
+                            creditTotal = 0;
+                        })
                         var subjectInput = $("[class='text1']");
                         $(this).next().find(subjectInput).coolautosuggest({
                             url:"<%=request.getContextPath()%>/finance/suggest/subject/name/",
@@ -353,7 +394,7 @@
                                             });
                                         }else if (a[i]==4){
                                             $(this).parent().next().find("input").coolautosuggest({
-                                                url:"<%=request.getContextPath()%>/finance/suggest/user/name/",
+                                                url:"<%=request.getContextPath()%>/finance/suggest/customer/name/",
                                                 showProperty: 'name'
                                             });
                                         }
@@ -376,13 +417,13 @@
     $("#voucherList tbody").on("keypress","tr",function (e) {
         if (e.keyCode == 13) {
             var tr = "<tr>"+
-                "<td><input name='details[][voucherItem[summary]]:string' /></td>"+
-                "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' />"+
+                "<td><input name='details[][voucherItem[summary]]:string' required /></td>"+
+                "<td><input class='text1' name='details[][voucherItem[subject[name]]]:string' required />"+
                 "<input type='hidden' name='details[][voucherItem[subject[id]]]:number' />"+
                 "</td>"+
-                "<td><input name='details[][voucherItem[assistant]]:string' /></td>"+
-                "<td><input name='details[][voucherItem[debit]]' /></td>"+
-                "<td><input name='details[][voucherItem[credit]]' /></td>"+
+                "<td><input class='text2' name='details[][voucherItem[assistant]]:string' /></td>"+
+                "<td><input name='details[][voucherItem[debit]]:number' data-debit='debit' /></td>"+
+                "<td><input name='details[][voucherItem[credit]]:number' data-credit='credit' /></td>"+
                 "</tr>"
             $(this).after(tr);
             var subjectInput = $("[class='text1']");
@@ -392,11 +433,97 @@
                 onSelected:function(result){
                     if(result!=null){
                         $(this).next().next().val(result.id);
+                        var a = result.accountItems;
+                        for(var i in a){
+                            if(a[i]==3){
+                                $(this).parent().next().find("input").coolautosuggest({
+                                    url:"<%=request.getContextPath()%>/finance/suggest/supplier/name/",
+                                    showProperty: 'name'
+                                });
+                            }else if (a[i]==4){
+                                $(this).parent().next().find("input").coolautosuggest({
+                                    url:"<%=request.getContextPath()%>/finance/suggest/customer/name/",
+                                    showProperty: 'name'
+                                });
+                            }
+                        }
                     }
                 }
             });
+            $('[data-debit="debit"]').blur(function () {
+                var inputs = $('[data-debit="debit"]');
+                for (var i = 0; i<inputs.length;i++){
+                    if (inputs[i].value != ""){
+                        var reg = /^\d+(\.\d+)?$/;
+                        if (reg.test(inputs[i].value) == false){
+                            alert("借方必须为纯数字，包括小数");
+                            $("#debit").val(debitTotal);
+                            debitTotal = 0;
+                            return false;
+                        }
+                        debitTotal += parseInt(inputs[i].value);
+                    }
+                }
+                $("#debit").val(debitTotal);
+                debitTotal = 0;
+            })
+            $('[data-credit="credit"]').blur(function () {
+                var inputs = $('[data-credit="credit"]');
+                for (var i = 0; i<inputs.length;i++){
+                    if (inputs[i].value != ""){
+                        var reg = /^\d+(\.\d+)?$/;
+                        if (reg.test(inputs[i].value) == false){
+                            alert("贷方必须为纯数字，包括小数");
+                            $("#credit").val(creditTotal);
+                            creditTotal = 0;
+                            return false;
+                        }
+                        creditTotal += parseInt(inputs[i].value);
+                    }
+                }
+                $("#credit").val(creditTotal);
+                creditTotal = 0;
+            })
         }
     });
+
+    var debitTotal = 0;
+    $('[data-debit="debit"]').blur(function () {
+        var inputs = $('[data-debit="debit"]');
+        for (var i = 0; i<inputs.length;i++){
+            if (inputs[i].value != ""){
+                var reg = /^\d+(\.\d+)?$/;
+                if (reg.test(inputs[i].value) == false){
+                    alert("借方必须为纯数字，包括小数");
+                    $("#debit").val(debitTotal);
+                    debitTotal = 0;
+                    return false;
+                }
+                debitTotal += parseInt(inputs[i].value);
+            }
+        }
+        $("#debit").val(debitTotal);
+        debitTotal = 0;
+    })
+
+    var creditTotal = 0;
+    $('[data-credit="credit"]').blur(function () {
+        var inputs = $('[data-credit="credit"]');
+        for (var i = 0; i<inputs.length;i++){
+            if (inputs[i].value != ""){
+                var reg = /^\d+(\.\d+)?$/;
+                if (reg.test(inputs[i].value) == false){
+                    alert("贷方必须为纯数字，包括小数");
+                    $("#credit").val(creditTotal);
+                    creditTotal = 0;
+                    return false;
+                }
+                creditTotal += parseInt(inputs[i].value);
+            }
+        }
+        $("#credit").val(creditTotal);
+        creditTotal = 0;
+    })
 
     $("#send").click(function () {
         /*因为填制凭证时的保存和生成凭证时的保存用的是同一个方法，

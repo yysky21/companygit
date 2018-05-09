@@ -36,7 +36,7 @@ public class ProductCheck implements Serializable {
     @Column(name="checkDate")
     private Timestamp checkDate;  //盘点日期
 
-    @Column(name="checkNo",length=15)
+    @Column(name="checkNo",length=16)
     private String checkNo;  //盘点单据编号
 
     @ManyToOne(cascade=CascadeType.DETACH, fetch = FetchType.LAZY)

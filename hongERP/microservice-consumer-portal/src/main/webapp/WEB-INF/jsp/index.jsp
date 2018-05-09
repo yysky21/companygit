@@ -31,6 +31,8 @@
     <link href="../../res/gentelella/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
     <!-- custom -->
     <link href="../../res/css/custom.css" rel="stylesheet">
+    <!-- list -->
+    <link href="../../res/css/list.css" rel="stylesheet">
     <%--smartMenu--%>
     <link type="text/css" href="../../res/css/smartMenu.css" rel="stylesheet">
 </head>

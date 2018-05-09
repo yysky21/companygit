@@ -732,7 +732,7 @@ var assistBook = (function ($) {
                 if (suggestWord != "") {
                     queryJson["name"] = suggestWord;
                 }
-                queryJson["state"] = 1;
+                queryJson["state"] = 3; //3:在售
                 queryJson["useType"] = "acc";
 
                 return queryJson;

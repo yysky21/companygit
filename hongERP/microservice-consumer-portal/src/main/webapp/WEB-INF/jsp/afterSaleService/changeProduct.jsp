@@ -383,10 +383,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/changeProductSaleAudit')}">
                 $("#saleAuditPass").click(function(){
                     changeProduct.saleAudit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/changeProductSaleAudit');
+                    $("#saleAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#saleAuditNotPass").click(function(){
                     changeProduct.saleAudit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/changeProductSaleAudit');
+                    $("#saleAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -395,10 +397,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/changeProductDirectorAudit')}">
                 $("#directorAuditPass").click(function(){
                     changeProduct.directorAudit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/changeProductDirectorAudit');
+                    $("#directorAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#directorAuditNotPass").click(function(){
                     changeProduct.directorAudit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/changeProductDirectorAudit');
+                    $("#directorAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -407,6 +411,7 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/changeProductWarehousingAudit')}">
                 $("#warehousingAuditPass").click(function(){
                     changeProduct.warehousingAudit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/changeProductWarehousingAudit');
+                    $("#warehousingAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#warehousingAuditNotPass").click(function(){
@@ -416,6 +421,7 @@
                             $("#printExpress").show();
                         }
                     });
+                    $("#warehousingAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>

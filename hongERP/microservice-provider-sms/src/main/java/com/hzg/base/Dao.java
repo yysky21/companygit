@@ -3,7 +3,7 @@ package com.hzg.base;
 /**
  * Created by Administrator on 2017/4/20.
  */
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Repository
 public class Dao {
+    Logger logger = Logger.getLogger(Dao.class);
+
     @Autowired
     public RedisTemplate<String, Object> redisTemplate;
 
@@ -80,7 +82,7 @@ public class Dao {
         try {
             expire = redisTemplate.boundValueOps(key).getExpire();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return expire;

@@ -92,4 +92,6 @@ public class ErpConstant {
     public final static String unit_kg = "千克";
     public final static String unit_ct = "克拉";
     public final static String unit_oz = "盎司";
+
+    public final static Integer purchase_type_deposit = 4;
 }

@@ -459,7 +459,7 @@ public class OrderService {
                  */
                 Product queryProduct = new Product();
                 queryProduct.setNo(acc.getProductNo());
-                queryProduct.setState(ErpConstant.product_state_stockIn);
+                queryProduct.setState(ErpConstant.product_state_onSale);
                 queryProduct.setUseType(ErpConstant.product_use_type_acc);
                 List<Product> products = writer.gson.fromJson(erpClient.query(queryProduct.getClass().getSimpleName(), writer.gson.toJson(queryProduct)),
                         new TypeToken<List<Product>>(){}.getType());
@@ -522,7 +522,7 @@ public class OrderService {
                     for (OrderPrivateAcc acc : detail.getOrderPrivate().getAccs()) {
                         Product accQueryProduct = new Product();
                         accQueryProduct.setNo(acc.getProductNo());
-                        accQueryProduct.setState(ErpConstant.product_state_stockIn);
+                        accQueryProduct.setState(ErpConstant.product_state_onSale);
                         accQueryProduct.setUseType(ErpConstant.product_use_type_acc);
 
                         acc.setUnit(((Map<String, String>)writer.gson.fromJson(
@@ -1118,7 +1118,8 @@ public class OrderService {
     }
 
     /**
-     * 每隔 2 个小时，查询出订金 < 50% 的预定订单，如果这些订单未支付时间超过 2 天，则修改订单状态为取消状态
+     * 每隔 2 个小时，查询出未支付的订单，如果是普通订单且 2 小时内未支付，则取消订单，
+     * 如果是预定订单，且订金 < 订单金额50%，且未支付时间超过 2 天，则取消订单
      */
     @Transactional
     @Scheduled(cron = "0 0 0/" + OrderConstant.order_session_time/CommonConstant.hour_seconds + " * * ?")
@@ -1128,16 +1129,32 @@ public class OrderService {
         String currentDay = dateUtil.getCurrentDayStr();
         parameters.put(OrderConstant.order_class_field_date, currentDay + " - " + currentDay);
         parameters.put(OrderConstant.order_class_field_state, String.valueOf(OrderConstant.order_detail_state_unSale));
-        parameters.put(OrderConstant.order_class_field_type, String.valueOf(OrderConstant.order_type_book));
 
         List<Order> orders = orderDao.complexQuery(Order.class, parameters, 0, -1);
 
         long currentTimeMillis = System.currentTimeMillis();
         for (Order order : orders) {
-            if ((currentTimeMillis - order.getDate().getTime())/1000 > OrderConstant.order_book_deposit_less_half_product_lock_time) {
-                order.setState(OrderConstant.order_state_cancel);
-                orderDao.updateById(order.getId(), order);
+            if (order.getType().compareTo(OrderConstant.order_type_book) != 0) {
+                if ((currentTimeMillis - order.getDate().getTime()) > OrderConstant.order_session_time_millisecond) {
+                    cancelOrder(order);
+                }
+
+            } else {
+                OrderBook queryOrderBook = new OrderBook();
+                queryOrderBook.setOrder(order);
+                List<OrderBook> orderBooks = orderDao.query(queryOrderBook);
+
+                if (!orderBooks.isEmpty()) {
+                    double proportion = new BigDecimal(Float.toString(orderBooks.get(0).getDeposit())).
+                            divide(new BigDecimal(Float.toString(order.getPayAmount())), 2, BigDecimal.ROUND_DOWN).doubleValue();
+                    if (proportion < 50d) {
+                        if ((currentTimeMillis - order.getDate().getTime())/1000 > OrderConstant.order_book_deposit_less_half_product_lock_time) {
+                            cancelOrder(order);
+                        }
+                    }
+                }
             }
+
         }
     }
 
@@ -1231,7 +1248,7 @@ public class OrderService {
 
             sql = "select distinct " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;

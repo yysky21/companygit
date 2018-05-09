@@ -89,9 +89,11 @@
                                         <button id="doBusiness" type="button" class="btn btn-success">申请</button>
                                     </c:if>
                                     <c:if test="${entity != null && entity.state == 2}">
+                                        <c:if test="${entity.user.id == userId}">
                                         <button id="send" type="button" class="btn btn-success">修改</button>
                                         <button id="doBusiness" type="button" class="btn btn-success">申请</button>
                                         <button id="edit" type="button" class="btn btn-primary">编辑</button>
+                                        </c:if>
                                     </c:if>
                                 </div>
                             </div>

@@ -575,6 +575,7 @@
        } else if (this.value == <%=ErpConstant.stockInOut_type_changeWarehouse_outWarehouse%>) {
            $("#changeWarehouse").show();
            setDisabled($("#changeWarehouse").find(":input"), false);
+
        }
 
        if (this.value < <%=ErpConstant.stockInOut_type_virtual_outWarehouse%>) {
@@ -601,10 +602,14 @@
            $("#text2").val("");
            document.getElementById("warehouse[id]").value = "";
 
-           $("#send").hide();
+           $("#send").show();
            $("#doBusiness").hide();
            $("#doBusinessOut").show();
        }
+
+        if (this.value == <%=ErpConstant.stockInOut_type_breakage_outWarehouse%>) {
+            $("#doBusinessOut").hide();
+        }
 
         $("#tbody").empty();
     });
@@ -910,14 +915,14 @@
 
     $("#delete").click(function(){
         if (confirm("确定作废该入库单吗？")) {
-            $("#form").sendData('<%=request.getContextPath()%>/erp/delete/<%=StockInOut.class.getSimpleName().toLowerCase()%>',
+            $("#form").sendData('<%=request.getContextPath()%>/erp/delete/stockInOut',
                 '{"id":${entity.id},"state":<%=ErpConstant.stockInOut_state_cancel%>}');
         }
     });
 
     $("#recover").click(function(){
         if (confirm("确定恢复该入库单吗？")) {
-            $("#form").sendData('<%=request.getContextPath()%>/erp/recover/<%=StockInOut.class.getSimpleName().toLowerCase()%>',
+            $("#form").sendData('<%=request.getContextPath()%>/erp/recover/stockInOut',
                 '{"id":${entity.id},"state":<%=ErpConstant.stockInOut_state_apply%>}');
         }
     });

@@ -438,6 +438,24 @@ public class AfterSaleServiceService {
         }
 
         if (canReturnMsg.equals("")) {
+            if (returnProduct.getEntity().equals(ErpConstant.purchase)) {
+                Purchase purchase = (Purchase) orderDao.queryById(returnProduct.getEntityId(), Purchase.class);
+                if (purchase.getType().compareTo(ErpConstant.purchase_type_deposit) == 0) {
+                    canReturnMsg += "采购单：" + purchase.getNo() + "为押金采购，不能退货";
+                }
+            }
+        }
+
+        if (canReturnMsg.equals("")) {
+            List<Pay> pays = orderService.getPaysByEntity(returnProduct.getEntity(), returnProduct.getEntityId());
+            for (Pay pay : pays) {
+                if (pay.getState().compareTo(PayConstants.pay_state_success) != 0) {
+                    canReturnMsg += "单号：" + returnProduct.getEntityNo() + " 的单子，还未支付完成，不同退货";
+                }
+            }
+        }
+
+        if (canReturnMsg.equals("")) {
             for (ReturnProductDetail detail : returnProduct.getDetails()) {
                 if (detail.getQuantity() == 0) {
                     canReturnMsg += "商品：" + detail.getProductNo() + "申请退货数量为: 0;";
@@ -481,7 +499,7 @@ public class AfterSaleServiceService {
                 }
 
             } else {
-                if (detail.getReturnProductDetailProducts().size() != detail.getQuantity().intValue()) {
+                if (detail.getReturnProductDetailProducts().size() < detail.getQuantity().intValue()) {
                     canReturnMsg += "商品：" + detail.getProductNo() + "实际可退" + detail.getReturnProductDetailProducts().size() +
                             "件，但申请退货件数为" + detail.getQuantity().intValue() + "，不能退货。";
                     break;
@@ -650,7 +668,12 @@ public class AfterSaleServiceService {
         }
 
         returnProduct.setDate(dateUtil.getSecondCurrentTimestamp());
-        returnProduct.setState(AfterSaleServiceConstant.returnProduct_state_refund);
+        if (returnProduct.getEntity().equals(OrderConstant.order)) {
+            returnProduct.setState(AfterSaleServiceConstant.returnProduct_state_refund);
+
+        } else if (returnProduct.getEntity().equals(ErpConstant.purchase)) {
+            returnProduct.setState(AfterSaleServiceConstant.returnProduct_purchase_state_refund);
+        }
         result += afterSaleServiceDao.updateById(returnProduct.getId(), returnProduct);
 
         for (ReturnProductDetail returnProductDetail : returnProduct.getDetails()) {
@@ -1171,7 +1194,7 @@ public class AfterSaleServiceService {
             pay.setState(PayConstants.pay_state_apply);
             pay.setBalanceType(PayConstants.balance_type_income);
 
-            pay.setEntity(changeProduct.getClass().getSimpleName());
+            pay.setEntity(AfterSaleServiceConstant.changeProduct);
             pay.setEntityId(changeProduct.getId());
             pay.setEntityNo(changeProduct.getNo());
             pay.setUser(changeProduct.getUser());
@@ -1295,6 +1318,15 @@ public class AfterSaleServiceService {
             }
 
             if (canReturnMsg.equals("")) {
+                List<Pay> pays = orderService.getPaysByEntity(changeProduct.getEntity(), changeProduct.getEntityId());
+                for (Pay pay : pays) {
+                    if (pay.getState().compareTo(PayConstants.pay_state_success) != 0) {
+                        canReturnMsg += "单号：" + changeProduct.getEntityNo() + " 的单子，还未支付完成，不同换货";
+                    }
+                }
+            }
+
+            if (canReturnMsg.equals("")) {
                 for (ChangeProductDetail detail : changeProduct.getDetails()) {
                     if (detail.getType().compareTo(AfterSaleServiceConstant.changeProduct_detail_type_returnProduct) == 0) {
                         if (detail.getQuantity() == 0) {
@@ -1345,7 +1377,7 @@ public class AfterSaleServiceService {
                         }
 
                     } else {
-                        if (detail.getChangeProductDetailProducts().size() != detail.getQuantity().intValue()) {
+                        if (detail.getChangeProductDetailProducts().size() < detail.getQuantity().intValue()) {
                             canReturnMsg += "商品：" + detail.getProductNo() + "实际可退" + detail.getChangeProductDetailProducts().size() +
                                     "件，但申请退货件数为" + detail.getQuantity().intValue() + "，不能退货。";
                             break;
@@ -2323,6 +2355,15 @@ public class AfterSaleServiceService {
         String canReturnMsg = "";
 
         if (canReturnMsg.equals("")) {
+            List<Pay> pays = orderService.getPaysByEntity(repairProduct.getEntity(), repairProduct.getEntityId());
+            for (Pay pay : pays) {
+                if (pay.getState().compareTo(PayConstants.pay_state_success) != 0) {
+                    canReturnMsg += "单号：" + repairProduct.getEntityNo() + " 的单子，还未支付完成，不同修补货品";
+                }
+            }
+        }
+
+        if (canReturnMsg.equals("")) {
             for (RepairProductDetail detail : repairProduct.getDetails()) {
                 if (detail.getQuantity() == 0) {
                     canReturnMsg += "商品：" + detail.getProductNo() + "申请修补数量为: 0;";
@@ -2498,7 +2539,7 @@ public class AfterSaleServiceService {
         String result = CommonConstant.fail;
 
         Pay queryPay = new Pay();
-        queryPay.setEntity(repairProduct.getClass().getSimpleName());
+        queryPay.setEntity(AfterSaleServiceConstant.repairProduct);
         queryPay.setEntityId(repairProduct.getId());
         result += writer.getResult(payClient.offlinePaid(payClient.query(queryPay.getClass().getSimpleName(), writer.gson.toJson(queryPay))));
 

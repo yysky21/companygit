@@ -1,5 +1,6 @@
 package com.hzg.tools;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.security.*;
@@ -14,6 +15,8 @@ import javax.crypto.spec.DESKeySpec;
  */
 @Component
 public class Des {
+    Logger logger = Logger.getLogger(Des.class);
+
     /** 加密、解密key. */
     private final String PASSWORD_CRYPT_KEY = "l3bxztxDjQLIYRPh8ntzSakMGezqBUPtzNBHK0j7fzqwg5DzDdlS1MnXfwe34eF9l3bxztxDjQLdbcvb56DDsBUPtzNBHK0j7fzqwg5DzDdlS1MnXfwe34eF9vcd45SL";
 
@@ -41,7 +44,7 @@ public class Des {
         try {
             return new String(decrypt(hex2byte(data.getBytes())));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -58,7 +61,7 @@ public class Des {
         try {
             return byte2hex(encrypt(data.getBytes()));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return null;

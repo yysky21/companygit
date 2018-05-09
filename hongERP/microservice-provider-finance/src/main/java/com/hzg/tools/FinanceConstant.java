@@ -6,9 +6,9 @@ package com.hzg.tools;
  * 文件名: AuditFlowConstant.java
  * 类的详细说明
  *
- * @author smjie
+ * @author yuanyun
  * @version 1.00
- * @Date 2017/6/22
+ * @Date 2018/1/17
  */
 
 public class FinanceConstant {
@@ -45,6 +45,7 @@ public class FinanceConstant {
     public final static String advance_payAmount = "预付款";
     public final static String receiptAmount = "普通收款";
     public final static String payAmount = "普通付款";
+    public final static String repairProduct = "修补货品";
 
     // 科目名称
     public final static String processRepair = "加工费/修补费";

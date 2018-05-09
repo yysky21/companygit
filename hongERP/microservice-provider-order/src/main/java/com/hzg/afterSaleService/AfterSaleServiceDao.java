@@ -108,7 +108,7 @@ public class AfterSaleServiceDao extends Dao {
             try {
                 obj = clazz.newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             objects.add(setObjectValue(obj, value, startPosition));

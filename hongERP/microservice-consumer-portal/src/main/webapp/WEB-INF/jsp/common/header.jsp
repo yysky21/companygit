@@ -5,6 +5,7 @@
 <%@ page import="com.hzg.finance.Voucher" %>
 <%@ page import="com.hzg.finance.Subject" %>
 <%@ page import="com.hzg.pay.Refund" %>
+<%@ page import="com.hzg.sys.Article" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--
@@ -153,7 +154,7 @@
                                 <ul class="nav child_menu">
                                     <li><a href="#/customerManagement/list/customer/{}">管理</a></li>
                                     <c:if test="${fn:contains(resources, '/customerManagement/save/customer')}">
-                                        <li><a href="#/customerManagement/view/customer/-1">添加客户</a></li>
+                                        <li><a href="#/customerManagement/view/customer/-1">注册客户</a></li>
                                     </c:if>
                                 </ul>
                             </li>
@@ -220,7 +221,7 @@
                             </li>
                         </c:if>
 
-                        <c:if test="${fn:contains(resources, '/sys/save')}">
+                        <c:if test="${fn:contains(resources, '/sys/save/user')}">
                             <li><a><i class="fa fa-edit"></i> 后台 <span class="fa fa-chevron-down"></span></a>
                                 <ul class="nav child_menu">
                                     <li><a href="#/sys/list/<%=User.class.getSimpleName().toLowerCase()%>/{}">管理</a></li>
@@ -230,9 +231,16 @@
                                 <c:if test="${fn:contains(resources, '/sys/save/auditFlow')}">
                                     <li><a href="#/sys/view/auditFlow/-1">添加流程</a></li>
                                 </c:if>
-                                <c:if test="${fn:contains(resources, '/sys/save/article')}">
-                                    <li><a href="#/sys/view/article/-1">添加文章</a></li>
-                                </c:if>
+                                </ul>
+                            </li>
+                        </c:if>
+                        <c:if test="${fn:contains(resources, '/sys/save/article')}">
+                            <li><a><i class="fa fa-edit"></i> 文章发布 <span class="fa fa-chevron-down"></span></a>
+                                <ul class="nav child_menu">
+                                    <li><a href="#/sys/list/<%=Article.class.getSimpleName().toLowerCase()%>/{}">管理</a></li>
+                                    <c:if test="${fn:contains(resources, '/sys/save/article')}">
+                                        <li><a href="#/sys/view/article/-1">添加文章</a></li>
+                                    </c:if>
                                 </ul>
                             </li>
                         </c:if>

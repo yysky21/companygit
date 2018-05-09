@@ -42,6 +42,7 @@ var dataList = (function ($) {
         "audit": "事宜",
         "customer": "客户",
         "customerUser": "用户",
+        "express": "收件信息",
         "voucher":"凭证",
         "voucherCategory":"凭证类别",
         "subject":"科目",
@@ -85,6 +86,7 @@ var dataList = (function ($) {
         "audit": "办理时间",
         "customer": "注册时间",
         "customerUser": "注册时间",
+        "express": "添加时间",
         "voucher": "制单日期",
         "voucherCategory": "创建时间",
         "subject":"创建时间",
@@ -128,6 +130,7 @@ var dataList = (function ($) {
         "audit": "dealDate",
         "customer": "inputDate",
         "customerUser": "inputDate",
+        "express": "inputDate",
         "voucher": "voucher[makeDate]",
         "voucherCategory": "inputDate",
         "subject":"inputDate",
@@ -170,6 +173,7 @@ var dataList = (function ($) {
         "audit": "状态",
         "customer": "类别",
         "customerUser": "类别",
+        "express": "类别",
         "voucher": "类别",
         "voucherCategory": "类别",
         "subject": "类别",
@@ -202,6 +206,7 @@ var dataList = (function ($) {
         "account": "/view",
         "customer": "/view",
         "customerUser": "/view",
+        "express": "/view",
         "voucherCategory": "/view",
         "subject": "/view"
     };
@@ -227,6 +232,7 @@ var dataList = (function ($) {
         "account": "注册银行账户",
         "customer": "注册客户",
         "customerUser": "注册用户",
+        "express": "添加收件信息",
         "stockInOut": "商品入库、出库",
         "voucherCategory": "添加凭证类别",
         "subject": "添加科目"
@@ -265,6 +271,7 @@ var dataList = (function ($) {
         "account": "/pay",
         "customer": "/customerManagement",
         "customerUser": "/customerManagement",
+        "express": "/customerManagement",
         "voucher": "/finance",
         "voucherCategory": "/finance",
         "subject": "/finance",
@@ -319,6 +326,7 @@ var dataList = (function ($) {
         "account": "/complexQuery",
         "customer": "/unlimitedComplexQuery",
         "customerUser": "/unlimitedComplexQuery",
+        "express": "/unlimitedComplexQuery",
         "voucher": "/complexQuery",
         "voucherCategory": "/complexQuery",
         "subject": "/complexQuery",
@@ -362,6 +370,7 @@ var dataList = (function ($) {
         "account": "/view",
         "customer": "/view",
         "customerUser": "/view",
+        "express": "/view",
         "voucher": "/view",
         "voucherCategory": "/view",
         "subject": "/view"
@@ -375,14 +384,14 @@ var dataList = (function ($) {
         "privilegeResource": "<th>名称</th><th>URI</th>",
         "audit": "<th>名称</th><th>流转时间</th><th>状态</th>",
         "auditFlow": "<th>名称</th><th>业务类型</th><th>所属公司</th><th>状态</th>",
-        "article": "<th>标题</th><th>分类</th><th>摘要</th><th>阅读量</th><th>发布人</th><th>创建时间</th><th>状态</th><th>文章优化关键词</th>",
+        "article": "<th width='20%'>标题</th><th>分类</th><th width='30%'>摘要</th><th>阅读量</th><th>发布人</th><th>创建时间</th><th>状态</th><th>文章优化关键词</th>",
         "articleCate": "<th>文章分类名称</th><th>分类名称简写</th><th>文章分类优化关键词</th>",
         "articleTag": "<th>文章标签名称</th><th>创建时间</th>",
         "product": "<th>名称</th><th>编号</th><th>类别</th><th>结缘价</th><th>市场价</th><th>采购单价</th><th>特性</th><th>供应商</th><th>图片</th><th>状态</th>",
         "productDescribe": "<th>标题</th><th>关键词</th><th>编辑时间</th>",
         "productType": "<th>名称</th><th>缩写</th><th>优化标题</th><th>优化关键字</th><th>优化描述</th><th>所属父类</th>",
         "productPriceChange": "<th>编号</th><th>商品编号</th><th>商品价格</th><th>调整后价格</th><th>状态</th>",
-        "productCheck": "<th>盘点单据编号</th><th>盘点日期</th><th>盘点仓库</th><th>盘点部门</th><th>盈亏总数量</th><th>盈亏总金额</th><th>制单人</th><th>公司</th><th>备注</th><th>状态</th>",
+        "productCheck": "<th>盘点单据编号</th><th>盘点日期</th><th>盘点仓库</th><th>盘点部门</th><th>盈亏总数量</th><th>盈亏总金额</th><th>制单人</th><th>公司</th><th width='20%'>备注</th><th>状态</th>",
         "supplier": "<th>名称</th><th>主要供货类型</th><th>等级</th><th>负责人</th><th>地址</th><th>电话</th><th>合作日期</th><th>商家类型</th>",
         "purchase": "<th>名称</th><th>编号</th><th>状态</th><th>类型</th><th>采购时间</th><th>采购人</th><th>录入人</th>",
         "borrowProduct": "<th>编号</th><th>状态</th><th>借货人</th><th>出借人</th><th>申请时间</th><th>借货时间</th>",
@@ -399,7 +408,8 @@ var dataList = (function ($) {
         "refund": "<th>退款编号</th><th>状态</th><th>金额</th><th>退款时间</th><th>退款银行</th><th>收款银行</th><th>退款支付号</th><th>银行流水号</th><th>关联单号</th><th>收支类型</th>",
         "account": "<th>账户</th><th>所属银行</th><th>开户人</th><th>开户行</th><th>账户金额</th><th>创建时间</th>",
         "customer": "<th>姓名</th><th>性别</th><th>创建时间</th>",
-        "customerUser": "<th>用户名</th><th>昵称</th><th>最近登录时间</th><th>在线时长</th><th>登录次数</th><th>点击次数</th><th>用户积分</th><th>状态</th>",
+        "customerUser": "<th>用户名</th><th>昵称</th><th>最近登录时间</th><th>在线时长</th><th>登录次数</th><th>点击次数</th><th>用户积分</th><th>状态</th><th>所属客户</th>",
+        "express": "<th>收件人</th><th>收件联系手机</th><th>收件联系电话</th><th>所在城市</th><th>所在省份</th><th>收件地址</th><th>是否默认使用</th><th>所属客户</th>",
         "voucher": "<th>凭证编号</th><th>凭证类别</th><th>制单日期</th><th>制单人</th><th>借方合计</th><th>贷方合计</th>",
         "voucherCategory": "<th>凭证类别</th><th>凭证字</th><th>创建时间</th>",
         "subject": "<th>科目编码</th><th>编码规则</th><th>科目名称</th><th>科目类型</th><th>余额方向</th><th>辅助核算项</th><th>停用</th><th>账面格式</th><th>创建时间</th>",
@@ -442,7 +452,8 @@ var dataList = (function ($) {
         "refund": ["no", "state", "amount", "refundDate", "refundBank", "payBank", "pay[no]", "bankBillNo", "entityNo", "balanceType"],
         "account": ["account", "bank", "owner[name]", "branch", "amount", "inputDate"],
         "customer": ["name", "gender", "inputDate"],
-        "customerUser": ["username", "nickname", "lastLoginDate", "onlineTime", "loginCount", "clickCount", "points", "state"],
+        "customerUser": ["username", "nickname", "lastLoginDate", "onlineTime", "loginCount", "clickCount", "points", "state", "customer[name]"],
+        "express": ["receiver", "mobile", "phone", "city", "province", "address", "defaultUse", "customer[name]"],
         "voucher": ["no", "voucherCategory[name]", "makeDate", "chartMaker[name]", "debit", "credit"],
         "voucherCategory": ["name", "voucherWord","inputDate"],
         "subject": ["no","codeRule", "name", "type", "direction", "accountItems[]", "state","paperFormat","inputDate"],
@@ -486,6 +497,7 @@ var dataList = (function ($) {
         "account": "account",
         "customer": "name",
         "customerUser": "username",
+        "express": "receiver",
         "voucher": "no",
         "voucherCategory": "name",
         "subject": "no"
@@ -524,6 +536,7 @@ var dataList = (function ($) {
         "account": "id",
         "customer": "id",
         "customerUser": "id",
+        "express": "id",
         "voucher": "id",
         "voucherCategory": "id",
         "subject": "id"
@@ -540,7 +553,7 @@ var dataList = (function ($) {
         "article": {"state": {0: "保存", 1: "发布",2:"删除"}},
         "product": {"state": {0: "采购", 10: "采购审核通过", 11: "采购完成", 1: "入库", 12:"部分入库", 2: "出库", 21:"部分出库", 3: "在售", 4: "售完", 41: "部分已售", 5: "无效", 6: "编辑", 7: "多媒体文件已上传", 8: "已发货", 81:"部分发货", 82:"申请采购退货", 83:"采购退货完成", 84:"部分申请采购退货", 85:"部分采购退货完成", 86:"申请修补",87:"已修补", 88:"部分申请修补", 89:"部分申请修补完成", 9:"申请退货", 91:"已退货", 92:"申请换货", 93:"已换货", 94:"部分申请退货", 95:"部分已退货", 96:"部分申请换货", 97:"部分已换货", 98:"换货申请退货", 99:"换货部分申请退货"}},
         "productPriceChange": {"state": {0: "申请", 1: "在用", 2: "保存"}},
-        "productCheck": {"state": {0: "保存", 1: "盘点"}},
+        "productCheck": {"state": {0: "保存", 1: "盘点",2:"作废"}},
         "purchase": {"state": {0: "申请", 1: "完成", 2: "作废"}, "type": {0: "正常采购", 1: "临时采购", 2: "应急采购", 3: "现金采购", 4: "押金采购"}},
         "borrowProduct": {"state": {0: "保存", 1: "申请", 2: "完成", 3: "取消", 4: "已还", 5: "部分已还"}},
         "borrowProductReturn": {"state": {0: "保存", 1: "申请", 2: "完成", 3: "取消"}},
@@ -609,9 +622,8 @@ var dataList = (function ($) {
                 1:"收入"
             }
         },
-        "customerUser": {
-            "state": {0: "在用", 1: "注销"}
-        },
+        "customerUser": {"state": {0: "在用", 1: "注销"}},
+        "express": {"defaultUse": {"N": "否", "Y": "是"}},
         "voucher": {"state": {0: "保存", 1: "审核"}},
         "subject": {
             "state": {0: "否", 1: "是"},
@@ -664,6 +676,7 @@ var dataList = (function ($) {
         "refund": "refund",
         "customer": "customer",
         "customerUser": "customerUser",
+        "express": "express",
         "voucher": "voucher",
         "voucherCategory": "voucherCategory",
         "subject": "subject",
@@ -726,6 +739,11 @@ var dataList = (function ($) {
                 .append(visitEntitiesOptions["productCheck"])
                 .append(visitEntitiesOptions["warehouse"]);
 
+            if (entity == "purchase") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">采购单号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="no" name="no" class="form-control col-md-7 col-xs-12" placeholder="输入单号" /></div></div>');
+            }
+
             if (entity == "stockInOut") {
                 $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">入/出库单号</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="no" name="no" class="form-control col-md-7 col-xs-12" placeholder="输入单号" /></div></div>');
@@ -741,7 +759,12 @@ var dataList = (function ($) {
                 $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="product[state]">状态</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><select id="product[state]" name="product[state]" data-value-type="number" data-skip-falsy="true" class="form-control col-md-7 col-xs-12">' +
                     '<option value="">所有</option><option value="1">入库</option><option value="2">出库</option><option value="3">在售</option>' +
-                    '<option value="4">售完</option><option value="10">采购审核通过</option><option value="7">编辑</option><option value="7">多媒体文件已上传</option>' +
+                    '<option value="4">售完</option><option value="10">采购审核通过</option><option value="6">编辑</option><option value="7">多媒体文件已上传</option>' +
+                    '<option value="41">部分已售</option><option value="8">已发货</option><option value="81">部分发货</option><option value="9">申请退货</option>' +
+                    '<option value="91">已退货</option><option value="94">部分申请退货</option><option value="95">部分已退货</option><option value="92">申请换货</option>' +
+                    '<option value="93">已换货</option><option value="96">部分申请换货</option><option value="97">部分已换货</option><option value="98">换货申请退货</option>' +
+                    '<option value="99">换货部分申请退货</option><option value="86">申请修补</option><option value="87">已修补</option><option value="82">申请采购退货</option>' +
+                    '<option value="83">采购退货完成</option><option value="84">部分申请采购退货</option><option value="85">部分采购退货完成</option>' +
                     '</select></div></div>' +
                     '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="product[name]">商品名称</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="product[name]" name="product[name]" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>' +
@@ -834,7 +857,8 @@ var dataList = (function ($) {
         } else if (modules[entity] == "/customerManagement") {
             $("#entity").empty()
                 .append(visitEntitiesOptions["customer"])
-                .append(visitEntitiesOptions["customerUser"]);
+                .append(visitEntitiesOptions["customerUser"])
+                .append(visitEntitiesOptions["express"]);
 
             if (entity == "customer") {
                 $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">姓名</label>' +
@@ -843,6 +867,10 @@ var dataList = (function ($) {
             if (entity == "customerUser") {
                 $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">用户名</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="username" name="username" class="form-control col-md-7 col-xs-12" placeholder="输入用户名" /></div></div>');
+            }
+            if (entity == "express") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">收件人</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="receiver" name="receiver" class="form-control col-md-7 col-xs-12" placeholder="输入用户名" /></div></div>');
             }
 
         } else if (childModules[entity] == "/voucher"){
@@ -931,7 +959,11 @@ var dataList = (function ($) {
 
         } else {
             $("#add").html(urlTitles[entity]).unbind().click(function () {
-                render(rootPath + modules[entity] + addActions[entity] + "/" + getActualEntity(entity) + "/-1");
+                if (entity == "productCheck"){
+                    render(rootPath + modules[entity] + addActions[entity] + "/productCheckInput/-1");
+                } else {
+                    render(rootPath + modules[entity] + addActions[entity] + "/" + getActualEntity(entity) + "/-1");
+                }
             });
             $("#add").show();
         }
@@ -1353,9 +1385,7 @@ var dataList = (function ($) {
     }
 
     function getActualEntity(entity) {
-        if (entity=="productCheck"){
-            return "productCheckInput";
-        } else if (entity=="customerUser"){
+        if (entity=="customerUser"){
             return "user";
         }
 

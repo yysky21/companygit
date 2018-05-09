@@ -20,6 +20,7 @@ package com.boyuanitsm.pay.wxpay.protocol.refund_protocol;
 import com.boyuanitsm.pay.wxpay.common.RandomStringGenerator;
 import com.boyuanitsm.pay.wxpay.common.Configure;
 import com.boyuanitsm.pay.wxpay.common.Signature;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ import java.util.Map;
  * Time: 16:12
  */
 public class RefundReqData {
+
+    Logger logger = Logger.getLogger(RefundReqData.class);
 
     //每个字段具体的意思请查看API文档
     private String appid = "";
@@ -205,9 +208,9 @@ public class RefundReqData {
                     map.put(field.getName(), obj);
                 }
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         return map;

@@ -29,7 +29,7 @@ public class ProductPriceChange implements Serializable {
     @Column(name="id", length = 11)
     private Integer id;
 
-    @Column(name="no",length=6)
+    @Column(name="no",length=12)
     private String no;
 
     @Column(name = "productNo")

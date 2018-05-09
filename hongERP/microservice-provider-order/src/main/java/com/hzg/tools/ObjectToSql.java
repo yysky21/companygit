@@ -187,7 +187,7 @@ public class ObjectToSql {
             try {
                 field = clazz.getDeclaredField(entry.getKey());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             if (field != null) {
@@ -753,7 +753,7 @@ public class ObjectToSql {
         try {
             limitFields[0] = order.getClass().getDeclaredField("user");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         System.out.println(objectToSql.generateSuggestSqlByAnnotation(order, limitFields));

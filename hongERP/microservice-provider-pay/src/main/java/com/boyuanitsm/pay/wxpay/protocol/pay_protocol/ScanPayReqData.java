@@ -25,6 +25,7 @@ package com.boyuanitsm.pay.wxpay.protocol.pay_protocol;
 import com.boyuanitsm.pay.wxpay.common.RandomStringGenerator;
 import com.boyuanitsm.pay.wxpay.common.Configure;
 import com.boyuanitsm.pay.wxpay.common.Signature;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.Map;
  * 请求被扫支付API需要提交的数据
  */
 public class ScanPayReqData {
+
+    Logger logger = Logger.getLogger(ScanPayReqData.class);
 
     //每个字段具体的意思请查看API文档
     private String appid = "";
@@ -235,9 +238,9 @@ public class ScanPayReqData {
                     map.put(field.getName(), obj);
                 }
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         return map;

@@ -21,9 +21,9 @@ import java.util.*;
  * 文件名: ErpService.java
  * 类的详细说明
  *
- * @author smjie
+ * @author yuanyun
  * @version 1.00
- * @Date 2017/6/28
+ * @Date 2017/11/24
  */
 @Service
 public class FinanceService {
@@ -433,7 +433,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -686,7 +686,7 @@ public class FinanceService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -748,7 +748,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -797,7 +797,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -846,7 +846,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -893,7 +893,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -942,7 +942,7 @@ public class FinanceService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;

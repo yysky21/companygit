@@ -132,7 +132,7 @@
                         </div>
                     </div>
 
-                    <c:if test="${entity.pays != null}">
+                    <c:if test="${!empty entity.pays}">
                     <div class="x_content">
                         <span class="section" style="margin-top: 40px">支付记录</span>
                         <div class="item form-group" style="margin-top:20px;">
@@ -284,10 +284,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/repairProductSaleAudit')}">
                 $("#saleAuditPass").click(function(){
                     repairProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/repairProductSaleAudit');
+                    $("#saleAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#saleAuditNotPass").click(function(){
                     repairProduct.audit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/repairProductSaleAudit');
+                    $("#saleAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -296,10 +298,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/repairProductDirectorAudit')}">
                 $("#directorAuditPass").click(function(){
                     repairProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/repairProductDirectorAudit');
+                    $("#directorAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#directorAuditNotPass").click(function(){
                     repairProduct.audit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/repairProductDirectorAudit');
+                    $("#directorAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -343,6 +347,7 @@
 
 
                     $form.sendData('<%=request.getContextPath()%>/afterSaleService/doBusiness/repairProductWarehousingAudit', json);
+                    $("#warehousingAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#warehousingAuditNotPass").click(function(){
@@ -352,6 +357,7 @@
                             $("#printExpress").show();
                         }
                     });
+                    $("#warehousingAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>

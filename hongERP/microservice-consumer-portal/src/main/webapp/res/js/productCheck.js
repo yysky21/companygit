@@ -76,13 +76,13 @@ var productCheck = (function ($) {
                                 $("#confirm").unbind("click");
                                 $("#checkQuantity").val("");
                                 code.val("");
-                                code.focus();
+                                $("#code1").focus();
                                 $(".checkQuantity").css("display","none");
                                 $("#confirm").unbind("click").bind("click",function () {
                                     if (stockIsSelect($("#code2"))==false){
                                         return false;
                                     }
-                                    if ($("#table > tbody > tr:not(.old)").length>=5){
+                                    if ($("#table > tbody > tr:not(.old)").length>=50){
                                         alert("请保存后再继续输入条形码");
                                         $("#code2").val("");
                                         return false;
@@ -115,13 +115,13 @@ var productCheck = (function ($) {
                                     $("table tbody").append(newTr);
                                     $("#checkQuantity").val("");
                                     code.val("");
-                                    code.focus();
+                                    $("#code1").focus();
                                     $(".checkQuantity").css("display","none");
                                     $("#checkQuantity").unbind("keypress").bind("keypress",function () {
                                         if (stockIsSelect($("#code2"))==false){
                                             return false;
                                         }
-                                        if ($("#table > tbody > tr:not(.old)").length>=5){
+                                        if ($("#table > tbody > tr:not(.old)").length>=50){
                                             alert("请保存后再继续输入条形码!");
                                             $("#code2").val("");
                                             return false;
@@ -139,7 +139,7 @@ var productCheck = (function ($) {
                                         if (stockIsSelect($("#code2"))==false){
                                             return false;
                                         }
-                                        if ($("#table > tbody > tr:not(.old)").length>=5){
+                                        if ($("#table > tbody > tr:not(.old)").length>=50){
                                             alert("请保存后再继续输入条形码");
                                             $("#code2").val("");
                                             return false;
@@ -160,7 +160,7 @@ var productCheck = (function ($) {
                         "<td><input name='details[][checkQuantity]:number' value='1' readonly /></td></tr>");
                     $("table tbody").append(newTr);
                     code.val("");
-                    code.focus();
+                    $("#code1").focus();
                 }
             }else {
                 alert("查不到该商品，请输入商品编码!");
@@ -169,6 +169,7 @@ var productCheck = (function ($) {
                 $("#confirm").unbind("click").bind("click",function () {
                     if ($("#itemNo").val() == null || $("#itemNo").val() == ""){
                         alert("请输入商品编码！");
+                        $("#itemNo").focus();
                         return false;
                     } else {
                         var itemNo = $("#itemNo").val();
@@ -176,14 +177,14 @@ var productCheck = (function ($) {
                             "<td><input name='details[][checkQuantity]:number' value='1' readonly /></td></tr>");
                         $("table tbody").append(newTr);
                         code.val("");
-                        code.focus();
+                        $("#code1").focus();
                         $("#itemNo").val("");
                         $(".itemNo").css("display","none");
                         $("#confirm").unbind("click").bind("click",function () {
                             if (stockIsSelect($("#code2"))==false){
                                 return false;
                             }
-                            if ($("#table > tbody > tr:not(.old)").length>=5){
+                            if ($("#table > tbody > tr:not(.old)").length>=50){
                                 alert("请保存后再继续输入条形码");
                                 $("#code2").val("");
                                 return false;
@@ -202,6 +203,7 @@ var productCheck = (function ($) {
                         if (e.keyCode == 13) {
                             if ($("#itemNo").val() == null || $("#itemNo").val() == ""){
                                 alert("请输入商品编码！");
+                                $("#itemNo").focus();
                                 return false;
                             } else {
                                 var itemNo = $("#itemNo").val();
@@ -209,7 +211,7 @@ var productCheck = (function ($) {
                                     "<td><input name='details[][checkQuantity]:number' value='1' readonly /></td></tr>");
                                 $("table tbody").append(newTr);
                                 code.val("");
-                                code.focus();
+                                $("#code1").focus();
                                 $("#itemNo").val("");
                                 $(".itemNo").css("display", "none");
                                 $("#itemNo").unbind("keypress");
@@ -217,7 +219,7 @@ var productCheck = (function ($) {
                                     if (stockIsSelect($("#code2"))==false){
                                         return false;
                                     }
-                                    if ($("#table > tbody > tr:not(.old)").length>=5){
+                                    if ($("#table > tbody > tr:not(.old)").length>=50){
                                         alert("请保存后再继续输入条形码");
                                         $("#code2").val("");
                                         return false;

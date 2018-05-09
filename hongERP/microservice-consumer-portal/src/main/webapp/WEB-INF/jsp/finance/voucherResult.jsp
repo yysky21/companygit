@@ -1,11 +1,10 @@
-<%@ page import="com.hzg.tools.FinanceConstant" %>
 <%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
-* 文件名: productCheck.jsp
+* 文件名: voucherResult.jsp
 *
 * @author yuanyun
-* @Date  2017/10/25
+* @Date  2018/2/6
 * @version 1.00
 *
 --%>
@@ -162,8 +161,10 @@
                             <div class="form-group" id="submitDiv">
                                 <div class="col-md-6 col-md-offset-8">
                                     <button id="cancel" type="button" class="btn btn-primary">取消</button>
+                                    <button id="first" type="button" class="btn btn-primary">首张</button>
                                     <button id="previous" type="button" class="btn btn-primary">上一张</button>
                                     <button id="next" type="button" class="btn btn-primary">下一张</button>
+                                    <button id="last" type="button" class="btn btn-primary">末张</button>
                                     <button id="send" type="button" class="btn btn-success">保存</button>
                                     <button id="sendAll" type="button" class="btn btn-success">批量保存</button>
                                 </div>
@@ -371,16 +372,58 @@
         }
     });
 
+    if (${entities[1] == undefined}){
+        $("#previous").attr("disabled",true);
+        $("#next").attr("disabled",true);
+    }
     var vouchers = ${json};
+    console.log("--------------------------"+vouchers.length);
     // 用来存储已经保存的凭证的标志
     var disabledSaveNo = {};
     var count = 0;
     if (count == 0){
         $("#previous").attr("disabled",true);
+        $("#first").attr("disabled",true);
     }
+
+    $("#first").click(function () {
+        $("#send").attr("disabled",false);
+        $("#next").attr("disabled",false);
+        $("#last").attr("disabled",false);
+        var json = JSON.stringify($("#form").serializeJSON());
+        json = json.substring(0, (json.indexOf("details")-2))+json.substring((json.indexOf("]")+1),json.length-1) + ',"details":[';
+
+        var trs = $("#voucherList tbody tr");
+
+        for (var i = 0; i < trs.length; i++) {
+            var inputs = $(trs[i]).find(":input");
+            json += JSON.stringify(inputs.not('[value=""]').serializeJSON({skipFalsyValuesForFields: ["details[][voucherItem[assistant]]:string", "details[][voucherItem[debit]]","details[][voucherItem[credit]]"]})["details"][0]) + ",";
+        }
+
+        json = json.substring(0, json.length-1) + ']';
+        json += ',"voucherItemSources":' + JSON.stringify(vouchers[count].voucherItemSources)+"}";
+        var jsonn = JSON.parse(json);
+        vouchers[count] = jsonn;
+        $("#no").val(vouchers[0].no);
+        $("#debit").val(vouchers[0].debit);
+        $("#credit").val(vouchers[0].credit);
+        $("#voucherList tbody").empty();
+        var details = vouchers[0].details;
+        addItem(details);
+        count = 0;
+        if (count == 0){
+            $("#previous").attr("disabled",true);
+            $("#first").attr("disabled",true);
+        }
+        if (count == disabledSaveNo[count] ){
+            $("#send").attr("disabled",true);
+        }
+    });
+
     $("#previous").click(function () {
         $("#send").attr("disabled",false);
         $("#next").attr("disabled",false);
+        $("#last").attr("disabled",false);
         var json = JSON.stringify($("#form").serializeJSON());
         json = json.substring(0, (json.indexOf("details")-2))+json.substring((json.indexOf("]")+1),json.length-1) + ',"details":[';
 
@@ -404,16 +447,17 @@
         count--;
         if (count == 0){
             $("#previous").attr("disabled",true);
+            $("#first").attr("disabled",true);
         }
         if (count == disabledSaveNo[count] ){
             $("#send").attr("disabled",true);
         }
-
     });
 
     $("#next").click(function () {
         $("#send").attr("disabled",false);
         $("#previous").attr("disabled",false);
+        $("#first").attr("disabled",false);
         var json = JSON.stringify($("#form").serializeJSON());
         json = json.substring(0, (json.indexOf("details")-2))+json.substring((json.indexOf("]")+1),json.length-1) + ',"details":[';
 
@@ -437,12 +481,46 @@
         count++;
         if (count == vouchers.length-1){
             $("#next").attr("disabled",true);
+            $("#last").attr("disabled",true);
         }
         if (count == disabledSaveNo[count] ){
             $("#send").attr("disabled",true);
         }
-
     })
+
+    $("#last").click(function () {
+        $("#send").attr("disabled",false);
+        $("#previous").attr("disabled",false);
+        $("#first").attr("disabled",false);
+        var json = JSON.stringify($("#form").serializeJSON());
+        json = json.substring(0, (json.indexOf("details")-2))+json.substring((json.indexOf("]")+1),json.length-1) + ',"details":[';
+
+        var trs = $("#voucherList tbody tr");
+
+        for (var i = 0; i < trs.length; i++) {
+            var inputs = $(trs[i]).find(":input");
+            json += JSON.stringify(inputs.not('[value=""]').serializeJSON({skipFalsyValuesForFields: ["details[][voucherItem[assistant]]:string", "details[][voucherItem[debit]]","details[][voucherItem[credit]]"]})["details"][0]) + ",";
+        }
+
+        json = json.substring(0, json.length-1) + ']';
+        json += ',"voucherItemSources":' + JSON.stringify(vouchers[count].voucherItemSources)+"}";
+        var jsonn = JSON.parse(json);
+        vouchers[count] = jsonn;
+        $("#no").val(vouchers[vouchers.length-1].no);
+        $("#debit").val(vouchers[vouchers.length-1].debit);
+        $("#credit").val(vouchers[vouchers.length-1].credit);
+        $("#voucherList tbody").empty();
+        var details = vouchers[vouchers.length-1].details;
+        addItem(details);
+        count = vouchers.length-1;
+        if (count == vouchers.length-1){
+            $("#next").attr("disabled",true);
+            $("#last").attr("disabled",true);
+        }
+        if (count == disabledSaveNo[count] ){
+            $("#send").attr("disabled",true);
+        }
+    });
 
     function addItem(details) {
         for (var i in details){

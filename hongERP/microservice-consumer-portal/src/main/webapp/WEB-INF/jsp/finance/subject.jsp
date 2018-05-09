@@ -1,17 +1,13 @@
 <%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
-* 文件名: user.jsp
+* 文件名: subject.jsp
 *
-* @author smjie
-* @Date  2017/4/12
+* @author yuanyun
+* @Date  2017/11/27
 * @version 1.00
 *
 --%>
-<%@ page import="com.hzg.sys.User" %>
-<%@ page import="com.hzg.sys.Company" %>
-<%@ page import="com.hzg.sys.Dept" %>
-<%@ page import="com.hzg.sys.Post" %>
 <%@ page import="com.hzg.finance.Subject" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -169,7 +165,7 @@
                             <div class="ln_solid"></div>
                             <div class="form-group">
                                 <div class="col-md-6 col-md-offset-3">
-                                    <button id="cancel" type="button" class="btn btn-primary">取消</button>
+                                    <button id="cancel" type="button" class="btn btn-primary">返回</button>
                                     <c:if test="${entity == null}">
                                     <button id="send" type="button" class="btn btn-success">保存</button>
                                     </c:if>
@@ -209,12 +205,6 @@
         checkboxClass: 'icheckbox_flat-green',
         radioClass: 'iradio_flat-green'
     });
-
-    /*$("#subjectCategory2").on("ifChecked", function() {
-        if ($("#subjectCategory2").attr("value") == 2){
-            $("#info").iCheck("check");
-        }
-    });*/
 
     if (${entity == null}){
         $("#no").blur(function () {
@@ -271,7 +261,11 @@
     $("#stop").click(function(){
         if (confirm("确定停用该科目吗？")) {
             $("#form").sendData('<%=request.getContextPath()%>/finance/update/subject',
-                '{"id":${entity.id},"state":1}');
+                '{"id":${entity.id},"state":1}',function (result) {
+                    if (result.result.indexOf("success") != -1){
+                        $("#send").attr("disabled",true);
+                    }
+                });
         }
     });
 
@@ -283,9 +277,15 @@
     });
 
     $("#delete").click(function(){
-        if (confirm("确定删除该科目吗？")) {
+        if (confirm("删除之后不能恢复，确定删除该科目吗？")) {
             $("#form").sendData('<%=request.getContextPath()%>/finance/delete/subject',
-                '{"id":${entity.id}}');
+                '{"id":${entity.id}}',function (result) {
+                    if (result.result.indexOf("success") != -1){
+                        $("#send").attr("disabled",true);
+                        $("#stop").attr("disabled",true);
+                        $("#recover").attr("disabled",true);
+                    }
+                });
         }
     });
 

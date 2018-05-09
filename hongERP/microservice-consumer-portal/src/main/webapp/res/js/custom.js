@@ -312,7 +312,7 @@ function init(editable) {
     $("#edit").unbind("click").click(function(){
         editable = true;
         $('#form :input').attr("readonly",false).css("border", "1px solid #ccc");
-        $('#send, #doBusiness, #delete, #recover,#publish,#stop').attr("disabled", false);
+        $('#send, #doBusiness, #delete, #recover,#publish,#stop,#save').attr("disabled", false);
         $("#edit").attr("disabled", "disabled");
     });
 
@@ -323,7 +323,7 @@ function init(editable) {
 
     if (!editable) {
         $('#form :input').attr("readonly","readonly").css("border", "0");
-        $('#send, #doBusiness, #delete, #recover,#publish,#stop').attr("disabled","disabled");
+        $('#send, #doBusiness, #delete, #recover,#publish,#stop,#save').attr("disabled","disabled");
     }
 
     $("#cancel, #return").unbind("click").click(function(){

@@ -4,7 +4,7 @@
 * 文件名: articleTag.jsp
 *
 * @author yuanyun
-* @Date  2017/10/06
+* @Date  2017/04/02
 * @version 1.00
 *
 --%>
@@ -48,7 +48,7 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">文章标签名称 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="name" name="name" class="form-control col-md-7 col-xs-12" value="${entity.name}" data-validate-length="1,20" data-validate-words="1"  required type="text">
+                                    <input id="name" name="name" class="form-control col-md-7 col-xs-12" value="${entity.name}"  required type="text">
                                 </div>
                             </div>
                             <div class="ln_solid"></div>

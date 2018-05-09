@@ -4,6 +4,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
+import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -24,7 +25,7 @@ import java.util.Map;
  * from https://github.com/egzosn/pay-java-parent
  */
 public class MatrixToImageWriter {
-
+	   static Logger logger = Logger.getLogger(MatrixToImageWriter.class);
 
 	   private static final int BLACK = 0xFF000000;
 	   private static final int WHITE = 0xFFFFFFFF;
@@ -97,7 +98,7 @@ public class MatrixToImageWriter {
 				File file1 = new File(fileUrl);
 				MatrixToImageWriter.writeToFile(bitMatrix, "jpg", file1);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}	 
 	   }
 	  
@@ -118,7 +119,7 @@ public class MatrixToImageWriter {
 						BarcodeFormat.QR_CODE, 250, 250, hints);
 				re=MatrixToImageWriter.toBufferedImage(bitMatrix);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 			}	 
 		    
 		  return re;

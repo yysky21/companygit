@@ -101,7 +101,7 @@ public class OrderController {
         try {
             result += orderService.saveOrder(order);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -179,7 +179,7 @@ public class OrderController {
                 result +=  CommonConstant.fail + ",未支付订单才可以取消或确认收款";
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -224,7 +224,7 @@ public class OrderController {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -301,7 +301,7 @@ public class OrderController {
         try {
             limitFields[0] = order.getClass().getDeclaredField("user");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         writer.writeObjectToJson(response, orderDao.suggest(order, limitFields));

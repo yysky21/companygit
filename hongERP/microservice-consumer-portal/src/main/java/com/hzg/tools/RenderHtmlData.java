@@ -93,6 +93,7 @@ public class RenderHtmlData {
                         productPriceChanges.get(0).getUser().getName() + "</option>"
                         + refuseUserOptions;
             }
+
         } else if (audits.get(0).getEntity().equals(AuditFlowConstant.business_voucherAudit)){
             List<Voucher> vouchers = writer.gson.fromJson(financeClient.query(Voucher.class.getSimpleName().toLowerCase(),
                     "{\"id\":" + audits.get(0).getEntityId() + "}"),
@@ -102,6 +103,17 @@ public class RenderHtmlData {
                     vouchers.get(0).getChartMaker().getId().compareTo(currentUser.getId()) != 0) {
                 refuseUserOptions = "<option value='" + vouchers.get(0).getChartMaker().getId() + "'>" +
                         vouchers.get(0).getChartMaker().getName() + "</option>"
+                        + refuseUserOptions;
+            }
+
+        } else if (audits.get(0).getEntity().equals(AuditFlowConstant.business_stockOut_breakage)) {
+            List<StockInOut> stockInOuts = writer.gson.fromJson(erpClient.query(StockInOut.class.getSimpleName().toLowerCase(),
+                    "{\"id\":" + audits.get(0).getEntityId() + "}"),
+                    new TypeToken<List<StockInOut>>() {}.getType());
+
+            if (!refuseUserOptions.contains("'" +  stockInOuts.get(0).getInputer().getId() + "'") &&
+                    stockInOuts.get(0).getInputer().getId().compareTo(currentUser.getId()) != 0) {
+                refuseUserOptions = "<option value='" + stockInOuts.get(0).getInputer().getId() + "'>" + stockInOuts.get(0).getInputer().getName() + "</option>"
                         + refuseUserOptions;
             }
         }

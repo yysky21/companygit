@@ -40,7 +40,7 @@ public class Article implements Serializable {
     @Column(name="content")
     private String content;
 
-    @Column(name="shortContent",length=150)
+    @Column(name="shortContent",length=300)
     private String shortContent;
 
     @Column(name="position", length = 1)

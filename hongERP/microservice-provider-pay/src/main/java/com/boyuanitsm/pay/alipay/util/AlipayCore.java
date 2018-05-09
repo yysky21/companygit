@@ -20,6 +20,7 @@ import com.boyuanitsm.pay.alipay.config.AlipayConfig;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.httpclient.methods.multipart.FilePartSource;
 import org.apache.commons.httpclient.methods.multipart.PartSource;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -38,6 +39,8 @@ import java.util.*;
  */
 
 public class AlipayCore {
+
+    static Logger logger = Logger.getLogger(AlipayCore.class);
 
     /** 
      * 除去数组中的空值和签名参数
@@ -100,13 +103,13 @@ public class AlipayCore {
             writer = new FileWriter(AlipayConfig.log_path + "alipay_log_" + System.currentTimeMillis()+".txt");
             writer.write(sWord);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             if (writer != null) {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
         }

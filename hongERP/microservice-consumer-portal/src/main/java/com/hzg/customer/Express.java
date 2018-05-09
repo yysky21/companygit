@@ -2,6 +2,7 @@ package com.hzg.customer;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
@@ -58,6 +59,9 @@ public class Express implements Serializable {
 
     @Column(name="defaultUse",length=7)
     private String defaultUse;
+
+    @Column(name="inputDate")
+    private Timestamp inputDate;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -157,5 +161,13 @@ public class Express implements Serializable {
 
     public void setDefaultUse(String defaultUse) {
         this.defaultUse = defaultUse;
+    }
+
+    public Timestamp getInputDate() {
+        return inputDate;
+    }
+
+    public void setInputDate(Timestamp inputDate) {
+        this.inputDate = inputDate;
     }
 }

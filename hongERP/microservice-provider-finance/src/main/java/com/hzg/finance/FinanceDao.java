@@ -20,9 +20,9 @@ import java.util.*;
  * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
  * 文件名: SysDao.java
  *
- * @author smjie
+ * @author yuanyun
  * @version 1.00
- * @Date 2017/4/12
+ * @Date 2017/11/24
  */
 @Repository
 public class FinanceDao extends Dao {
@@ -129,7 +129,7 @@ public class FinanceDao extends Dao {
             try {
                 obj = clazz.newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             objects.add(setObjectValue(obj, value, startPosition));

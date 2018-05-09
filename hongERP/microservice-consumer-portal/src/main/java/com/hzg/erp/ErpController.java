@@ -112,7 +112,7 @@ public class ErpController extends com.hzg.base.Controller {
         } else if (entity.equalsIgnoreCase(ProductPriceChange.class.getSimpleName())) {
             entities = writer.gson.fromJson(client.query(entity, json), new TypeToken<List<ProductPriceChange>>() {}.getType());
             if (entities.isEmpty()) {
-                Map<String, String> no = writer.gson.fromJson(erpClient.getSimpleNo(ErpConstant.product_price_change_no_length), new TypeToken<Map<String, String>>() {}.getType());
+                Map<String, String> no = writer.gson.fromJson(erpClient.getPriceChangeNo(ErpConstant.product_price_change_no_length), new TypeToken<Map<String, String>>() {}.getType());
                 model.put(CommonConstant.no, no.get(CommonConstant.no));
             }
 

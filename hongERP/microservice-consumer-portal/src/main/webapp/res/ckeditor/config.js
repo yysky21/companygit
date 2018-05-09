@@ -11,10 +11,11 @@ CKEDITOR.editorConfig = function (config) {
     config.shiftEnterMode = CKEDITOR.ENTER_BR;
     config.skin="kama";
     // 上传文件时servlet
-    config.filebrowserImageUploadUrl = 'http://stream.demohzg.com/uploadCKEditorFile';
+    config.filebrowserImageUploadUrl = 'http://stream.demohzg.com/uploadCKEditorImage';
+    config.filebrowserFlashUploadUrl = 'http://stream.demohzg.com/uploadCKEditorFlash';
     // 预览区域显示内容
     config.image_previewText = ' ';
+    config.flash_previewText = ' ';
     // 移除图片上传页面的'高级','链接'页签
-    config.removeDialogTabs = 'image:advanced;image:Link';
-
+    config.removeDialogTabs = 'image:advanced;image:Link;flash:advanced';
 };

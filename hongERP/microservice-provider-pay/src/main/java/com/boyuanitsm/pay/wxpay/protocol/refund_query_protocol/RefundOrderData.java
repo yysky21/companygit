@@ -16,6 +16,8 @@
 
 package com.boyuanitsm.pay.wxpay.protocol.refund_query_protocol;
 
+import org.apache.log4j.Logger;
+
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,6 +29,8 @@ import java.util.Map;
  * 用来存放退款订单数据
  */
 public class RefundOrderData {
+
+    Logger logger = Logger.getLogger(RefundOrderData.class);
 
     private String outRefundNo = "";//商户退款单号
     private String refundID = "";//微信退款单号
@@ -104,9 +108,9 @@ public class RefundOrderData {
 //                    map.put(field.getName(), obj);
                 }
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
         s.append("}");

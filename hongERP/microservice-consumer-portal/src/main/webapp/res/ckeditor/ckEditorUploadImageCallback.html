@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or http://ckeditor.com/license
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ckEditorUploadImageCallback</title>
+</head>
+<body >
+<script type="text/javascript">
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return decodeURI(r[2]); return null;
+    }
+    window.parent.CKEDITOR.tools.callFunction(getQueryString("CKEditorFuncNum"), getQueryString("imageUrl"), getQueryString("message"));
+</script>
+</body>
+</html>

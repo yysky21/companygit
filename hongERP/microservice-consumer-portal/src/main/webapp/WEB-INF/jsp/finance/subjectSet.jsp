@@ -1,10 +1,10 @@
-<%@ page import="com.hzg.tools.FinanceConstant" %><%--
+<%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
-* 文件名: productCheck.jsp
+* 文件名: subjectSet.jsp
 *
 * @author yuanyun
-* @Date  2017/10/25
+* @Date  2017/12/7
 * @version 1.00
 *
 --%>

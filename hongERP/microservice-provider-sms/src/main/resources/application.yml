@@ -1,5 +1,5 @@
 ﻿server:
-  port: 8040
+  port: 8090
 
 spring:
   application:
@@ -12,8 +12,8 @@ spring:
 
   datasource:
     url: jdbc:mysql:loadbalance://127.0.0.1:3306/hzg_new_db?roundRobinLoadBalance=true&useUnicode=true&characterEncoding=utf-8  #connect mysql cluster url: jdbc:mysql:loadbalance://192.168.37.128:3306,192.168.31.129:3306/db?roundRobinLoadBalance=true
-    username: hzg
-    password: hongzhanggui
+    username: root
+    password: root
     driver-class-name: com.mysql.jdbc.Driver
     tomcat:
       max-wait: 10000   # Number of ms to wait before throwing an exception if no connection is available

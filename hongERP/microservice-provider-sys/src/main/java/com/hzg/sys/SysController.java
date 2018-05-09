@@ -134,7 +134,7 @@ public class SysController {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -226,7 +226,9 @@ public class SysController {
                 result = sysDao.updateById(auditFlow.getId(), auditFlow);
 
             } else if (entity.equalsIgnoreCase(Article.class.getSimpleName())) {
-                json = json.substring(0,json.indexOf("articleTags")+13) + "[" +json.substring(json.indexOf("articleTags")+14,json.indexOf("seoTitle")-4) + "]" +json.substring(json.indexOf("seoTitle")-2);
+                if (json.indexOf("articleTags") != -1){
+                    json = json.substring(0,json.indexOf("articleTags")+13) + "[" +json.substring(json.indexOf("articleTags")+14,json.indexOf("seoTitle")-4) + "]" +json.substring(json.indexOf("seoTitle")-2);
+                }
                 Article article = writer.gson.fromJson(json, Article.class);
 
                 if (article.getArticleTags() != null) {
@@ -258,7 +260,7 @@ public class SysController {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -352,7 +354,7 @@ public class SysController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -374,7 +376,7 @@ public class SysController {
                 result = sysDao.delete(writer.gson.fromJson(json, Audit.class));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -495,7 +497,7 @@ public class SysController {
             try {
                 limitFields[0] = user.getClass().getDeclaredField("state");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             writer.writeObjectToJson(response, sysDao.suggest(user, limitFields));
@@ -524,7 +526,7 @@ public class SysController {
             try {
                 limitFields[0] = auditFlow.getClass().getDeclaredField("state");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             writer.writeObjectToJson(response,  sysDao.suggest(auditFlow, limitFields));
         }
@@ -712,7 +714,7 @@ public class SysController {
     @Transactional
     @PostMapping("/launchAuditFlow")
     public void launchAuditFlow(HttpServletResponse response, @RequestBody String json){
-        logger.info("audit start, parameter:" + json);
+        logger.info("launchAuditFlow start, parameter:" + json);
         String result = CommonConstant.fail, auditResult = CommonConstant.fail;
 
         Audit audit = writer.gson.fromJson(json, Audit.class);
@@ -728,14 +730,14 @@ public class SysController {
             auditResult = AuditFlowConstant.audit_do;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
         }
 
         writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\", \"auditResult\":\"" + auditResult + "\"}");
-        logger.info("audit end");
+        logger.info("launchAuditFlow end");
     }
 
     /**
@@ -859,7 +861,7 @@ public class SysController {
                 auditResult = AuditFlowConstant.audit_deny;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);

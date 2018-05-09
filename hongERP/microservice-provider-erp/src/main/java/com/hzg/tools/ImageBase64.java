@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -18,6 +19,8 @@ import sun.misc.BASE64Encoder;
  */
 @Component
 public class ImageBase64 {
+    Logger logger = Logger.getLogger(ImageBase64.class);
+
     private BASE64Encoder encoder = new sun.misc.BASE64Encoder();
     private BASE64Decoder decoder = new sun.misc.BASE64Decoder();
 
@@ -32,7 +35,7 @@ public class ImageBase64 {
 
             return encoder.encodeBuffer(bytes).trim();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -45,7 +48,7 @@ public class ImageBase64 {
             File w2 = new File(imagePath);//可以是jpg,png,gif格式
             ImageIO.write(bi1, "jpg", w2);//不管输出什么格式图片，此处不需改动
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -57,7 +60,7 @@ public class ImageBase64 {
         try {
             return decoder.decodeBuffer(base64String);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return null;

@@ -55,6 +55,9 @@ public class CustomerController {
     @Autowired
     private StrUtil strUtil;
 
+    @Autowired
+    private CustomerService customerService;
+
     /**
      * 保存实体
      * @param response
@@ -67,7 +70,6 @@ public class CustomerController {
         logger.info("save start, parameter:" + entity + ":" + json);
 
         String result = CommonConstant.fail;
-        Timestamp inputDate = dateUtil.getSecondCurrentTimestamp();
 
         try {
             /**
@@ -82,74 +84,10 @@ public class CustomerController {
                  * 客户注册
                  */
                 if (entity.equalsIgnoreCase(Customer.class.getSimpleName())) {
-                    Customer customer = writer.gson.fromJson(json, Customer.class);
-
-                    Degree degree = new Degree();
-                    degree.setLoyalty(CustomerConstant.customer_init_loyalty);
-                    degree.setCredit(CustomerConstant.customer_init_credit);
-                    degree.setLevel(CustomerConstant.customer_level_normal);
-                    degree.setSpendAmount(0f);
-                    degree.setSpendCount(0);
-                    degree.setSpendPoints(0);
-                    result += dao.save(degree);
-
-                    customer.setDegree(degree);
-                    customer.setInputDate(inputDate);
-                    result += dao.save(customer);
-
-                    Customer idCustomer = new Customer();
-                    idCustomer.setId(customer.getId());
-
-                    User user = (User) customer.getUsers().toArray()[0];
-                    if (!dao.isValueRepeat(User.class, CommonConstant.username, user.getUsername(), user.getId())) {
-                        user.setCustomer(idCustomer);
-                        user.setInputDate(inputDate);
-                        user.setState(CustomerConstant.user_state_onUse);
-                        user.setOnlineTime(0);
-                        user.setClickCount(0);
-                        user.setLoginCount(0);
-                        user.setPoints(0);
-
-                        result += dao.save(user);
-
-                        /**
-                         * 一对多保存时，为一的实体里的子元素 id 为空，重新设置 redis 里为一的实体里的子元素
-                         */
-                        customer.getUsers().clear();
-                        customer.getUsers().add(user);
-                        dao.storeToRedis(customer.getClass().getName() + CommonConstant.underline + customer.getId(), customer);
-
-                    } else {
-                        result = CommonConstant.fail + ",用户名已经存在";
-                    }
-
-                    for (Express express : customer.getExpresses()) {
-                        express.setCustomer(idCustomer);
-                        express.setState(CustomerConstant.express_state_onUse);
-                        express.setDefaultUse(CustomerConstant.express_default_use);
-                        result += dao.save(express);
-                    }
+                    result += customerService.saveCustomer(writer.gson.fromJson(json, Customer.class));
 
                 } else if (entity.equalsIgnoreCase(User.class.getSimpleName())) {
-                    User singInUser = (User) dao.getFromRedis((String) dao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + saveData.get(CommonConstant.sessionId).toString()));
-
-                    User registryUser = writer.gson.fromJson(json, User.class);
-                    if (!dao.isValueRepeat(User.class, CommonConstant.username, registryUser.getUsername(), registryUser.getId())) {
-                        Customer idCustomer = new Customer();
-                        idCustomer.setId(singInUser.getCustomer().getId());
-                        registryUser.setCustomer(idCustomer);
-
-                        result += dao.save(registryUser);
-
-                        /**
-                         * 多次增加一对多中为一的实体里的子元素，需要重新设置为一的实体到 redis
-                         */
-                        singInUser.getCustomer().getUsers().add(registryUser);
-                        dao.storeToRedis(singInUser.getCustomer().getClass().getName() + CommonConstant.underline + singInUser.getCustomer().getId(), singInUser.getCustomer());
-
-                    }  else {
-                        result = CommonConstant.fail + ",用户名已经存在";
-                    }
+                    result += customerService.saveUser(writer.gson.fromJson(json, User.class));
                 }
 
                 if (!result.contains(CommonConstant.fail)) {
@@ -166,21 +104,11 @@ public class CustomerController {
             }
 
             if (entity.equalsIgnoreCase(Express.class.getSimpleName())) {
-                User singInUser = (User) dao.getFromRedis((String) dao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + saveData.get(CommonConstant.sessionId).toString()));
-
-                Express express = writer.gson.fromJson(json, Express.class);
-                Customer idCustomer = new Customer();
-                idCustomer.setId(singInUser.getCustomer().getId());
-                express.setCustomer(idCustomer);
-
-                result += dao.save(express);
-
-                singInUser.getCustomer().getExpresses().add(express);
-                dao.storeToRedis(singInUser.getCustomer().getClass().getName() + CommonConstant.underline + singInUser.getCustomer().getId(), singInUser.getCustomer());
+                result += customerService.saveExpress(writer.gson.fromJson(json, Express.class));
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -220,10 +148,11 @@ public class CustomerController {
                 Express dbExpress = (Express) dao.queryById(express.getId(), express.getClass());
                 if (dbExpress.getCustomer().getId().compareTo(signUser.getCustomer().getId()) == 0) {
                     result += dao.updateById(express.getId(), express);
+                    result += customerService.setExpressDefaultUse(express);
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -306,10 +235,59 @@ public class CustomerController {
                 } else {
                     result += CommonConstant.fail + ",用户没有登录或会话已过期，不能重置密码";
                 }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.customer_action_admin_save)) {
+                Customer customer = writer.gson.fromJson(json, Customer.class);
+                if (customerService.getBackUserBySessionId(customer.getSessionId()) != null) {
+                    result += customerService.saveCustomer(customer);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能保存客户";
+                }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.customer_action_admin_update)) {
+                Customer customer = writer.gson.fromJson(json, Customer.class);
+                if (customerService.getBackUserBySessionId(customer.getSessionId()) != null) {
+                    result += dao.updateById(customer.getId(), customer);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能修改客户";
+                }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.user_action_admin_save)) {
+                User user = writer.gson.fromJson(json, User.class);
+                if (customerService.getBackUserBySessionId(user.getSessionId()) != null) {
+                    result += customerService.saveUserAdmin(user);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能保存用户";
+                }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.user_action_admin_update)) {
+                User user = writer.gson.fromJson(json, User.class);
+                if (customerService.getBackUserBySessionId(user.getSessionId()) != null) {
+                    result += dao.updateById(user.getId(), user);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能修改用户";
+                }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.express_action_admin_save)) {
+                Express express = writer.gson.fromJson(json, Express.class);
+                if (customerService.getBackUserBySessionId(express.getSessionId()) != null) {
+                    result += customerService.saveExpressAdmin(express);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能保存收件信息";
+                }
+
+            } else if (name.equalsIgnoreCase(CustomerConstant.express_action_admin_update)) {
+                Express express = writer.gson.fromJson(json, Express.class);
+                if (customerService.getBackUserBySessionId(express.getSessionId()) != null) {
+                    result += dao.updateById(express.getId(), express);
+                    result += customerService.setExpressDefaultUse(express);
+                } else {
+                    result += CommonConstant.fail + ",用户没有登录或会话已过期，不能修改收件信息";
+                }
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             result += CommonConstant.fail;
         } finally {
             result = transcation.dealResult(result);
@@ -393,6 +371,13 @@ public class CustomerController {
                 ele.setCustomer((Customer) dao.queryById(ele.getCustomer().getId(), ele.getCustomer().getClass()));
             }
             writer.writeObjectToJson(response, users);
+
+        } else if (entity.equalsIgnoreCase(Express.class.getSimpleName())) {
+            List<Express> expresses = dao.suggest(writer.gson.fromJson(json, Express.class), null);
+            for (Express ele : expresses) {
+                ele.setCustomer((Customer) dao.queryById(ele.getCustomer().getId(), ele.getCustomer().getClass()));
+            }
+            writer.writeObjectToJson(response, expresses);
         }
 
         logger.info("unlimitedSuggest end");
@@ -408,6 +393,10 @@ public class CustomerController {
 
         } else if (entity.equalsIgnoreCase(User.class.getSimpleName())) {
             writer.writeObjectToJson(response, dao.complexQuery(User.class,
+                    writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType()), position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(Express.class.getSimpleName())) {
+            writer.writeObjectToJson(response, dao.complexQuery(Express.class,
                     writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType()), position, rowNum));
         }
 
@@ -430,6 +419,9 @@ public class CustomerController {
 
         } else if (entity.equalsIgnoreCase(User.class.getSimpleName())) {
             recordsSum = dao.recordsSum(User.class, writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType()));
+
+        } else if (entity.equalsIgnoreCase(Express.class.getSimpleName())) {
+            recordsSum = dao.recordsSum(Express.class, writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType()));
         }
 
         writer.writeStringToJson(response, "{\"" + CommonConstant.recordsSum + "\":" + recordsSum + "}");

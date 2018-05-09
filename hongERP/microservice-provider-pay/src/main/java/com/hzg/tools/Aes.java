@@ -1,5 +1,6 @@
 package com.hzg.tools;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -33,6 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
 @Component
 public class Aes {
 
+      Logger logger = Logger.getLogger(Aes.class);
 
 
       /*
@@ -149,27 +151,27 @@ public class Aes {
 
         } catch (NoSuchAlgorithmException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (NoSuchPaddingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (InvalidKeyException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (UnsupportedEncodingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (IllegalBlockSizeException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (BadPaddingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         }
 
@@ -229,23 +231,23 @@ public class Aes {
 
         } catch (NoSuchAlgorithmException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (NoSuchPaddingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (InvalidKeyException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (IllegalBlockSizeException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         } catch (BadPaddingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         }
 
@@ -284,7 +286,7 @@ public class Aes {
 
         } catch (UnsupportedEncodingException e) {
 
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
 
         }
 

@@ -1,5 +1,6 @@
 package com.hzg.tools;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -19,6 +20,8 @@ import java.net.URL;
  */
 @Component
 public class HttpUtil {
+
+    Logger logger = Logger.getLogger(HttpUtil.class);
 
     public String get(String url){
         String responseStr = null;
@@ -45,7 +48,7 @@ public class HttpUtil {
             }
             con.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             if (con != null) {
                 con.disconnect();
             }
@@ -95,7 +98,7 @@ public class HttpUtil {
             }
             con.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             if (con != null) {
                 con.disconnect();
             }

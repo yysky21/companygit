@@ -23,7 +23,6 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.Configurable;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
@@ -36,12 +35,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
@@ -54,6 +49,8 @@ import java.security.cert.CertificateException;
  * Time: 14:36
  */
 public class HttpsRequest implements IServiceRequest {
+
+    org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(HttpsRequest.class);
 
     public interface ResultListener {
 
@@ -90,7 +87,7 @@ public class HttpsRequest implements IServiceRequest {
         try {
             keyStore.load(instream, Configure.getCertPassword().toCharArray());//设置证书密码
         } catch (CertificateException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             instream.close();
         }

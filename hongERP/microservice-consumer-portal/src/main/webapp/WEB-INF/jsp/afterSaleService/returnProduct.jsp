@@ -230,7 +230,9 @@
 
                                 <c:if test="${entity.state == 5 || entity.state == 9}">
                                 <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductRefund')}">
-                                <button id="refund" type="button" class="btn btn-success">确认收款</button>
+                                <button id="refund" type="button" class="btn btn-success">
+                                    确认<c:if test="${fn:contains(entity.entity, 'order')}">退款</c:if><c:if test="${fn:contains(entity.entity, 'purchase')}">收款</c:if>
+                                </button>
                                 </c:if>
                                 </c:if>
                                 </c:if>
@@ -267,10 +269,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductSaleAudit')}">
                 $("#saleAuditPass").click(function(){
                     returnProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductSaleAudit');
+                    $("#saleAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#saleAuditNotPass").click(function(){
                     returnProduct.audit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductSaleAudit');
+                    $("#saleAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -279,10 +283,12 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductDirectorAudit')}">
                 $("#directorAuditPass").click(function(){
                     returnProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductDirectorAudit');
+                    $("#directorAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#directorAuditNotPass").click(function(){
                     returnProduct.audit('N', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductDirectorAudit');
+                    $("#directorAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>
@@ -291,6 +297,7 @@
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductWarehousingAudit')}">
                 $("#warehousingAuditPass").click(function(){
                     returnProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductWarehousingAudit');
+                    $("#warehousingAuditNotPass").attr("disabled", "disabled");
                 });
 
                 $("#warehousingAuditNotPass").click(function(){
@@ -300,6 +307,7 @@
                             $("#printExpress").show();
                         }
                     });
+                    $("#warehousingAuditPass").attr("disabled", "disabled");
                 });
             </c:if>
         </c:if>

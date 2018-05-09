@@ -90,6 +90,9 @@ public class Customer implements Serializable {
     @OneToMany(mappedBy = "customer", cascade=CascadeType.DETACH, fetch = FetchType.LAZY)
     private Set<Express> expresses;
 
+    @Transient
+    private String sessionId;
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -244,5 +247,13 @@ public class Customer implements Serializable {
 
     public void setExpresses(Set<Express> expresses) {
         this.expresses = expresses;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

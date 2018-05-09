@@ -63,7 +63,7 @@
                                                 <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="warehouse">选择仓库 (<span class="required">*</span>)：
                                                 </label>
                                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                                    <input type="text" id="warehouse" name="warehouse" value="${entity.warehouse.name}" class="form-control col-md-7 col-xs-12" placeholder="输入仓库名称" required />
+                                                    <input type="text" id="warehouse" name="warehouse" value="${entity.warehouse.name}" class="form-control col-md-7 col-xs-12" placeholder="输入仓库名称" <c:if test="${entity != null}">readonly</c:if> required />
                                                     <input type="hidden" id="warehouse[id]" name="warehouse[id]" value="${entity.warehouse.id}">
                                                 </div>
                                             </div>
@@ -181,7 +181,7 @@
         if (productCheck.stockIsSelect($("#code1"))==false){
             return false;
         }
-        if ($("#table > tbody > tr:not(.old)").length>=5){
+        if ($("#table > tbody > tr:not(.old)").length>=50){
             alert("请保存后再继续扫描条形码");
             $("#code1").val("");
             return false;
@@ -198,7 +198,7 @@
         if (productCheck.stockIsSelect($("#code2"))==false){
             return false;
         }
-        if ($("#table > tbody > tr:not(.old)").length>=5){
+        if ($("#table > tbody > tr:not(.old)").length>=50){
             alert("请保存后再继续输入条形码");
             $("#code2").val("");
             return false;
@@ -215,7 +215,7 @@
         if (productCheck.stockIsSelect($("#code2"))==false){
             return false;
         }
-        if ($("#table > tbody > tr:not(.old)").length>=5){
+        if ($("#table > tbody > tr:not(.old)").length>=50){
             alert("请保存后再继续输入条形码!");
             $("#code2").val("");
             return false;
@@ -227,6 +227,29 @@
                     productCheck.setCheckQuantity("<%=request.getContextPath()%>/erp/privateQuery/productUnit",$("#code2"));
                 }
             }
+        }
+    });
+
+    $("#table tbody").on("mousedown","tr:not(.old)",function (e) {
+        $.smartMenu.remove();//重新加载smartMenu，这很重要，不然会使用html的缓存
+        if (e.which == 3) {
+            var opertionn = {
+                name: "",
+                offsetX: 2,
+                offsetY: 2,
+                textLimit: 10,
+                beforeShow: $.noop,
+                afterShow: $.noop
+            };
+            var imageMenuData = [
+                [{
+                    text: "删行",
+                    func: function(){
+                        $(this).remove();
+                    }
+                }]
+            ];
+            $(this).smartMenu(imageMenuData,opertionn);
         }
     });
 

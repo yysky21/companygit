@@ -55,33 +55,33 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">文章分类名称 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="name" name="name" class="form-control col-md-7 col-xs-12" value="${entity.name}" data-validate-length="1,20" data-validate-words="1"  required type="text">
+                                    <input id="name" name="name" class="form-control col-md-7 col-xs-12" value="${entity.name}"  required type="text">
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label for="nickname" class="control-label col-md-3 col-sm-3 col-xs-12">分类名称简写 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="nickname" type="text" name="nickname" value="${entity.nickname}" data-validate-length="1,20" data-validate-words="1" class="form-control col-md-7 col-xs-12" required>
+                                    <input id="nickname" type="text" name="nickname" value="${entity.nickname}" class="form-control col-md-7 col-xs-12" required>
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="articleTitle">文章分类优化标题 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="articleTitle" type="text" name="articleTitle" value="${entity.articleTitle}" data-validate-length="1,50" data-validate-words="1" class="form-control col-md-7 col-xs-12" required>
+                                    <input id="articleTitle" type="text" name="articleTitle" value="${entity.articleTitle}" class="form-control col-md-7 col-xs-12" required>
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="articleKeyword">文章分类优化关键词 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="articleKeyword" name="articleKeyword" class="form-control col-md-7 col-xs-12" value="${entity.articleKeyword}" data-validate-length="1,50" data-validate-words="1" required type="text">
+                                    <input id="articleKeyword" name="articleKeyword" class="form-control col-md-7 col-xs-12" value="${entity.articleKeyword}" required type="text">
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="articleDesc">文章分类优化描述 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="articleDesc" name="articleDesc" class="form-control col-md-7 col-xs-12" value="${entity.articleDesc}" data-validate-length="5,100" data-validate-words="1" required type="text">
+                                    <input id="articleDesc" name="articleDesc" class="form-control col-md-7 col-xs-12" value="${entity.articleDesc}" required type="text">
                                 </div>
                             </div>
                             <div class="ln_solid"></div>

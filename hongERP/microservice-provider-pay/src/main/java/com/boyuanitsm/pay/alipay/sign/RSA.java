@@ -17,6 +17,8 @@
 
 package com.boyuanitsm.pay.alipay.sign;
 
+import org.apache.log4j.Logger;
+
 import javax.crypto.Cipher;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,7 +30,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class RSA{
-	
+
+	static Logger logger = Logger.getLogger(RSA.class);
+
 	public static final String  SIGN_ALGORITHMS = "SHA1WithRSA";
 	
 	/**
@@ -58,7 +62,7 @@ public class RSA{
         }
         catch (Exception e) 
         {
-        	e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         }
         
         return null;
@@ -93,7 +97,7 @@ public class RSA{
 		} 
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 		
 		return false;

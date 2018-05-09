@@ -47,8 +47,12 @@ public class CustomerManagementController extends com.hzg.base.Controller {
         String json = "{\"" + CommonConstant.id +"\":" + id + "}";
         if (entity.equalsIgnoreCase(Customer.class.getSimpleName())) {
             entities = writer.gson.fromJson(customerClient.unlimitedQuery(entity, json), new TypeToken<List<Customer>>() {}.getType());
+
         } else if (entity.equalsIgnoreCase(User.class.getSimpleName())) {
             entities = writer.gson.fromJson(customerClient.unlimitedQuery(entity, json), new TypeToken<List<User>>() {}.getType());
+
+        } else if (entity.equalsIgnoreCase(Express.class.getSimpleName())) {
+            entities = writer.gson.fromJson(customerClient.unlimitedQuery(entity, json), new TypeToken<List<Express>>() {}.getType());
         }
 
         model.put(CommonConstant.entity, entities.isEmpty() ? null : entities.get(0));

@@ -397,7 +397,7 @@ public class Dao {
             try {
                 obj = clazz.newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             objects.add(setObjectValue(obj, value));
@@ -419,7 +419,7 @@ public class Dao {
             try {
                 dbObject = setObjectValue(clazz.newInstance(), objectValue);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             querySetRelateObject(dbObject);
@@ -511,7 +511,7 @@ public class Dao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             logger.info(e.getMessage());
         }
 
@@ -564,7 +564,7 @@ public class Dao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             logger.info(e);
         }
     }
@@ -640,7 +640,7 @@ public class Dao {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             logger.info(e.getMessage());
         }
     }
@@ -669,7 +669,7 @@ public class Dao {
                         relateObject = dbObject.getClass().getMethod(
                                 objectToSql.getMethodPerfix + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1)).invoke(dbObject);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                     }
 
                     break;
@@ -707,7 +707,7 @@ public class Dao {
                     field.getType()).invoke(object, relateObjects);
         } catch (Exception e){
             logger.info(e.getMessage());
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         String selectSql = objectToSql.generateSelectSqlByAnnotation(object);
@@ -747,7 +747,7 @@ public class Dao {
             try {
                 id = (Integer) clazz.getMethod("getId").invoke(object);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
 
@@ -765,7 +765,7 @@ public class Dao {
             try {
                 clazz.getMethod("setId", Integer.class).invoke(object, new Object[] {id});
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -834,7 +834,7 @@ public class Dao {
             clazz.getMethod(objectToSql.setMethodPerfix + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1),
                     field.getType()).invoke(object, value);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         List<Object> objects = query(object);

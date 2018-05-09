@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  *
  * @author yuanyun
  * @version 1.00
- * @Date 2017/9/26
+ * @Date 2017/04/02
  */
 
 @Entity(name = "hzg_article_tag")

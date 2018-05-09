@@ -32,4 +32,11 @@ public class CustomerConstant {
     public final static Integer express_state_cancel = 1;
 
     public final static String express_default_use = "Y";
+
+    public final static String customer_action_admin_save = "customerAdminSave";
+    public final static String customer_action_admin_update = "customerAdminUpdate";
+    public final static String user_action_admin_save = "userAdminSave";
+    public final static String user_action_admin_update = "userAdminUpdate";
+    public final static String express_action_admin_save = "expressAdminSave";
+    public final static String express_action_admin_update = "expressAdminUpdate";
 }

@@ -149,7 +149,7 @@ public class ErpService {
         }
 
         if (result.equals("")) {
-            if (amount.floatValue() != purchase.getAmount()) {
+            if (purchase.getType() != 4 && amount.floatValue() != purchase.getAmount()) { //押金采购不比较采购单金额
                 result =  "采购单金额不对";
             }
         }
@@ -291,7 +291,7 @@ public class ErpService {
                     result += erpDao.save(detail);
                     continue;
                 }
-                // 设置盘点详细条目的盘点单据编号
+                // 设置盘点详细条目的盘点单id
                 detail.setProductCheck(productCheck1);
                 ProductCheckDetail detail2 = new ProductCheckDetail();
                 detail2.setProductCheck(productCheck1);
@@ -498,7 +498,7 @@ public class ErpService {
         if (!result.contains(CommonConstant.fail+CommonConstant.fail)) {
             StockInOut stateStockIn = new StockInOut();
             stateStockIn.setId(stockIn.getId());
-            stateStockIn.setState(stockIn.getState());
+            stateStockIn.setState(ErpConstant.stockInOut_state_finished);
             result += erpDao.updateById(stateStockIn.getId(), stateStockIn);
 
             result += setStockProductIn(stockIn);
@@ -602,7 +602,7 @@ public class ErpService {
         if (!result.contains(CommonConstant.fail+CommonConstant.fail)) {
             StockInOut stateStockOut = new StockInOut();
             stateStockOut.setId(stockOut.getId());
-            stateStockOut.setState(stockOut.getState());
+            stateStockOut.setState(ErpConstant.stockInOut_state_finished);
             result += erpDao.updateById(stateStockOut.getId(), stateStockOut);
 
             if (stockOut.getType().compareTo(ErpConstant.stockInOut_type_normal_outWarehouse) == 0) {
@@ -619,16 +619,6 @@ public class ErpService {
                 result += launchAuditFlow(AuditFlowConstant.business_stockOut_print_expressWaybill_notify, stockOut.getId(), stockOut.getNo(),
                         "打印出库单:" + stockOut.getNo() + " 里商品的快递单", "打印出库单:" + stockOut.getNo() + " 里商品的快递单",
                         stockOut.getInputer());
-
-
-            } else if (stockOut.getType().compareTo(ErpConstant.stockInOut_type_breakage_outWarehouse) == 0) {
-                /**
-                 * 报损出库进入报损出库审批流程
-                 */
-                result += launchAuditFlow(AuditFlowConstant.business_stockOut_breakage, stockOut.getId(), stockOut.getNo(),
-                        "出库单:" + stockOut.getNo() + " 商品报损出库", "请报损出库出库单" + stockOut.getNo() + " 的商品",
-                        stockOut.getInputer());
-
 
             } else {
                 /**
@@ -807,6 +797,15 @@ public class ErpService {
         result += erpDao.save(stockInOut);
         result += saveStockInOutDetails(stockInOut);
 
+        /**
+         * 报损出库进入报损出库审批流程
+         */
+        if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_breakage_outWarehouse) == 0) {
+            result += launchAuditFlow(AuditFlowConstant.business_stockOut_breakage, stockInOut.getId(), stockInOut.getNo(),
+                    "出库单:" + stockInOut.getNo() + " 商品报损出库", "请报损出库出库单" + stockInOut.getNo() + " 的商品",
+                    stockInOut.getInputer());
+        }
+
         return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
     }
 
@@ -935,11 +934,13 @@ public class ErpService {
         StockInOut stockInOut = (StockInOut) erpDao.queryById(audit.getEntityId(), StockInOut.class);
         Purchase purchase = (Purchase) erpDao.queryById(stockInOut.getDeposit().getPurchase().getId(), stockInOut.getDeposit().getPurchase().getClass());
 
-        Map<String, String> result1 = writer.gson.fromJson(
-                payClient.refund(audit.getEntity(), audit.getEntityId(), stockInOut.getNo(), stockInOut.getDeposit().getAmount(),
-                                 writer.gson.toJson(getPaysByEntity(purchase.getClass().getSimpleName().toLowerCase(), purchase.getId()))),
-                new TypeToken<Map<String, String>>(){}.getType());
-        result += result1.get(CommonConstant.result);
+        List<Pay> pays = getPaysByEntity(purchase.getClass().getSimpleName().toLowerCase(), purchase.getId());
+        for (Pay pay : pays) {
+            Map<String, String> result1 = writer.gson.fromJson(
+                    payClient.refund(audit.getEntity(), audit.getEntityId(), stockInOut.getNo(), stockInOut.getDeposit().getAmount(), writer.gson.toJson(pay)),
+                    new TypeToken<Map<String, String>>(){}.getType());
+            result += result1.get(CommonConstant.result);
+        }
 
         return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
     }
@@ -1269,7 +1270,7 @@ public class ErpService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -1353,7 +1354,7 @@ public class ErpService {
 
             sql = "select distinct " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -1408,7 +1409,7 @@ public class ErpService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -1480,7 +1481,7 @@ public class ErpService {
 
             sql = "select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -1502,7 +1503,7 @@ public class ErpService {
                 sql = sqlParts[0] + " where " + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("editor")) + " is not null order by " + sqlParts[1];
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sql;
@@ -2638,7 +2639,7 @@ public class ErpService {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return false;
@@ -2829,7 +2830,7 @@ public class ErpService {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -2991,7 +2992,7 @@ public class ErpService {
         try {
             result = httpClientUtil.postSFAPI(sfExpress.getBspUrl(), requestXml, verifyCodeUtil.md5EncryptAndBase64(requestXml+sfExpress.getBspCheckWord()));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         logger.info("sfBspHttpRequest end, result:" + result);
@@ -3121,7 +3122,7 @@ public class ErpService {
             try {
                 messageResp = OrderTools.order(url, appInfo, req);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             if (messageResp.getHead().getCode().equals(ErpConstant.sf_response_code_success) &&
@@ -3162,7 +3163,7 @@ public class ErpService {
         try {
             messageResp = OrderTools.orderQuery(url, appInfo, req);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         if (messageResp.getHead().getCode().equals(ErpConstant.sf_response_code_success)) {
@@ -3181,7 +3182,7 @@ public class ErpService {
             dbDeliverDetail.setMailNo(mailNo);
             erpDao.updateById(dbDeliverDetail.getId(), dbDeliverDetail);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
@@ -3223,7 +3224,7 @@ public class ErpService {
                 }
             }
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return sfWaybillImage;
@@ -3271,7 +3272,7 @@ public class ErpService {
                     messageResp.getBody().getAccessToken() + "," + messageResp.getBody().getRefreshToken());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         logger.info("setSfTokens end");
@@ -3309,7 +3310,7 @@ public class ErpService {
                     messageResp.getBody().getAccessToken() + "," + messageResp.getBody().getRefreshToken());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         logger.info("refreshSfTokens end");
@@ -3611,7 +3612,7 @@ public class ErpService {
             audits = erpDao.queryBySql("select " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql, Audit.class);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return audits;
@@ -3623,8 +3624,15 @@ public class ErpService {
         PurchaseDetail detail = ((PurchaseDetailProduct)erpDao.query(detailProduct).get(0)).getPurchaseDetail();
 
         Audit audit = new Audit();
-        audit.setEntity(Purchase.class.getSimpleName().toLowerCase());
-        audit.setEntityId(detail.getPurchase().getId());
+        Purchase purchase = (Purchase) erpDao.queryById(detail.getPurchase().getId(), detail.getPurchase().getClass());
+        if (purchase.getType().compareTo(ErpConstant.purchase_type_emergency) == 0 ||
+                purchase.getType().compareTo(ErpConstant.purchase_type_cash) == 0 ||
+                purchase.getType().compareTo(ErpConstant.purchase_type_deposit) == 0) {
+            audit.setEntity(AuditFlowConstant.business_purchaseEmergency);
+        } else {
+            audit.setEntity(AuditFlowConstant.business_purchase);
+        }
+        audit.setEntityId(purchase.getId());
 
         List<Audit> dbAudits = writer.gson.fromJson(
                 sysClient.query(Audit.class.getSimpleName().toLowerCase(), writer.gson.toJson(audit)),

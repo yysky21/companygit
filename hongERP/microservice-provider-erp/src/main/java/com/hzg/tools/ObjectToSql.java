@@ -187,7 +187,7 @@ public class ObjectToSql {
             try {
                 field = clazz.getDeclaredField(entry.getKey());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
             if (field != null) {

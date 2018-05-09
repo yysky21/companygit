@@ -104,7 +104,7 @@ public interface PayClient extends Client {
             try {
                 return ("{\"" + CommonConstant.result + "\":\"系统异常，获取支付宝支付二维码出错\"}").getBytes(CommonConstant.UTF8);
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             return null;
         }
@@ -119,7 +119,7 @@ public interface PayClient extends Client {
             try {
                 return ("{\"" + CommonConstant.result + "\":\"系统异常，微信扫码支付出错\"}").getBytes(CommonConstant.UTF8);
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             return null;
         }

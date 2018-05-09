@@ -8,7 +8,6 @@
 * @version 1.00
 *
 --%>
-<%@ page import="com.hzg.customer.Customer" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!-- page content -->
@@ -258,6 +257,7 @@
                                 </div>
                             </div>
                             <c:if test="${entity != null}"><input type="hidden" id="id" name="id" value="${entity.id}"></c:if>
+                            <input type="hidden" name="sessionId" value="${sessionId}">
                         </form>
                     </div>
                 </div>
@@ -298,7 +298,7 @@
         }
         </c:if>
 
-        $("#form").submitForm('<%=request.getContextPath()%>/customerManagement/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/<%=Customer.class.getSimpleName().toLowerCase()%>');
+        $("#form").submitForm('<%=request.getContextPath()%>/customerManagement/doBusiness/<c:choose><c:when test="${entity != null}">customerAdminUpdate</c:when><c:otherwise>customerAdminSave</c:otherwise></c:choose>');
     });
 
    <c:choose><c:when test="${entity != null}">document.title = "客户修改";</c:when><c:otherwise> document.title = "客户注册";</c:otherwise></c:choose>

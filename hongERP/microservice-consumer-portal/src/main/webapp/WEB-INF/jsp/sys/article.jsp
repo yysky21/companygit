@@ -13,38 +13,36 @@
 <%@ page import="com.hzg.tools.FileServerInfo" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
-<%--jquery ui--%>
-<link type="text/css" href="../../../res/css/jquery-ui-1.10.0.custom.css" rel="stylesheet">
 <style type="text/css">
 
     /*关键设置 tbody出现滚动条*/
-    table tbody {
+    #tagChooseDiv table tbody {
         display: block;
         height: 520px;
         overflow: scroll;
     }
 
-    table thead ,
-    tbody tr {
+    #tagChooseDiv table thead ,
+    #tagChooseDiv tbody tr {
         display: table;
         width: 100%;
         table-layout: fixed;
     }
 
     /*关键设置：滚动条默认宽度是17px 将thead的宽度减17px*/
-    table thead {
+    #tagChooseDiv table thead {
         width: calc( 100% - 17px);
         background: rgba(52,73,94,.94);
         color: #ECF0F1;
     }
 
-    .table tbody tr td {
+    #tagChooseDiv .table tbody tr td {
         padding: 4px;
         vertical-align: middle;
         border-top: 0px;
     }
 
-    table thead tr th,table thead tr th input {
+    #tagChooseDiv table thead tr th,#tagChooseDiv table thead tr th input {
         text-align: center;
         vertical-align: middle;
     }
@@ -97,7 +95,7 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">标题 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="title" name="title" class="form-control col-md-7 col-xs-12" value="${entity.title}" data-validate-length="5,100" data-validate-words="1"  required type="text">
+                                    <input id="title" name="title" class="form-control col-md-7 col-xs-12" value="${entity.title}" required type="text">
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -122,7 +120,7 @@
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="shortContent">摘要 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <textarea id="shortContent" name="shortContent" cols="20" rows="5" required >${entity.shortContent}</textarea>
+                                    <textarea id="shortContent" name="shortContent" class="form-control col-md-7 col-xs-12" rows="3" required >${entity.shortContent}</textarea>
                                 </div>
                             </div>
                             <div class="item form-group">
@@ -162,21 +160,21 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoTitle">文章优化标题 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="seoTitle" name="seoTitle" class="form-control col-md-7 col-xs-12" value="${entity.seoTitle}" data-validate-length="5,80" data-validate-words="1" required type="text">
+                                    <input id="seoTitle" name="seoTitle" class="form-control col-md-7 col-xs-12" value="${entity.seoTitle}" required type="text">
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoKeyword">文章优化关键词 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="seoKeyword" name="seoKeyword" class="form-control col-md-7 col-xs-12" value="${entity.seoKeyword}" data-validate-length="5,80" data-validate-words="1" required type="text">
+                                    <input id="seoKeyword" name="seoKeyword" class="form-control col-md-7 col-xs-12" value="${entity.seoKeyword}" required type="text">
                                 </div>
                             </div>
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoDesc">文章优化描述 <span class="required">*</span>
                                 </label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input id="seoDesc" name="seoDesc" class="form-control col-md-7 col-xs-12" value="${entity.seoDesc}" data-validate-length="5,100" data-validate-words="1" required type="text">
+                                    <input id="seoDesc" name="seoDesc" class="form-control col-md-7 col-xs-12" value="${entity.seoDesc}" required type="text">
                                 </div>
                             </div>
                             <div class="ln_solid"></div>
@@ -184,13 +182,13 @@
                                 <div class="col-md-6 col-md-offset-3">
                                     <button id="cancel" type="button" class="btn btn-primary">返回</button>
                                     <c:if test="${entity == null}">
-                                        <button id="send" type="button" class="btn btn-success">保存</button>
+                                        <button id="save" type="button" class="btn btn-success">保存</button>
                                         <button id="publish" type="button" class="btn btn-success">发布</button>
                                     </c:if>
                                     <c:if test="${entity != null}">
                                             <c:if test="${entity.state == 0}">
                                                 <button id="edit" type="button" class="btn btn-primary">编辑</button>
-                                                <button id="send" type="button" class="btn btn-success">保存</button>
+                                                <button id="save" type="button" class="btn btn-success">保存</button>
                                                 <button id="publish" type="button" class="btn btn-success">发布</button>
                                                 <button id="delete" type="button" class="btn btn-danger">删除</button>
                                             </c:if>
@@ -238,7 +236,7 @@
     init(<c:out value="${entity == null}"/>);
     $("#content").attr("readonly",false);
 
-    CKEDITOR.replace( 'content');
+    CKEDITOR.replace( 'content',{height:400});
 
     $(".ui-dialog").remove();
     article.initArticleTag();
@@ -261,7 +259,7 @@
     });
 
     /*保存文章*/
-    $("#send").click(function () {
+    $("#save").click(function () {
         $(document.getElementById("tag[name]")).attr("disabled","disabled");
         if(test()==false){
             return false;
@@ -276,7 +274,11 @@
             return false;
         }
         $("#state").val(1);
-        articleSubmit();
+        var publishResult = articleSubmit();
+        if(publishResult!=false){
+            $("#save").attr("disabled","disabled");
+        }
+
     });
 
     /*处理撤销发布文章、删除文章和撤销删除文章的公用部分*/
@@ -292,6 +294,7 @@
         $("#seoKeyword").attr("disabled","disabled");
         $("#seoDesc").attr("disabled","disabled");
         $(document.getElementById("tag[name]")).attr("disabled","disabled");
+        $("#articleTags").attr("disabled","disabled");
     }
 
     /*撤销发布文章和撤销删除文章*/
@@ -308,7 +311,7 @@
         var deleteResult = articleSubmit();
         if(deleteResult!=false){
             $("#recover").attr("disabled","disabled");
-            $("#send").attr("disabled","disabled");
+            $("#save").attr("disabled","disabled");
             $("#publish").attr("disabled","disabled");
         }
     });
@@ -337,7 +340,10 @@
                 $('#form').submitForm('<%=request.getContextPath()%>/sys/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/article',
                     function (result) {
                         if (result.result.indexOf("success") != -1){
-                            $("#send").attr("disabled","disabled");
+                            <c:if test="${entity == null}">
+                            $("#save").attr("disabled","disabled");
+                            $("#publish").attr("disabled","disabled");
+                            </c:if>
                         }
                     }
                 );
@@ -364,7 +370,10 @@
             $('#form').submitForm('<%=request.getContextPath()%>/sys/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/article',
                 function (result) {
                     if (result.result.indexOf("success") != -1){
-                        $("#send").attr("disabled","disabled");
+                        <c:if test="${entity == null}">
+                        $("#save").attr("disabled","disabled");
+                        $("#publish").attr("disabled","disabled");
+                        </c:if>
                     }
                 }
             );

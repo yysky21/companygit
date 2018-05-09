@@ -1,5 +1,6 @@
 package com.hzg.tools;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
@@ -26,6 +27,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class DateUtil {
+    Logger logger = Logger.getLogger(DateUtil.class);
+
     private SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -65,7 +68,7 @@ public class DateUtil {
         try {
              date = df.parse(dateStr);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return df.format(new Date(date.getTime() + (long)num * 24 * 60 * 60 * 1000));
@@ -85,7 +88,7 @@ public class DateUtil {
             date = new SimpleDateFormat("yy-M-d").parse(calendar.get(Calendar.YEAR) + "-" +
                     (calendar.get(Calendar.MONTH)+1) + "-" + calendar.get(Calendar.DATE));
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         calendar.setTime(date);
