@@ -438,7 +438,11 @@ public class ErpController {
                 /**
                  * 入库，设置库存
                  */
-                 result += erpService.stockIn(stockIn);
+                 result = transcation.dealResult(result+erpService.stockIn(stockIn));
+
+                 if (!result.contains(CommonConstant.fail)) {
+                     stockIn.setState(ErpConstant.stockInOut_state_finished);
+                 }
 
                 action.setEntity(ErpConstant.stockInOut);
                 action.setType(ErpConstant.stockInOut_action_inProduct);
@@ -446,7 +450,7 @@ public class ErpController {
                 action.setInputDate(dateUtil.getSecondCurrentTimestamp());
                 result += erpDao.save(action);
 
-                result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                result = "{\"" + CommonConstant.result + "\":\"" + result + "\"" +
                         ",\"" + CommonConstant.id + "\":" + stockIn.getId() +
                         ",\"" + CommonConstant.type + "\":" + stockIn.getType() +
                         ",\"" + CommonConstant.state + "\":" + stockIn.getState() + "}";
@@ -458,7 +462,11 @@ public class ErpController {
                 Action action = writer.gson.fromJson(json, Action.class);
                 StockInOut stockOut = erpService.queryStockInOut(action.getEntityId());
 
-                result += erpService.stockOut(stockOut);
+                result = transcation.dealResult(result+erpService.stockOut(stockOut));
+
+                if (!result.contains(CommonConstant.fail)) {
+                    stockOut.setState(ErpConstant.stockInOut_state_finished);
+                }
 
                 action.setEntity(ErpConstant.stockInOut);
                 action.setType(ErpConstant.stockInOut_action_outProduct);
@@ -466,7 +474,7 @@ public class ErpController {
                 action.setInputDate(dateUtil.getSecondCurrentTimestamp());
                 result += erpDao.save(action);
 
-                result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                result = "{\"" + CommonConstant.result + "\":\"" + result + "\"" +
                         ",\"" + CommonConstant.id + "\":" + stockOut.getId() +
                         ",\"" + CommonConstant.type + "\":" + stockOut.getType() +
                         ",\"" + CommonConstant.state + "\":" + stockOut.getState() + "}";

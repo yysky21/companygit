@@ -3,7 +3,6 @@ package com.hzg.order;
 import com.google.gson.reflect.TypeToken;
 import com.hzg.customer.User;
 import com.hzg.erp.Product;
-import com.hzg.pay.Pay;
 import com.hzg.sys.Action;
 import com.hzg.tools.*;
 import org.apache.log4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -51,6 +49,12 @@ public class OrderController {
     @Autowired
     CustomerClient customerClient;
 
+    @Autowired
+    MacValidator macValidator;
+
+    @Autowired
+    StrUtil strUtil;
+
     /**
      * 使用消息队列保存用户订单
      * 订单消息队列里一有消息，就会把消息自动发送至该方法，该方法然后保存订单信息
@@ -60,11 +64,30 @@ public class OrderController {
     @JmsListener(destination = OrderConstant.queue_order)
     public void saveQueueOrder(String json) {
         logger.info("saveQueueOrder start, parameter:" + json);
+        String result = null;
 
-        Order order = writer.gson.fromJson(json, Order.class);
-        String result = saveOrder(order);
-        orderDao.storeToRedis(order.getOrderSessionId(), result, OrderConstant.order_session_time);
+        Map<String, Object> saveData = writer.gson.fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
 
+        try {
+            String orderStr = strUtil.getJsonValue(OrderConstant.order, json);
+            String sessionId = (String)saveData.get(CommonConstant.sessionId);
+            String mac = (String)saveData.get(CommonConstant.mac);
+
+            if (macValidator.md5Validate(mac, sessionId, orderStr)) {
+                Order order = writer.gson.fromJson(orderStr, Order.class);
+                order.setUser((User) orderDao.getFromRedis((String) orderDao.getFromRedis(
+                        CommonConstant.sessionId + CommonConstant.underline + sessionId)));
+                result = saveOrder(order);
+            } else {
+                result = "mac 校验不通过，不能保存订单";
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result += CommonConstant.fail;
+        }
+
+        orderDao.storeToRedis((String)saveData.get(CommonConstant.orderSessionId), result, OrderConstant.order_session_time);
         logger.info("saveQueueOrder end, result:" + result);
     }
 

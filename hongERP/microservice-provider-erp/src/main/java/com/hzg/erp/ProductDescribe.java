@@ -31,7 +31,7 @@ public class ProductDescribe implements Serializable {
     @Column(name="state",length = 1)
     private Integer state;
 
-    @Column(name="describes",length=256)
+    @Column(name="describes",length=1600)
     private String describes;
 
     @Column(name="imageParentDirPath",length=30)

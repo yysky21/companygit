@@ -198,9 +198,6 @@
                                     <a href="<%=FileServerInfo.imageServerUrl%>/${entity.describe.imageParentDirPath}/7.jpg"  class="lightbox" rel="roadtrip">
                                         <img src="<%=FileServerInfo.imageServerUrl%>/${entity.describe.imageParentDirPath}/7.jpg" width="15%">
                                     </a>
-                                    <a href="<%=FileServerInfo.imageServerUrl%>/${entity.describe.imageParentDirPath}/8.jpg"  class="lightbox" rel="roadtrip">
-                                        <img src="<%=FileServerInfo.imageServerUrl%>/${entity.describe.imageParentDirPath}/8.jpg" width="15%">
-                                    </a>
                                 </div>
                             </div>
                             <div class="item form-group">

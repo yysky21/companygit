@@ -75,31 +75,39 @@ public class CustomerController {
             /**
              * 客户、用户注册要验证短信验证码
              */
-            Map<String, Object> saveData = writer.gson.fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
-            String validateCode = saveData.get(SmsConstant.validateCode).toString();
-            String dbValidateCode = smsClient.getValidateCode(saveData.get(SmsConstant.phone).toString(), saveData.get(SmsConstant.validateCodeKey).toString());
+            if (entity.equalsIgnoreCase(Customer.class.getSimpleName())) {
+                Map<String, Object> saveData = writer.gson.fromJson(json, new TypeToken<Map<String, Object>>() {}.getType());
+                String validateCode = saveData.get(SmsConstant.validateCode).toString();
+                int index = validateCode.indexOf(".");
+                if (index != -1) {
+                    validateCode = validateCode.substring(0, index);
+                }
 
-            if (dbValidateCode != null && validateCode.equals(dbValidateCode)) {
-                /**
-                 * 客户注册
-                 */
-                if (entity.equalsIgnoreCase(Customer.class.getSimpleName())) {
+                Map<String, Object> dbValidateCodeMap = writer.gson.fromJson(smsClient.getValidateCode(saveData.get(SmsConstant.mobile).toString(), saveData.get(SmsConstant.validateCodeKey).toString()),
+                        new TypeToken<Map<String, Object>>() {
+                        }.getType());
+                String dbValidateCode = dbValidateCodeMap.get(SmsConstant.validateCode).toString();
+                int dbIndex = dbValidateCode.indexOf(".");
+                if (dbIndex != -1) {
+                    dbValidateCode = dbValidateCode.substring(0, index);
+                }
+
+                if (dbValidateCode != null && validateCode.equals(dbValidateCode)) {
+                    /**
+                     * 客户注册
+                     */
                     result += customerService.saveCustomer(writer.gson.fromJson(json, Customer.class));
-
-                } else if (entity.equalsIgnoreCase(User.class.getSimpleName())) {
-                    result += customerService.saveUser(writer.gson.fromJson(json, User.class));
-                }
-
-                if (!result.contains(CommonConstant.fail)) {
-                    smsClient.delValidateCode(saveData.get(SmsConstant.phone).toString(), saveData.get(SmsConstant.validateCodeKey).toString());
-                }
-
-            } else {
-                if (dbValidateCode != null) {
-                    result += CommonConstant.fail + ",验证码不正确，不能保存信息";
+                    if (!result.contains(CommonConstant.fail)) {
+                        smsClient.delValidateCode(saveData.get(SmsConstant.phone).toString(), saveData.get(SmsConstant.validateCodeKey).toString());
+                    }
 
                 } else {
-                    result += CommonConstant.fail + ",验证码已经过期，请重新获取验证码，来保存信息";
+                    if (dbValidateCode != null) {
+                        result += CommonConstant.fail + ",验证码不正确，或者注册的手机号不是接受短信验证码的手机号，不能保存信息";
+
+                    } else {
+                        result += CommonConstant.fail + ",验证码已经过期，请重新获取验证码，来保存信息";
+                    }
                 }
             }
 
@@ -567,16 +575,14 @@ public class CustomerController {
         Map<String, String> dealInfo = writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
         String username = dealInfo.get(CommonConstant.username);
         String sessionId = dealInfo.get(CommonConstant.sessionId);
-        String oldSessionId = dealInfo.get(CommonConstant.oldSessionId);
 
-        String tempUserKey = username + CommonConstant.underline +  oldSessionId;
+        String tempUserKey = username + CommonConstant.underline +  sessionId;
 
         if (dealInfo.get("dealType").equals("againSignIn")) {
             User user = (User) dao.getFromRedis(tempUserKey);
 
             if (user != null) {
                 //移除之前登录的用户
-                dao.deleteFromRedis(CommonConstant.salt + CommonConstant.underline + oldSessionId);
                 signInUtil.removeUser(username);
 
                 dao.storeToRedis(username, user, signInUtil.sessionTime);

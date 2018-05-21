@@ -47,4 +47,8 @@ public class CommonConstant {
 
     public final static String unit = "unit";
     public final static String amount = "amount";
+
+    public final static String orderSessionId  = "orderSessionId";
+    public final static String mac  = "mac";
+
 }

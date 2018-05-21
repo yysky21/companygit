@@ -45,16 +45,20 @@ public class SmsController {
         String result = CommonConstant.fail;
 
         try {
-            Map<String, String> smsData = writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
-            String mobileNumber = smsData.get(SmsConstant.mobileNumber);
+            Map<String, Object> smsData = writer.gson.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
+            String mobileNumber = smsData.get(SmsConstant.mobileNumber).toString();
+            int index = mobileNumber.indexOf(".");
+            if (index != -1) {
+                mobileNumber = mobileNumber.substring(0, index);
+            }
 
             int count = dao.getSendCount(SmsConstant.count + CommonConstant.underline + mobileNumber);
             if (count < SmsConstant.maxSendCountPerDay) {
 
                 long expire = dao.getExpire(mobileNumber);
 
-                if (expire == 0) {
-                    result = send(mobileNumber, smsData.get(SmsConstant.content));
+                if (expire <= 0) {
+                    result = send(mobileNumber, smsData.get(SmsConstant.content).toString());
 
                     dao.storeToRedis(mobileNumber, "", SmsConstant.sendInterval);
                     dao.storeToRedisAtDate(SmsConstant.count + CommonConstant.underline + mobileNumber, ++count, dateUtil.getDay(1));
@@ -74,7 +78,7 @@ public class SmsController {
             result = CommonConstant.fail;
         }
 
-        writer.writeObjectToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\"}");
+        writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\"}");
         logger.info("send end");
     }
 
@@ -85,17 +89,17 @@ public class SmsController {
         String intervalKey = mobileNumber + CommonConstant.underline + SmsConstant.validateCode;
         long expire = dao.getExpire(intervalKey);
 
-        if (expire == 0) {
+        if (expire <= 0) {
             String validateCodeKey = strUtil.generateRandomStr(32);
             String validateCode = strUtil.generateRandomNumberStr(length);
             dao.storeToRedis(mobileNumber + CommonConstant.underline + validateCodeKey, validateCode, SmsConstant.validTime);
 
             dao.storeToRedis(intervalKey, "", SmsConstant.sendInterval);
 
-            writer.writeObjectToJson(response, "{\"" + SmsConstant.validateCode + "\":\"" + validateCode + "\",\"" + SmsConstant.validateCodeKey + "\":\"" + validateCodeKey + "\"}");
+            writer.writeStringToJson(response, "{\"" + SmsConstant.validateCode + "\":\"" + validateCode + "\",\"" + SmsConstant.validateCodeKey + "\":\"" + validateCodeKey + "\"}");
 
         } else {
-            writer.writeObjectToJson(response, "{\"" + CommonConstant.result + "\":\"" + CommonConstant.fail + "," + expire + "秒后，产生验证码。可以再次发送短信到号码为：" + mobileNumber + "的手机" + "\"}");
+            writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + CommonConstant.fail + "," + expire + "秒后，产生验证码。可以再次发送短信到号码为：" + mobileNumber + "的手机" + "\"}");
         }
 
 
@@ -106,7 +110,7 @@ public class SmsController {
     public void getValidateCode(HttpServletResponse response, String mobileNumber, String validateCodeKey){
         logger.info("getValidateCode start, parameter:" + mobileNumber + "," + validateCodeKey);
 
-        writer.writeObjectToJson(response, "{\"" + SmsConstant.validateCode + "\":\"" + dao.getFromRedis(mobileNumber + CommonConstant.underline + validateCodeKey) + "\"}");
+        writer.writeStringToJson(response, "{\"" + SmsConstant.validateCode + "\":\"" + dao.getFromRedis(mobileNumber + CommonConstant.underline + validateCodeKey) + "\"}");
         logger.info("getValidateCode end");
     }
 
@@ -115,7 +119,7 @@ public class SmsController {
         logger.info("delValidateCode start, parameter:" + mobileNumber + "," + validateCodeKey);
 
         dao.deleteFromRedis(mobileNumber + CommonConstant.underline + validateCodeKey);
-        writer.writeObjectToJson(response, "{\"" + CommonConstant.result + "\":\"" + CommonConstant.success + "\"}");
+        writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + CommonConstant.success + "\"}");
         logger.info("delValidateCode end");
     }
 

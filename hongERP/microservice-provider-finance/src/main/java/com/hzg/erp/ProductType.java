@@ -32,7 +32,7 @@ public class ProductType implements Serializable {
     @Column(name="name",length=20)
     private String name;
 
-    @Column(name="abbreviate",length=10)
+    @Column(name="abbreviate",length=50)
     private String abbreviate;
 
     @Column(name="title",length=50)

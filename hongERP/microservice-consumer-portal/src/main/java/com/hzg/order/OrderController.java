@@ -45,17 +45,14 @@ public class OrderController extends com.hzg.base.SessionController {
 
     @CrossOrigin
     @PostMapping("/save")
-    public void save(HttpServletResponse response, String json,
-                     @CookieValue(name=CommonConstant.sessionId, defaultValue = "")String sessionId) {
+    public void save(HttpServletResponse response, String json) {
         logger.info("save order start:" + json);
 
         String orderSessionId = strUtil.generateDateRandomStr(32);
-        json = json.substring(0, json.length()-1) + ",\"" + CommonConstant.orderSessionId + "\":\"" + orderSessionId + "\"," +
-                "\"" + CommonConstant.sessionId + "\":\"" + sessionId + "\"}";
-
+        json = json.substring(0, json.length()-1) + ",\"" + CommonConstant.orderSessionId + "\":\"" + orderSessionId + "\"}";
         jmsMessagingTemplate.convertAndSend(orderQueue, json);
-        writer.writeStringToJson(response, "{\"" + CommonConstant.orderSessionId + "\":\"" + orderSessionId + "\"}");
 
+        writer.writeStringToJson(response, "{\"" + CommonConstant.orderSessionId + "\":\"" + orderSessionId + "\"}");
         logger.info("save order end");
     }
 

@@ -1406,7 +1406,7 @@ public class FinanceUtil {
                             inOutDetail.setOutUnitPrice(inOutUnitPrice);
                             inOutDetail.setOutAmount(inOutDetail.getOutUnitPrice() * inOutDetail.getOutQuantity());
                             inOutDetail.setEndQuantity(inOutDetail.getBeginQuantity() - inOutDetail.getOutQuantity());
-                            inOutDetail.setEndAmount(inOutDetail.getBeginAmount()+inOutDetail.getOutQuantity());
+                            inOutDetail.setEndAmount(inOutDetail.getBeginAmount()-inOutDetail.getOutAmount());
                             if (inOutDetail.getEndQuantity() == 0 ){
                                 inOutDetail.setEndUnitPrice(null);
                             } else {

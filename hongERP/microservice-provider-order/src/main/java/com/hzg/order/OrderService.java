@@ -93,9 +93,6 @@ public class OrderService {
         order.setDate(dateUtil.getSecondCurrentTimestamp());
 
         if (order.getType().compareTo(OrderConstant.order_type_selfService) == 0) {
-            order.setUser((User) orderDao.getFromRedis((String) orderDao.getFromRedis(
-                    CommonConstant.sessionId + CommonConstant.underline + order.getSessionId())));
-
             result += saveBaseOrder(order);
 
             Pay pay = new Pay();
@@ -308,7 +305,8 @@ public class OrderService {
         }
 
         if (result.equals("")) {
-            if (order.getType().compareTo(OrderConstant.order_type_book) != 0) {
+            if (order.getType().compareTo(OrderConstant.order_type_book) != 0 &&
+                    order.getType().compareTo(OrderConstant.order_type_selfService) != 0) {
                 BigDecimal paysAmount = new BigDecimal(0);
                 for (Pay pay : order.getPays()) {
                     paysAmount = paysAmount.add(new BigDecimal(Float.toString(pay.getAmount())));
@@ -1045,7 +1043,7 @@ public class OrderService {
         ExpressDeliver expressDeliver = new ExpressDeliver();
         expressDeliver.setDeliver(ErpConstant.deliver_sfExpress);
         expressDeliver.setType(ErpConstant.deliver_sfExpress_type);
-        expressDeliver.setDate(expressDetail.getExpressDate());
+        expressDeliver.setDate(expressDetail.getExpressDate() == null ?  new java.sql.Timestamp(dateUtil.getDay(1).getTime()) : expressDetail.getExpressDate());
 
         expressDeliver.setReceiver(receiver.getReceiver());
         expressDeliver.setReceiverAddress(receiver.getAddress());

@@ -260,6 +260,9 @@ public class Pay implements Serializable {
     }
 
     public String getPayTypeName() {
+        if (payType == null) {
+            return "";
+        }
         switch (payType) {
             case 0 : return "现金";
             case 1 : return "网上支付";

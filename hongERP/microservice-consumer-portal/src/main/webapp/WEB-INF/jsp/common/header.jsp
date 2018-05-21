@@ -202,19 +202,9 @@
                                     <li><a><i class="fa fa-edit"></i>报表<span class="fa fa-chevron-down"></span></a>
                                         <ul class="nav child_menu">
                                             <li><a href="#/finance/list/grossProfit/%7b%22grossProfit%22%3a%7b%7d%2c%22chartMaker%22%3a%7b%22name%22%3a%22%22%7d%7d">报表管理</a></li>
-                                            <c:if test="${fn:contains(resources, '/finance/save/subject')}">
+                                            <%--<c:if test="${fn:contains(resources, '/finance/save/subject')}">
                                                 <li><a href="#/finance/view/subject/-1">生成报表</a></li>
-                                            </c:if>
-                                            <%--<li><a><i class="fa fa-edit"></i>特殊报表管理<span class="fa fa-chevron-down"></span></a>
-                                                <ul class="nav child_menu">
-                                                    <c:if test="${fn:contains(resources, '/finance/complexQuery/inOutDetail')}">
-                                                        <li><a href="#/finance/view/inOutDetail/-1">进销存明细账</a></li>
-                                                    </c:if>
-                                                    <c:if test="${fn:contains(resources, '/finance/complexQuery/capitalFlowMeter')}">
-                                                        <li><a href="#/finance/view/subject/-1">资金流水表</a></li>
-                                                    </c:if>
-                                                </ul>
-                                            </li>--%>
+                                            </c:if>--%>
                                         </ul>
                                     </li>
                                 </ul>

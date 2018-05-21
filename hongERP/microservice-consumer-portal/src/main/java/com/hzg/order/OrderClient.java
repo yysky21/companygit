@@ -23,7 +23,7 @@ public interface OrderClient extends Client {
     org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(OrderClient.class);
 
     @RequestMapping(value = "/querySaveResult", method = RequestMethod.GET)
-    String querySaveResult(String orderSessionId);
+    String querySaveResult(@RequestParam("orderSessionId") String orderSessionId);
 
     @RequestMapping(value = "/authorizeAmount", method = RequestMethod.POST)
     String authorizeAmount(String json);

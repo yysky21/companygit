@@ -17,6 +17,7 @@ public class SmsConstant {
     public final static String count = "count";
 
     public final static String phone = "phone";
+    public final static String mobile = "mobile";
     public final static String mobileNumber = "mobileNumber";
     public final static String content = "content";
     public final static String validateCode = "validateCode";

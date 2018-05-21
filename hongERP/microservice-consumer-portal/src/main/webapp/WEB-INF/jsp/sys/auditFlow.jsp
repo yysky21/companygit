@@ -263,6 +263,11 @@
         '{}', ['company[id]', 'dept[id]'], 0);
 
 
+    $(document.getElementById("company[id]")).change(function(){
+        $(document.getElementById("dept[id]")).empty();
+        $(document.getElementById("post")).empty().append("<option value=\"\">请选择</option>");
+    });
+
     $("#entity").change(function(){
         $("#action").empty().append(businessFlowActionOptions[$("#entity").val()]);
         $("#nodeAction").empty().append(businessNodeActionOptions[$("#entity").val()]);

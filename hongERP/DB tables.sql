@@ -31,7 +31,7 @@ CREATE TABLE `hzg_article` (
   `title` varchar(100) DEFAULT NULL COMMENT '标题',
   `imageUrl` varchar(100) DEFAULT NULL COMMENT '封面图',
   `content` text COMMENT '内容',
-  `shortContent` varchar(150) DEFAULT NULL COMMENT '摘要',
+  `shortContent` varchar(256) DEFAULT NULL COMMENT '摘要',
   `position` int(1) DEFAULT NULL COMMENT '推荐位（1:首页，2:焦点图，3:栏目推荐等）',
   `hits` int(11) unsigned DEFAULT NULL COMMENT '阅读量',
   `authorId` int(3) unsigned DEFAULT NULL COMMENT '发布人Id',
@@ -39,7 +39,7 @@ CREATE TABLE `hzg_article` (
   `state` int(1) unsigned DEFAULT NULL COMMENT '状态（0:保存/1:发布/2:删除）',
   `seoTitle` varchar(80) DEFAULT NULL COMMENT '文章优化标题',
   `seoKeyword` varchar(80) DEFAULT NULL COMMENT '文章优化关键词',
-  `seoDesc` varchar(100) DEFAULT NULL COMMENT '文章优化描述',
+  `seoDesc` varchar(256) DEFAULT NULL COMMENT '文章优化描述',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8 COMMENT='文章表';
 
@@ -1163,15 +1163,15 @@ DROP TABLE IF EXISTS `hzg_product_describe`;
 CREATE TABLE `hzg_product_describe` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `state` int(1) DEFAULT NULL COMMENT '状态，0:未启用，1：启用',
-  `describes` varchar(256) DEFAULT NULL COMMENT '软文描述',
-  `imageParentDirPath` varchar(30) DEFAULT NULL COMMENT '图片父文件夹地址',
-  `videoParentDirPath` varchar(30) DEFAULT NULL COMMENT '视频父文件夹地址',
+  `describes` varchar(1600) DEFAULT NULL COMMENT '软文描述',
+  `imageParentDirPath` varchar(60) DEFAULT NULL COMMENT '图片父文件夹地址',
+  `videoParentDirPath` varchar(60) DEFAULT NULL COMMENT '视频父文件夹地址',
   `photographerId` int(11) DEFAULT NULL COMMENT '摄影人id',
   `editorId` int(11) DEFAULT NULL COMMENT '编辑id',
   `date` datetime DEFAULT NULL COMMENT '编辑时间',
   `seoTitle` varchar(80) DEFAULT NULL COMMENT '商品优化标题',
-  `seoKeyword` varchar(80) DEFAULT NULL COMMENT '商品优化关键词',
-  `seoDesc` varchar(100) DEFAULT NULL COMMENT '商品优化描述',
+  `seoKeyword` varchar(128) DEFAULT NULL COMMENT '商品优化关键词',
+  `seoDesc` varchar(256) DEFAULT NULL COMMENT '商品优化描述',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=352 DEFAULT CHARSET=utf8 COMMENT='商品描述';
 
@@ -1196,8 +1196,8 @@ CREATE TABLE `hzg_product_own_property` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `productId` int(11) DEFAULT NULL COMMENT '商品id',
   `propertyId` int(11) DEFAULT NULL COMMENT '属性id',
-  `name` varchar(10) DEFAULT NULL COMMENT '属性名',
-  `value` varchar(40) DEFAULT NULL COMMENT '属性值',
+  `name` varchar(40) DEFAULT NULL COMMENT '属性名',
+  `value` varchar(256) DEFAULT NULL COMMENT '属性值',
   PRIMARY KEY (`Id`),
   KEY `productId` (`productId`),
   KEY `propertyId` (`propertyId`)
@@ -1267,10 +1267,10 @@ CREATE TABLE `hzg_product_type` (
   `Id` int(11) NOT NULL AUTO_INCREMENT,
   `parentId` int(11) DEFAULT NULL COMMENT '父id',
   `name` varchar(20) DEFAULT NULL COMMENT '名称',
-  `abbreviate` varchar(10) DEFAULT NULL COMMENT '分类简写',
+  `abbreviate` varchar(50) DEFAULT NULL COMMENT '分类简写',
   `title` varchar(50) DEFAULT NULL COMMENT '商品分类优化标题',
   `keyword` varchar(50) DEFAULT NULL COMMENT '商品分类优化关键词',
-  `describes` varchar(100) DEFAULT NULL COMMENT '商品分类优化描述',
+  `describes` varchar(256) DEFAULT NULL COMMENT '商品分类优化描述',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COMMENT='商品分类';
 

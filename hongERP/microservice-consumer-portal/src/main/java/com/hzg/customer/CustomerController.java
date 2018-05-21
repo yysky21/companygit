@@ -58,30 +58,29 @@ public class CustomerController extends com.hzg.base.SessionController {
     }
 
     /**
-     * 到登录页面，设置加密密码的 salt
+     * 获取 sessionId
      * @param response
-     * @param model
      * @return
      */
     @CrossOrigin
-    @GetMapping("/user/signIn")
-    public void signIn(HttpServletResponse response, Map<String, Object> model) {
+    @GetMapping("/user/getSessionId")
+    public void getSessionId(HttpServletResponse response) {
         String sessionId = strUtil.generateDateRandomStr(32);
-
-        String salt = "";
-        if (model.get(CommonConstant.oldSessionId) == null) {
-            salt = strUtil.generateRandomStr(256);
-        } else {
-            salt = (String) dao.getFromRedis(CommonConstant.salt + CommonConstant.underline + (String)model.get(CommonConstant.oldSessionId));
-        }
-
         cookieUtils.addCookie(response, CommonConstant.sessionId, sessionId);
+        writer.writeStringToJson(response, "{\"" + CommonConstant.sessionId + "\":\"" + sessionId + "\"}");
+    }
+
+    /**
+     * 获取 salt
+     * @param response
+     * @return
+     */
+    @CrossOrigin
+    @GetMapping("/user/getSalt/{sessionId}")
+    public void getSalt(HttpServletResponse response, @PathVariable("sessionId") String sessionId) {
+        String salt = strUtil.generateRandomStr(256);
         dao.storeToRedis(CommonConstant.salt + CommonConstant.underline + sessionId, salt, sessionTime);
-
-        model.put(CommonConstant.salt, salt);
-        model.put(CommonConstant.sessionId, sessionId);
-
-        writer.writeObjectToJson(response, model);
+        writer.writeStringToJson(response, "{\"" + CommonConstant.salt + "\":\"" + salt + "\"}");
     }
 
     /**
@@ -95,44 +94,47 @@ public class CustomerController extends com.hzg.base.SessionController {
     public void user(HttpServletRequest request, HttpServletResponse response, @PathVariable("name") String name, String json) {
         logger.info("user start, name:" + name + ", json:" + json);
 
-        Map<String, String> result = null;
+        String result = null;
         if (name.equals("signIn")) {
-            result = writer.gson.fromJson(customerClient.signIn(json), new TypeToken<Map<String, String>>(){}.getType());
+            result = customerClient.signIn(json);
 
         } else if (name.equals("signOut")) {
             cookieUtils.delCookie(request, response, CommonConstant.sessionId);
-            result = writer.gson.fromJson(customerClient.signOut(json), new TypeToken<Map<String, String>>(){}.getType());
+            result = customerClient.signOut(json);
 
         } else if (name.equals("hasLoginDeal")) {
-            result = writer.gson.fromJson(customerClient.hasLoginDeal(json), new TypeToken<Map<String, String>>(){}.getType());
+            result = customerClient.hasLoginDeal(json);
         }
 
-        if (result.get(CommonConstant.result).equals(CommonConstant.success)) {
-            writer.writeObjectToJson(response, result);
+        writer.writeStringToJson(response, result);
 
-        } else {
-            Map<String, String> formInfo = writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
-
-            Map<String, Object> model = new HashedMap();
-            model.put(CommonConstant.result, result.get(CommonConstant.result));
-            model.put(CommonConstant.oldSessionId, formInfo.get(CommonConstant.sessionId));
-
-            signIn(response, model);
-        }
 
         logger.info("user " + name + " end");
     }
 
     @CrossOrigin
-    @GetMapping("/user/getValidateCode/{mobileNumber}")
-    public void getValidateCode(HttpServletResponse response, @PathVariable("mobileNumber") String mobileNumber) {
-        String validateCodeStr = smsClient.generateValidateCode(SmsConstant.validateCodeLength, mobileNumber);
-        Map<String, String> validateCode = writer.gson.fromJson(validateCodeStr, new TypeToken<Map<String, String>>(){}.getType());
+    @GetMapping("/user/sendValidateCode/{mobileNumber}")
+    public void sendValidateCode(HttpServletResponse response, @PathVariable("mobileNumber") String mobileNumber) {
+        String validateCodeInfoStr = smsClient.generateValidateCode(SmsConstant.validateCodeLength, mobileNumber);
+        Map<String, Object> validateCodeInfo = writer.gson.fromJson(validateCodeInfoStr, new TypeToken<Map<String, Object>>(){}.getType());
 
-        if (!validateCodeStr.contains(CommonConstant.fail)) {
-            writer.writeStringToJson(response, smsClient.send("用户注册验证码是：" + validateCode.get(SmsConstant.validateCode) + ",请查收"));
+        if (!validateCodeInfoStr.contains(CommonConstant.fail)) {
+            /**
+             * gson 会把数字转换为 double 类型，toString后会形成如：23.0，这样带 .0 的字符串，需要去除.0
+             */
+            String codeStr = validateCodeInfo.get(SmsConstant.validateCode).toString();
+            int index = codeStr.indexOf(".");
+            if (index != -1) {
+                codeStr = codeStr.substring(0, index);
+            }
+
+            Map<String, String> sendResult = writer.gson.fromJson(
+                    smsClient.send("{\"" + SmsConstant.mobileNumber + "\":\"" + mobileNumber + "\",\"" + SmsConstant.content + "\":\"用户注册验证码是：" + codeStr + ",请查收\"}"),
+                    new TypeToken<Map<String, String>>(){}.getType());
+            writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + sendResult.get(CommonConstant.result) + "\"," +
+                    "\"" + SmsConstant.validateCodeKey + "\":\"" + validateCodeInfo.get(SmsConstant.validateCodeKey).toString() + "\"}");
         } else {
-            writer.writeStringToJson(response, validateCodeStr);
+            writer.writeStringToJson(response, validateCodeInfoStr);
         }
     }
 }

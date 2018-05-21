@@ -306,8 +306,9 @@ public class ErpService {
                 detail1.setItemNo(product.getNo());
                 detail1.setProductCheck(productCheck1);
                 // 该存货编码所对应的盘点详细条目已存在
-                if (erpDao.query(detail1) != null && !erpDao.query(detail1).isEmpty()){
-                    detail1 = (ProductCheckDetail)(erpDao.query(detail1).get(0));
+                List<ProductCheckDetail> productCheckDetails = erpDao.query(detail1);
+                if (productCheckDetails != null && !productCheckDetails.isEmpty()){
+                    detail1 = productCheckDetails.get(productCheckDetails.size() - 1);
                     // 更新已存在条目的盘点数量及盘点金额
                     detail1.setCheckQuantity(detail1.getCheckQuantity()+detail.getCheckQuantity());
                     detail1.setCheckAmount((detail1.getCheckQuantity()+detail.getCheckQuantity())*product.getUnitPrice());
