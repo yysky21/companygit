@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>New Style SWF/HTML5 Stream Uploading DEMO</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="css/stream-v1.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<div id="i_select_files" style="height:200px;width:610px">
+	</div>
+	<br/>已上传文件列表:
+	<div id="i_stream_files_queue">
+	</div>
+	<br/>消息:
+	<div id="i_stream_message_container" class="stream-main-upload-box" style="overflow: auto;height:200px;">
+	</div>
+	<br/><button onclick="javascript:window.location.reload();">重置</button>
+<br>
+
+
+<script type="text/javascript" src="js/stream-v1.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	var userData;
+	var setDirs, uploadPicProducts, kk, files, tempFilePath, productNo;
+
+    window.addEventListener('message', function(event) {
+		if (event.origin.indexOf("portal.demohzg.com") != -1) {
+			userData = JSON.parse(event.data);
+		}
+    }, false);
+
+	/**
+	 * 配置文件（如果没有默认字样，说明默认值就是注释下的值）
+	 * 但是，on*（onSelect， onMaxSizeExceed...）等函数的默认行为
+	 * 是在ID为i_stream_message_container的页面元素中写日志
+	 */
+	var config = {
+		browseFileId : "i_select_files", /** 选择文件的ID, 默认: i_select_files */
+		browseFileBtn : "<div>请选择文件</div>", /** 显示选择文件的样式, 默认: `<div>请选择文件</div>` */
+		dragAndDropArea: "i_select_files", /** 拖拽上传区域，Id（字符类型"i_select_files"）或者DOM对象, 默认: `i_select_files` */
+		dragAndDropTips: "<span>把文件夹或文件，拖拽到这里</span>", /** 拖拽提示, 默认: `<span>把文件(文件夹)拖拽到这里</span>` */
+		filesQueueId : "i_stream_files_queue", /** 文件上传容器的ID, 默认: i_stream_files_queue */
+		filesQueueHeight : 200, /** 文件上传容器的高度（px）, 默认: 450 */
+		messagerId : "i_stream_message_container", /** 消息显示容器的ID, 默认: i_stream_message_container */
+		multipleFiles: true, /** 多个文件一起上传, 默认: false */
+		uploadURL : "/upload", /** HTML5上传的URI */
+		onRepeatedFile: function(f) {
+			alert("文件："+f.name +" 大小："+f.size + " 已存在于上传队列中。");
+			return false;
+		},
+		tokenURL : "/tk", /** 根据文件名、大小等信息获取Token的URI（用于生成断点续传、跨域的令牌） */
+		/**
+		 *  选择文件后的响应事件
+		 * @param list
+		 */
+		onSelect: function(list) {
+            setDirs = ""; uploadPicProducts = []; kk = 0, files = [], tempFilePath = [], productNo = "";
+
+			for (var i = 0; i < list.length; i++) {
+			    var fileInfo = list[i].name.split("/");
+
+			    var pos = setDirs.indexOf("," + fileInfo[0] + ",");
+				if (pos == -1) {
+                    productNo = fileInfo[0];
+				    setDirs += "," + fileInfo[0] + ",";
+
+					$.ajax({
+						type:"post",
+						url:"http://portal.demohzg.com/erp/doBusiness/queryProductAccessAllow",
+						contentType: "application/x-www-form-urlencoded; charset=utf-8",
+						data: {json: JSON.stringify({no: fileInfo[0]}), sessionId: userData.sessionId},
+						dataType: "json",
+                        async: false,
+
+						success: function(products){
+						    if (products.length > 0) {
+						        for (var k = 0; k < products.length; k++) {
+						            var product = products[k];
+
+									var dirInfo = product.describe.imageParentDirPath.split("/");
+
+									for (var j = 0; j < list.length; j++) {
+										var fileInfo1 = list[j].name.split("/");
+
+										/**
+										 * 状态为 1 或 7 的商品，重新设置上传目录上传。其他的不可以上传
+										 **/
+										if ((product.state == 1 || product.state == 7) && $.trim(fileInfo1[0]) == $.trim(dirInfo[1])) {
+											tempFilePath[list[j].name] = product.describe.imageParentDirPath + "/" + fileInfo1[1];
+										}
+									}
+
+									if (product.state == 1 || product.state == 12 || product.state == 7) {
+                                        messages += "<br>系统ID为：" + product.id + ",编号为：" + product.no + "的商品，是入库状态或可上传文件状态，可以上传文件到商品编号目录";
+										uploadPicProducts[kk++] = product;
+                                        $("#i_stream_message_container").html(messages);
+									} else {
+										var messages = $("#i_stream_message_container").html();
+										messages += "<br>系统ID为：" + product.id + ",编号为：" + product.no + "的商品，不是入库状态或可上传文件状态，<br/>不能上传到商品编号目录，对应文件上传到 temp 文件夹";
+										$("#i_stream_message_container").html(messages);
+									}
+								}
+
+							} else {
+								var messages = $("#i_stream_message_container").html();
+								messages += "<br>查找不到编号为：" + productNo + "的商品，不能上传到商品编号目录，<br/>对应文件上传到 temp 文件夹";
+								$("#i_stream_message_container").html(messages);
+							}
+                        }
+					});
+                }
+			}
+
+			for (var i = 0; i < list.length; i++) {
+			    if (tempFilePath[list[i].name] != undefined) {
+                    list[i].name = tempFilePath[list[i].name];
+				} else {
+			        list[i].name = "temp/" + list[i].name;
+				}
+
+				console.log(list[i].name)
+			}
+
+            files = list;
+		},
+
+		/**
+		 * 所有文件上传完毕的响应事件
+		 */
+        onQueueComplete: function() {
+            var json = '';
+
+            for (kk = 0; kk < uploadPicProducts.length; kk++) {
+                json = '{"id":' + uploadPicProducts[kk].id + ', "no":"' + uploadPicProducts[kk].no + '", ' +
+					'"describe":{"id":' + uploadPicProducts[kk].describe.id + ', "photographer":{"id":' + userData.userId +'}}}';
+
+                $.ajax({
+                    type:"post",
+                    url:"http://portal.demohzg.com/erp/doBusiness/updateUploadMediaFilesInfo",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {json: json, sessionId: userData.sessionId},
+                    dataType: "json",
+                    async: false,
+
+                    success: function(result){
+
+                        if (result.result.indexOf("success") == -1) {
+                            var messages = $("#i_stream_message_container").html();
+                            messages += "<br>编号为：" + uploadPicProducts[kk].no + "的商品的文件上传信息更新失败，系统将自动删除其已上传文件。" +
+                                        "<br/>更新失败原因：" + result.result;
+                            $("#i_stream_message_container").html(messages);
+
+                            var fileInfo = uploadPicProducts[kk].describe.imageParentDirPath.split("/");
+
+
+                            for (var j = 0; j < files.length; j++) {
+                                if (files[j].name.indexOf("temp/") == -1) {
+                                    if (files[j].name.split("/")[1] == fileInfo[1]) {
+
+                                        $.ajax({
+                                            type: "post",
+                                            url: "/deleteFile",
+                                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                            data: {filePath: files[j].name, sessionId: userData.sessionId},
+                                            dataType: "json",
+                                            async: false,
+
+                                            success: function(result) {
+                                                var messages = $("#i_stream_message_container").html();
+
+                                                if (result.result.indexOf("success") != -1) {
+                                                    messages += "<br>已删除其已上传文件:" + files[j].name;
+                                                } else {
+                                                    messages += "<br>删除其已上传文件" + files[j].name + "失败。";
+                                                }
+
+                                                $("#i_stream_message_container").html(messages);
+                                            }
+                                        });
+									}
+								}
+							}
+                        }
+                    }
+                });
+            }
+        }
+
+	//		autoUploading: false, /** 选择文件后是否自动上传, 默认: true */
+	//		autoRemoveCompleted : true, /** 是否自动删除容器中已上传完毕的文件, 默认: false */
+	//		maxSize: 104857600//, /** 单个文件的最大大小，默认:2G */
+	//		retryCount : 5, /** HTML5上传失败的重试次数 */
+	//		postVarsPerFile : { /** 上传文件时传入的参数，默认: {} */
+	//			param1: "val1",
+	//			param2: "val2"
+	//		},
+	//		swfURL : "/swf/FlashUploader.swf", /** SWF文件的位置 */
+	//		frmUploadURL : "/fd;", /** Flash上传的URI */
+	//		uploadURL : "/upload", /** HTML5上传的URI */
+	//		simLimit: 200, /** 单次最大上传文件个数 */
+	//		extFilters: [".txt", ".rpm", ".rmvb", ".gz", ".rar", ".zip", ".avi", ".mkv", ".mp3"], /** 允许的文件扩展名, 默认: [] */
+	//		onMaxSizeExceed: function(size, limited, name) {alert('onMaxSizeExceed')}, /** 文件大小超出的响应事件 */
+	//		onFileCountExceed: function(selected, limit) {alert('onFileCountExceed')}, /** 文件数量超出的响应事件 */
+	//		onExtNameMismatch: function(name, filters) {alert('onExtNameMismatch')}, /** 文件的扩展名不匹配的响应事件 */
+	//		onCancel : function(file) {alert('Canceled:  ' + file.name)}, /** 取消上传文件的响应事件 */
+	//		onComplete: function(file) {alert(file.name + ' onComplete')} /** 单个文件上传完毕的响应事件 */
+	//		onUploadError: function(status, msg) {alert('onUploadError')} /** 文件上传出错的响应事件 */
+	//		onDestroy: function() {alert('onDestroy')} /** 文件上传出错的响应事件 */
+	};
+	var _t = new Stream(config);
+</script>
+</body>
