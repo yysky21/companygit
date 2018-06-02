@@ -126,6 +126,7 @@ public class BorrowProductDetail implements Serializable {
             case 0 : return "已借";
             case 1 : return "已还";
             case 2 : return "部分已还";
+            case 3 : return "申请借货";
             default : return "";
         }
     }

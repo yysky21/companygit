@@ -45,9 +45,24 @@ public class Refund implements Serializable {
     @Column(name="bankBillNo",length=35)
     private String bankBillNo;
 
+    @Column(name="payType",length = 1)
+    private Integer payType;
+
+    @Column(name="payAccount", length =25)
+    private String payAccount;
+
+    @Column(name="payBranch",length=30)
+    private String payBranch;
+    
     @Column(name="payBank",length=15)
     private String payBank;
 
+    @Column(name="refundAccount",length=25)
+    private String refundAccount;
+
+    @Column(name="refundBranch",length=30)
+    private String refundBranch;
+    
     @Column(name="refundBank",length=15)
     private String refundBank;
 
@@ -180,5 +195,45 @@ public class Refund implements Serializable {
 
     public void setBalanceType(Integer balanceType) {
         this.balanceType = balanceType;
+    }
+
+    public String getPayAccount() {
+        return payAccount;
+    }
+
+    public void setPayAccount(String payAccount) {
+        this.payAccount = payAccount;
+    }
+
+    public String getPayBranch() {
+        return payBranch;
+    }
+
+    public void setPayBranch(String payBranch) {
+        this.payBranch = payBranch;
+    }
+
+    public String getRefundAccount() {
+        return refundAccount;
+    }
+
+    public void setRefundAccount(String refundAccount) {
+        this.refundAccount = refundAccount;
+    }
+
+    public String getRefundBranch() {
+        return refundBranch;
+    }
+
+    public void setRefundBranch(String refundBranch) {
+        this.refundBranch = refundBranch;
+    }
+
+    public Integer getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Integer payType) {
+        this.payType = payType;
     }
 }

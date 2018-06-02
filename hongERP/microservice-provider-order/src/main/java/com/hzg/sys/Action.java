@@ -1,6 +1,8 @@
 package com.hzg.sys;
 
 import com.hzg.afterSaleService.RepairProductDetail;
+import com.hzg.pay.Pay;
+import com.hzg.pay.Refund;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -62,6 +64,9 @@ public class Action implements Serializable {
 
     @Transient
     private Timestamp repairDate;
+
+    @Transient
+    private List<Refund> refunds;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -161,5 +166,13 @@ public class Action implements Serializable {
 
     public void setRepairDate(Timestamp repairDate) {
         this.repairDate = repairDate;
+    }
+
+    public List<Refund> getRefunds() {
+        return refunds;
+    }
+
+    public void setRefunds(List<Refund> refunds) {
+        this.refunds = refunds;
     }
 }

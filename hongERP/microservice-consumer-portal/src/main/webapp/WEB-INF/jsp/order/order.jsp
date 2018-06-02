@@ -214,8 +214,44 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <c:if test="${entity.state == 0}">
+                                <c:if test="${fn:contains(resources, '/orderManagement/cancel')}">
+                                    <div id="cancelReasonDiv" style="display: none">
+                                        <span class="section" style="margin-top: 40px">取消原因</span>
+                                        <div class="item form-group" style="margin-top:20px;">
+                                            <div class="col-md-6 col-sm-6 col-xs-12" style="width:1400px;margin-left: 150px;margin-top: 10px">
+                                                <textarea id="cancelReason" name="cancelReason" class="form-control col-md-7 col-xs-12" style="width: 600px"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:if>
+                            </c:if>
                         </form>
                     </div>
+
+                    <c:if test="${entity != null && !empty entity.actions}">
+                    <div class="x_content">
+                        <span class="section" style="margin-top: 40px">操作记录</span>
+                        <div class="item form-group" style="margin-top:20px;">
+                            <div class="col-md-6 col-sm-6 col-xs-12" style="width:1400px;margin-left: 150px;margin-top: 10px">
+                                <table class="table-sheet">
+                                    <thead><tr><th>操作人人</th><th>时间</th><th>结果</th><th>备注</th></tr></thead>
+                                    <tbody>
+                                    <c:forEach items="${entity.actions}" var="action">
+                                        <tr>
+                                            <td style="width: 120px">${action.inputer.name}</td>
+                                            <td style="width: 120px">${action.inputDate}</td>
+                                            <td style="width: 200px">${action.typeName}</td>
+                                            <td style="width: 250px">${action.remark}</td>
+                                        </tr>
+                                    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </c:if>
 
                     <div class="x_content">
                         <div class="form-horizontal form-label-left">
@@ -270,8 +306,15 @@
 
     <c:if test="${fn:contains(resources, '/orderManagement/cancel')}">
         $("#cancelOrder").click(function(){
+            $("#cancelReasonDiv").show();
+            $("#cancelReason").attr("readonly",false).css("border", "1px solid #ccc");
+            var cancelReason = $.trim($("#cancelReason").val());
+            if (cancelReason == 0) {
+                alert("请填写取消原因");
+                return false;
+            }
             if (confirm("订单取消后不可进行支付等后续操作，确认取消订单吗？")) {
-                $("#form").sendData('<%=request.getContextPath()%>/orderManagement/cancel', '{"id":${entity.id},"sessionId":"${sessionId}"}');
+                $("#form").sendData('<%=request.getContextPath()%>/orderManagement/cancel', '{"id":${entity.id},"sessionId":"${sessionId}","cancelReason":"' + cancelReason + '"}');
             }
         });
     </c:if>

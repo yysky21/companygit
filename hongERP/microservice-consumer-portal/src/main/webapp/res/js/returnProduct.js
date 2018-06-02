@@ -174,12 +174,130 @@ var returnProduct = (function ($) {
         }, false);
     }
 
+    function addFrRefund() {
+        var trs = $("#frRefundList tbody tr");
+        $("#frRefundList tbody").append("<tr>" + $(trs[trs.length - 1]).html() + "</tr>");
+
+        trs = $("#frRefundList tbody tr");
+        $.each($(trs[trs.length-1]).find(":input"), function (ci, item) {
+            var name = item.name;
+            if (name != undefined) {
+                if (name == "refundAccountInfo") {
+                    $(item).click(function(){
+                        var receiptAccountInfo = $(this).val().split("/");
+
+                        $.each($(this).parent().find(":input"), function (ci, item) {
+                            var name = item.name;
+                            if (name != undefined) {
+                                if (name == "refunds[][refundAccount]:string") {
+                                    $(item).val(receiptAccountInfo[0]);
+                                }
+
+                                if (name == "refunds[][refundBranch]:string") {
+                                    $(item).val(receiptAccountInfo[1]);
+                                }
+
+                                if (name == "refunds[][refundBank]:string") {
+                                    $(item).val(receiptAccountInfo[2]);
+                                }
+                            }
+                        });
+                    });
+                }
+
+                if (name == "refunds[][payAccount]:string") {
+                    $(item).accountInput();
+                }
+                
+                if (name == "refunds[][refundDate]:string") {
+                    $(item).daterangepicker({
+                        locale: {
+                            format: 'YYYY-MM-DD',
+                            applyLabel : '确定',
+                            cancelLabel : '取消',
+                            fromLabel : '起始时间',
+                            toLabel : '结束时间',
+                            customRangeLabel : '自定义',
+                            daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                            monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                            firstDay : 1
+                        },
+                        singleDatePicker: true,
+                        singleClasses: "picker_3"
+                    }, function(start, end, label) {
+                        console.log(start.toISOString(), end.toISOString(), label);
+                    });
+                }
+            }
+        });
+    }
+
+    function addCgRefund() {
+        var trs = $("#cgRefundList tbody tr");
+        $("#cgRefundList tbody").append("<tr>" + $(trs[trs.length - 1]).html() + "</tr>");
+
+        trs = $("#cgRefundList tbody tr");
+        $.each($(trs[trs.length-1]).find(":input"), function (ci, item) {
+            var name = item.name;
+            if (name != undefined) {
+                if (name == "refundAccountInfo") {
+                    $(item).click(function(){
+                        var receiptAccountInfo = $(this).val().split("/");
+
+                        $.each($(this).parent().find(":input"), function (ci, item) {
+                            var name = item.name;
+                            if (name != undefined) {
+                                if (name == "refunds[][payAccount]:string") {
+                                    $(item).val(receiptAccountInfo[0]);
+                                }
+
+                                if (name == "refunds[][payBranch]:string") {
+                                    $(item).val(receiptAccountInfo[1]);
+                                }
+
+                                if (name == "refunds[][payBank]:string") {
+                                    $(item).val(receiptAccountInfo[2]);
+                                }
+                            }
+                        });
+                    });
+                }
+
+                if (name == "refunds[][refundAccount]:string") {
+                    $(item).accountInput();
+                }
+
+                if (name == "refunds[][refundDate]:string") {
+                    $(item).daterangepicker({
+                        locale: {
+                            format: 'YYYY-MM-DD',
+                            applyLabel : '确定',
+                            cancelLabel : '取消',
+                            fromLabel : '起始时间',
+                            toLabel : '结束时间',
+                            customRangeLabel : '自定义',
+                            daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                            monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                            firstDay : 1
+                        },
+                        singleDatePicker: true,
+                        singleClasses: "picker_3"
+                    }, function(start, end, label) {
+                        console.log(start.toISOString(), end.toISOString(), label);
+                    });
+                }
+            }
+        });
+    }
+
     return {
         calculateReturnProductAmounts: calculateReturnProductAmounts,
         calculateReturnProductDetailAmount: calculateReturnProductDetailAmount,
         calculateReturnProductAmount: calculateReturnProductAmount,
         save: save,
         audit: audit,
-        init: init
+        init: init,
+        addFrRefund: addFrRefund,
+        addCgRefund: addCgRefund
     }
 })(jQuery);

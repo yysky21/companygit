@@ -195,6 +195,7 @@ public class OrderController {
                 action.setType(type);
                 action.setInputer((com.hzg.sys.User) orderDao.getFromRedis((String)orderDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + dbOrder.getSessionId())));
                 action.setInputDate(dateUtil.getSecondCurrentTimestamp());
+                action.setRemark(order.getCancelReason());
 
                 result += orderDao.save(action);
 
@@ -368,6 +369,9 @@ public class OrderController {
                     writer.gson.fromJson(json, new TypeToken<Map<String, String>>(){}.getType()), position, rowNum));
 
         } else if (entity.equalsIgnoreCase(OrderPrivate.class.getSimpleName())) {
+            writer.writeObjectToJson(response, orderService.privateQuery(entity, json, position, rowNum));
+
+        } else if (entity.equalsIgnoreCase(OrderDetail.class.getSimpleName())) {
             writer.writeObjectToJson(response, orderService.privateQuery(entity, json, position, rowNum));
         }
 

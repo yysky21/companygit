@@ -160,6 +160,9 @@
                                     <c:if test="${fn:contains(resources, '/erp/save/borrowProduct')}">
                                     <button id="saveBorrowProduct" type="button" class="btn btn-success">保存</button>
                                     </c:if>
+                                    <c:if test="${fn:contains(resources, '/erp/doBusiness/applyBorrowProduct')}">
+                                    <button id="applyBorrowProduct" type="button" class="btn btn-success">提交申请</button>
+                                    </c:if>
                                     </c:if>
                                     <c:if test="${entity != null}">
                                     <c:if test="${entity.state == 0}">
@@ -168,6 +171,7 @@
                                     </c:if>
                                     <c:if test="${fn:contains(resources, '/erp/update/borrowProduct')}">
                                     <button id="updateBorrowProduct" type="button" class="btn btn-success">修改</button>
+                                    <button id="edit" type="button" class="btn btn-primary">编辑</button>
                                     </c:if>
                                     <c:if test="${fn:contains(resources, '/erp/delete/borrowProduct')}">
                                     <button id="cancelBorrowProduct" type="button" class="btn btn-success">取消</button>
@@ -193,11 +197,25 @@
     init(<c:out value="${entity == null}"/>);
 
     <c:if test="${entity == null}">
+        <c:if test="${fn:contains(resources, '/erp/doBusiness/applyBorrowProduct')}">
+            $("#applyBorrowProduct").click(function(){
+                var json = '{"id":' + $("#id").val() +'}';
+                $('#form').sendData('<%=request.getContextPath()%>/erp/doBusiness/applyBorrowProduct', json, function(result){
+                    if (result.result.indexOf("success") != -1) {
+                        $("#saveBorrowProduct").attr('disabled', true);
+                    }
+                });
+            }).hide();
+        </c:if>
+
         <c:if test="${fn:contains(resources, '/erp/save/borrowProduct')}">
             $("#saveBorrowProduct").click(function(){
                 var json = getData();
                 if (json != null) {
-                    $('#form').sendData('<%=request.getContextPath()%>/erp/save/borrowProduct', json);
+                    $('#form').sendData('<%=request.getContextPath()%>/erp/save/borrowProduct', json, function(result){
+                        $("#form").append("<input type='hidden' name='id' id='id' value='" + result.id + "'>");
+                        $("#applyBorrowProduct").show();
+                    });
                 }
             });
         </c:if>
@@ -208,8 +226,8 @@
             $("#applyBorrowProduct").click(function(){
                 $('#form').sendData('<%=request.getContextPath()%>/erp/doBusiness/applyBorrowProduct', '{"id":${entity.id}}', function(result){
                     if (result.result.indexOf("success") != -1) {
-                        $("#updateBorrowProduct").attr('disabled', "true");
-                        $("#cancelBorrowProduct").attr('disabled', "true");
+                        $("#updateBorrowProduct").attr('disabled', true);
+                        $("#cancelBorrowProduct").attr('disabled', true);
                     }
                 });
             });
@@ -222,6 +240,12 @@
                     $('#form').sendData('<%=request.getContextPath()%>/erp/update/borrowProduct', json);
                 }
             });
+
+            $("#edit").click(function(){
+                $("#updateBorrowProduct").attr('disabled', false);
+                $("#cancelBorrowProduct").attr('disabled', false);
+                $("#applyBorrowProduct").attr('disabled', false);
+            });
         </c:if>
 
         <c:if test="${fn:contains(resources, '/erp/delete/borrowProduct')}">
@@ -229,13 +253,17 @@
                 if (confirm("确定取消借货单吗？")) {
                     $('#form').sendData('<%=request.getContextPath()%>/erp/delete/borrowProduct', '{"id":${entity.id}}', function(result){
                         if (result.result.indexOf("success") != -1) {
-                            $("#updateBorrowProduct").attr('disabled',"true");
-                            $("#applyBorrowProduct").attr('disabled',"true");
+                            $("#updateBorrowProduct").attr('disabled',true);
+                            $("#applyBorrowProduct").attr('disabled',true);
                         }
                     });
                 }
             });
         </c:if>
+
+        $("#updateBorrowProduct").attr('disabled', true);
+        $("#cancelBorrowProduct").attr('disabled', true);
+        $("#applyBorrowProduct").attr('disabled', true);
     </c:if>
 
     <c:if test="${entity != null && entity.state == 1}">

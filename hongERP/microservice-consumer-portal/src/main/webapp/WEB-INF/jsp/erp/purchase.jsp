@@ -73,6 +73,7 @@
                                 <select id="type" name="type:number" class="form-control col-md-7 col-xs-12" required>
                         <%
                             Purchase purchase = (Purchase) request.getAttribute("entity");
+                            String amountLabel = "采购金额";
                             if (purchase == null) {
                         %>
                                     <option value="">请选择类型</option>
@@ -90,9 +91,14 @@
                                                 "<option value='" + ErpConstant.purchase_type_cash + "'>现金采购</option>" +
                                                 "<option value='" + ErpConstant.purchase_type_deposit + "'>押金采购</option>")
                                                 .replace("'" + purchase.getType() + "'", "'" + purchase.getType() + "' selected");
+
+                                if (purchase.getType().compareTo(ErpConstant.purchase_type_deposit) == 0) {
+                                    amountLabel = "押金金额";
+                                }
                         %>
                             <%=purchaseTypeOptions%>
                         <%
+
                             }
                         %>
                                 </select>
@@ -171,7 +177,7 @@
                             </div>
                         </div>
                         <div class="item form-group">
-                            <label class="control-label col-md-3 col-sm-3 col-xs-12" id="amountLabel" for="amount">采购金额 <span class="required">*</span>
+                            <label class="control-label col-md-3 col-sm-3 col-xs-12" id="amountLabel" for="amount"><%=amountLabel%> <span class="required">*</span>
                             </label>
                             <div class="col-md-6 col-sm-6 col-xs-12">
                                 <input id="amount" name="amount:number" value="${entity.amount}" style="width:40%" class="form-control col-md-7 col-xs-12" required type="number">
@@ -181,7 +187,7 @@
                             <label class="control-label col-md-3 col-sm-3 col-xs-12">支付明细 <span class="required">*</span></label>
                             <div class="col-md-9 col-sm-6 col-xs-12">
                                 <div style="padding-top:8px;padding-bottom:8px">支付方式&nbsp;/&nbsp;支付金额&nbsp;/&nbsp;支付账号&nbsp;/&nbsp;收款账号<c:if test="${entity.pays != null}">&nbsp;/&nbsp;状态</c:if></div>
-                                <table id="payList">
+                                <table id="payList" class="payList">
                                     <tbody>
                                     <c:if test="${entity.pays == null}">
                                         <tr>

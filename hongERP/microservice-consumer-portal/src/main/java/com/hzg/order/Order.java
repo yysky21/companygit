@@ -2,6 +2,7 @@ package com.hzg.order;
 
 import com.hzg.customer.User;
 import com.hzg.pay.Pay;
+import com.hzg.sys.Action;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -93,6 +94,11 @@ public class Order implements Serializable {
     @Transient
     private OrderBook orderBook;
 
+    @Transient
+    private String cancelReason;
+
+    @Transient
+    private List<Action> actions;
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -240,6 +246,22 @@ public class Order implements Serializable {
 
     public void setPays(List<Pay> pays) {
         this.pays = pays;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public List<Action> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<Action> actions) {
+        this.actions = actions;
     }
 
     public String getStateName() {

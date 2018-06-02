@@ -53,6 +53,7 @@ public class AfterSaleServiceController extends com.hzg.base.Controller {
         String json = "{\"" + CommonConstant.id +"\":" + id + "}";
         if (entity.equalsIgnoreCase(ReturnProduct.class.getSimpleName())) {
             entities = writer.gson.fromJson(afterSaleServiceClient.unlimitedQuery(entity, json), new TypeToken<List<ReturnProduct>>() {}.getType());
+            model.put("accounts", writer.gson.fromJson(payClient.query(Account.class.getSimpleName().toLowerCase(), "{}"), new com.google.gson.reflect.TypeToken<List<Account>>() {}.getType()));
 
         } else if (entity.equalsIgnoreCase(ChangeProduct.class.getSimpleName())) {
             entities = writer.gson.fromJson(afterSaleServiceClient.unlimitedQuery(entity, json), new TypeToken<List<ChangeProduct>>() {}.getType());

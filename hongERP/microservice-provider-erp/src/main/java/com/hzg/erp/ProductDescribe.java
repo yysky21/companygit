@@ -60,6 +60,12 @@ public class ProductDescribe implements Serializable {
     @Column(name="seoDesc",length=100)
     private String seoDesc;
 
+    @Transient
+    private String productNo;
+
+    @Transient
+    private String productName;
+
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -150,5 +156,21 @@ public class ProductDescribe implements Serializable {
 
     public void setSeoDesc(String seoDesc) {
         this.seoDesc = seoDesc;
+    }
+
+    public String getProductNo() {
+        return productNo;
+    }
+
+    public void setProductNo(String productNo) {
+        this.productNo = productNo;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

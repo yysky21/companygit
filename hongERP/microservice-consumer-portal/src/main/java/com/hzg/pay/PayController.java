@@ -1,26 +1,16 @@
 package com.hzg.pay;
 
-import com.boyuanitsm.pay.alipay.bean.AyncNotify;
-import com.boyuanitsm.pay.alipay.bean.SyncReturn;
 import com.google.gson.reflect.TypeToken;
-import com.hzg.erp.*;
-import com.hzg.order.Order;
-import com.hzg.order.OrderClient;
 import com.hzg.sys.User;
-import com.hzg.tools.CommonConstant;
-import com.hzg.tools.DateUtil;
-import com.hzg.tools.ErpConstant;
-import com.hzg.tools.Writer;
+import com.hzg.tools.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +78,13 @@ public class PayController extends com.hzg.base.Controller {
     /**
      * 根据支付号 no 查询支付记录，调用 alipay 网页支付
      * @param no 支付号
-     * @param payType 支付方式
      * @param response
      * @throws IOException
      */
-    @RequestMapping(value = "/alipay/pay", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
-    public void alipay(String no, String payType, HttpServletResponse response) {
-        logger.info("alipay, no:" + no + ",toAlipay:" + payType);
-        writer.write(response, payClient.alipay(no, payType));
+    @RequestMapping(value = "/alipay/pay/{" + CommonConstant.no + "}", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
+    public void alipay(@PathVariable(CommonConstant.no) String no, HttpServletResponse response) {
+        logger.info("alipay, no:" + no );
+        writer.writeHtml(response, payClient.alipay(no));
     }
 
     /**
@@ -128,8 +117,8 @@ public class PayController extends com.hzg.base.Controller {
      * 根据 no 查询退款记录，调用支付宝退款
      * @param no 退款编号
      */
-    @RequestMapping(value = "/alipay/refund", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
-    public void alipayRefund(String no, HttpServletResponse response) {
+    @RequestMapping(value = "/alipay/refund/{" + CommonConstant.no + "}", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
+    public void alipayRefund(@PathVariable(CommonConstant.no) String no, HttpServletResponse response) {
         logger.info("alipayRefund, refundNo:" + no);
         writer.write(response, payClient.alipayRefund(no));
     }
@@ -197,8 +186,8 @@ public class PayController extends com.hzg.base.Controller {
      * @param response
      * @throws IOException
      */
-    @RequestMapping(value = "/wechat/refund", method = RequestMethod.GET)
-    public void wechatRefund(String no, HttpServletResponse response) {
+    @RequestMapping(value = "/wechat/refund/{" + CommonConstant.no + "}", method = RequestMethod.GET)
+    public void wechatRefund(@PathVariable(CommonConstant.no) String no, HttpServletResponse response) {
         logger.info("wechatRefund, no:" + no);
         writer.writeStringToJson(response, payClient.wechatRefund(no));
     }
@@ -239,10 +228,10 @@ public class PayController extends com.hzg.base.Controller {
      * 根据支付号 no 查询支付记录，调用 unionpay 网页支付
      * @param no 支付号
      */
-    @RequestMapping(value = "/unionpay/acp/frontConsume", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
-    public void frontConsume(String no, HttpServletResponse response) {
+    @RequestMapping(value = "/unionpay/acp/frontConsume/{" + CommonConstant.no + "}", produces = "text/html;charset=UTF-8", method = RequestMethod.GET)
+    public void frontConsume(@PathVariable(CommonConstant.no) String no, HttpServletResponse response) {
         logger.info("alipay, no:" + no);
-        writer.write(response, payClient.unionpayFrontConsume(no));
+        writer.writeHtml(response, payClient.unionpayFrontConsume(no));
     }
 
     /**

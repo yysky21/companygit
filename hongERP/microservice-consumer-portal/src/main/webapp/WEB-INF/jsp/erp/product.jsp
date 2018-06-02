@@ -251,24 +251,7 @@
                             <div class="ln_solid"></div>
                             <div class="col-md-6 col-md-offset-3" id="submitDiv">
                                 <button id="cancel" type="button" class="btn btn-primary">返回</button>
-                                <c:if test="${entity == null}">
-                                    <button id="send" type="button" class="btn btn-success">保存</button>
-                                </c:if>
-                                <c:if test="${entity != null}">
-                                    <c:choose>
-                                        <c:when test="${entity.state == 6}">
-                                            <button id="send" type="button" class="btn btn-success">修改</button>
-                                            <button id="editSheet" type="button" class="btn btn-primary">编辑</button>
-                                            <%--<button id="delete" type="button" class="btn btn-danger">作废</button>--%>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:if test="${entity.state == 5}">
-                         <%--                   <button id="editState" type="button" class="btn btn-primary">编辑</button>
-                                            <button id="recover" type="button" class="btn btn-success">置为可用</button>--%>
-                                            </c:if>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:if>
+                                <c:if test="${entity != null && (entity.state == 6 || entity.state == 7)}"><button id="editDescribe" type="button" class="btn btn-success">编辑</button></c:if>
                             </div>
                         </div>
                         </div>
@@ -281,15 +264,11 @@
 <script type="text/javascript">
     init(<c:out value="${entity == null}"/>);
 
-    $("#editSheet").unbind("click").click(function(){
-        editable = true;
-
-        $('#form :input').attr("readonly",false).css("border", "1px solid #ccc");
-        $('.table-sheet tr :input').css("border", "0px solid #ccc");
-        $('#seoTitle, #seoKeyword, #seoDesc, #describes').attr("readonly",true);
-        $('#send, #delete, #recover').attr("disabled", false);
-        $("#editSheet").attr("disabled", "disabled");
+    <c:if test="${entity != null && (entity.state == 6 || entity.state == 7)}">
+    $("#editDescribe").unbind("click").click(function(){
+        render("/erp/view/productDescribe/${entity.describe.id}");
     });
+    </c:if>
 
     $(".lightbox").lightbox({
         fitToScreen: true,
@@ -323,58 +302,4 @@
         %>
     </c:forEach>
     tableSheet.suggests(null, "shape", "<%=request.getContextPath()%>");
-
-
-    $("#send").click(function(){
-        if (!validator.checkAll($('#form'))) {
-            return;
-        }
-
-        $("#imageParentDirPath").val($("#imageTopDirPath").val() + "/" + $("#no").val());
-
-        $(this).sendData('<%=request.getContextPath()%>/erp/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/<%=Product.class.getSimpleName().toLowerCase()%>',
-            JSON.stringify($('#form').find(":input").not('[value=""]').not('[name="propertyName"]').not('[name="propertyValue"]').serializeJSON()),
-            function (result) {
-                if (result.result.indexOf("success") != -1) {
-                    var file = document.getElementById("file");
-                    if ($.trim(file.value) != "") {
-                        sendFormData("snapshoot", $("#imageTopDirPath").val() +"/"+$("#no").val(), file, '<%=FileServerInfo.uploadFilesUrl%>', '<%=FileServerInfo.imageServerUrl%>');
-                    }
-                }
-            });
-    });
-
-    function sendFormData(name, dir, file, uploadFilesUrl, imageServerUrl){
-        var fd = new FormData();
-        fd.append("name", name);
-        fd.append("dir", dir);
-        fd.append("file", file.files[0]);
-
-        $("#form").sendFormData(uploadFilesUrl, fd, function(result){
-            if (result.result.indexOf("success") != -1) {
-                $("#imgA").attr("href", imageServerUrl + '/' + result.filePath + "?" + Math.random());
-                $("#img").attr("src", imageServerUrl + '/' + result.filePath + "?" + Math.random());
-
-                $(document.getElementById("imgA")).lightbox({
-                    fitToScreen: true,
-                    imageClickClose: false
-                });
-
-            }
-        });
-    }
-
-    $("#delete").click(function(){
-        if (confirm("确定作废该商品吗？")) {
-            $("#form").sendData('<%=request.getContextPath()%>/erp/delete/<%=Product.class.getSimpleName().toLowerCase()%>',
-                '{"id":${entity.id},"state":5}');
-        }
-    });
-
-    $("#recover").click(function(){
-        if (confirm("确定恢复该商品为入库状态吗？")) {
-            $("#form").sendData('<%=request.getContextPath()%>/erp/recover/<%=Product.class.getSimpleName().toLowerCase()%>',
-                '{"id":${entity.id},"state":1}');
-        }
-    });
 </script>

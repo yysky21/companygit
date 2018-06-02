@@ -104,7 +104,7 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12">支付明细 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <div style="padding-top:8px;padding-bottom:8px">支付方式&nbsp;/&nbsp;收款账号&nbsp;/&nbsp;支付银行&nbsp;/&nbsp;支付账号&nbsp;/&nbsp;支付金额</div>
-                                    <table id="payList">
+                                    <table id="payList" class="payList">
                                         <tbody>
                                         <tr>
                                             <td>

@@ -63,4 +63,14 @@ public class OrderController extends com.hzg.base.SessionController {
         writer.writeStringToJson(response, orderClient.querySaveResult(orderSessionId));
         logger.info("querySaveResult end");
     }
+
+    @CrossOrigin
+    @GetMapping("/queryOrder/{" + CommonConstant.sessionId +"}/{" + CommonConstant.no + "}")
+    public void queryPayNoByOrderNo(HttpServletResponse response, @PathVariable(CommonConstant.sessionId) String sessionId,
+                                    @PathVariable(CommonConstant.no) String no) {
+        logger.info("queryOrder start, sessionId:" + sessionId + ",no:" + no);
+        writer.writeStringToJson(response, orderClient.query(OrderConstant.order,
+                "{\"" + CommonConstant.no + "\":\"" + no + "\",\"" + CommonConstant.sessionId +"\":\"" + sessionId + "\"}"));
+        logger.info("queryOrder end");
+    }
 }

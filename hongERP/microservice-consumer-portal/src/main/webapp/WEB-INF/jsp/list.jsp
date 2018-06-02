@@ -144,6 +144,7 @@
     </c:if>
     <c:if test="${fn:contains(resources, '/order')}">
     visitEntitiesOptions["order"] = '<option value="order">订单</option>';
+    visitEntitiesOptions["orderDetail"] = '<option value="orderDetail">订单商品</option>';
     </c:if>
     <c:if test="${fn:contains(resources, '/orderPrivate')}">
     visitEntitiesOptions["orderPrivate"] = '<option value="orderPrivate">商品加工，私人订制</option>';

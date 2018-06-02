@@ -46,6 +46,9 @@ public interface PayClient {
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     String delete(@RequestParam("entity") String entity, @RequestBody String json);
 
+    @RequestMapping(value = "/business", method = RequestMethod.POST)
+    String business(@RequestParam("name") String name, @RequestBody String json);
+
     @Component
     class PayClientFallback implements PayClient {
         @Override
@@ -94,6 +97,12 @@ public interface PayClient {
         public String delete(String entity, String json) {
             logger.info("delete 异常发生，进入fallback方法，接收的参数：" + entity + ":" + json);
             return "{\"" + CommonConstant.result + "\":\"系统异常，作废出错\"}";
+        }
+
+        @Override
+        public String business(@RequestParam("name") String name, @RequestBody String json) {
+            logger.info("business 异常发生，进入fallback方法，接收的参数：" + name + ":" + json);
+            return "{\"" + CommonConstant.result + "\":\"系统异常，执行业务出错\"}";
         }
     }
 }

@@ -32,6 +32,7 @@ var dataList = (function ($) {
         "stock": "库存",
         "warehouse": "仓库",
         "order": "订单",
+        "orderDetail": "订单商品",
         "returnProduct": "退货",
         "changeProduct": "换货",
         "repairProduct": "修补货品",
@@ -76,6 +77,7 @@ var dataList = (function ($) {
         "stock": "入库时间",
         "warehouse": "录入时间",
         "order": "生成时间",
+        "orderDetail": "生成时间",
         "returnProduct": "申请时间",
         "changeProduct": "申请时间",
         "repairProduct": "申请时间",
@@ -108,7 +110,7 @@ var dataList = (function ($) {
         "articleCate": "inputDate",
         "articleTag": "inputDate",
         "product": "stockInOut[date]",
-        "productDescribe": "date",
+        "productDescribe": "productDescribe[date]",
         "productType": "inputDate",
         "productPriceChange": "inputDate",
         "productCheck": "productCheck[checkDate]",
@@ -120,6 +122,7 @@ var dataList = (function ($) {
         "stock": "stock[date]",
         "warehouse": "inputDate",
         "order": "date",
+        "orderDetail": "date",
         "returnProduct": "inputDate",
         "changeProduct": "inputDate",
         "repairProduct": "inputDate",
@@ -163,6 +166,7 @@ var dataList = (function ($) {
         "stockInOut": "类别",
         "warehouse": "类别",
         "order": "类别",
+        "orderDetail": "类别",
         "returnProduct": "类别",
         "changeProduct": "类别",
         "repairProduct": "类别",
@@ -262,6 +266,7 @@ var dataList = (function ($) {
         "stock": "/erp",
         "warehouse": "/erp",
         "order": "/orderManagement",
+        "orderDetail": "/orderManagement",
         "returnProduct": "/afterSaleService",
         "changeProduct": "/afterSaleService",
         "repairProduct": "/afterSaleService",
@@ -317,6 +322,7 @@ var dataList = (function ($) {
         "stock": "/complexQuery",
         "warehouse": "/complexQuery",
         "order": "/unlimitedComplexQuery",
+        "orderDetail": "/unlimitedComplexQuery",
         "returnProduct": "/unlimitedComplexQuery",
         "changeProduct": "/unlimitedComplexQuery",
         "repairProduct": "/unlimitedComplexQuery",
@@ -361,6 +367,7 @@ var dataList = (function ($) {
         "stock": "/view",
         "warehouse": "/view",
         "order": "/view",
+        "orderDetail": "/view",
         "returnProduct": "/view",
         "changeProduct": "/view",
         "repairProduct": "/view",
@@ -388,7 +395,7 @@ var dataList = (function ($) {
         "articleCate": "<th>文章分类名称</th><th>分类名称简写</th><th>文章分类优化关键词</th>",
         "articleTag": "<th>文章标签名称</th><th>创建时间</th>",
         "product": "<th>名称</th><th>编号</th><th>类别</th><th>结缘价</th><th>市场价</th><th>采购单价</th><th>特性</th><th>供应商</th><th>图片</th><th>状态</th>",
-        "productDescribe": "<th>标题</th><th>关键词</th><th>编辑时间</th>",
+        "productDescribe": "<th>商品编号</th><th>商品名称</th><th>标题</th><th>关键词</th><th>编辑时间</th>",
         "productType": "<th>名称</th><th>缩写</th><th>优化标题</th><th>优化关键字</th><th>优化描述</th><th>所属父类</th>",
         "productPriceChange": "<th>编号</th><th>商品编号</th><th>商品价格</th><th>调整后价格</th><th>状态</th>",
         "productCheck": "<th>盘点单据编号</th><th>盘点日期</th><th>盘点仓库</th><th>盘点部门</th><th>盈亏总数量</th><th>盈亏总金额</th><th>制单人</th><th>公司</th><th width='20%'>备注</th><th>状态</th>",
@@ -400,6 +407,7 @@ var dataList = (function ($) {
         "stock": "<th>库存编号</th><th>商品名称</th><th>商品编号</th><th>商品数量</th><th>商品单位</th><th>入库时间</th><th>仓库</th>",
         "warehouse": "<th>名称</th><th>负责人</th><th>地址</th><th>所属公司</th>",
         "order": "<th>订单编号</th><th>状态</th><th>类型</th><th>金额</th><th>实际支付金额</th><th>折扣</th><th>创建时间</th><th>订单所有人</th><th>销售人</th>",
+        "orderDetail": "<th>所属订单</th><th>商品编码</th><th>商品名称</th><th>状态</th><th>数量</th><th>单位</th><th>销售单价</th><th>实际支付总价</th><th>总价</th><th>折扣</th><th>创建时间</th>",
         "returnProduct": "<th>退货单编号</th><th>状态</th><th>金额</th><th>退货人</th><th>申请时间</th><th>退款时间</th>",
         "changeProduct": "<th>换货单编号</th><th>状态</th><th>金额</th><th>换货人</th><th>申请时间</th><th>换货时间</th>",
         "repairProduct": "<th>修补单编号</th><th>状态</th><th>金额</th><th>修补人</th><th>申请时间</th><th>修补时间</th>",
@@ -432,7 +440,7 @@ var dataList = (function ($) {
         "articleCate": ["name", "nickname", "articleKeyword"],
         "articleTag": ["name", "inputDate"],
         "product": ["name", "no", "type[name]", "fatePrice", "price", "unitPrice", "feature", "supplier[name]", "describe[imageParentDirPath]", "state"],
-        "productDescribe": ["seoTitle", "seoKeyword", "date"],
+        "productDescribe": ["productNo","productName","seoTitle", "seoKeyword", "date"],
         "productType": ["name", "abbreviate", "title", "keyword", "describes", "parent[name]"],
         "productPriceChange": ["no", "productNo", "prePrice", "price", "state"],
         "productCheck": ["checkNo", "checkDate", "warehouse[name]", "dept[name]", "quantity", "amount", "chartMaker[name]", "company[name]", "remark","state"],
@@ -444,6 +452,7 @@ var dataList = (function ($) {
         "stock": ["no", "product[name]", "productNo", "quantity", "unit", "date", "warehouse[name]"],
         "warehouse": ["name", "charger[name]", "address", "company[name]"],
         "order": ["no", "state", "type", "amount", "payAmount", "discount", "date", "user[username]", "saler[name]"],
+        "orderDetail": ["order[no]", "productNo", "product[name]", "state", "quantity", "unit", "productPrice", "payAmount", "amount", "discount", "date"],
         "returnProduct": ["no", "state", "amount", "returnProductUsername", "inputDate", "date"],
         "changeProduct": ["no", "state", "amount", "user[username]", "inputDate", "date"],
         "repairProduct": ["no", "state", "amount", "user[username]", "inputDate", "date"],
@@ -476,7 +485,7 @@ var dataList = (function ($) {
         "articleCate": "name",
         "articleTag": "name",
         "product": "name",
-        "productDescribe": "seoTitle",
+        "productDescribe": "productNo",
         "productType": "name",
         "productPriceChange": "no",
         "productCheck": "checkNo",
@@ -488,6 +497,7 @@ var dataList = (function ($) {
         "stock": "no",
         "warehouse": "name",
         "order": "no",
+        "orderDetail": "order[no]",
         "returnProduct": "no",
         "changeProduct": "no",
         "repairProduct": "no",
@@ -527,6 +537,7 @@ var dataList = (function ($) {
         "stock": "id",
         "warehouse": "id",
         "order": "id",
+        "orderDetail": "order[id]",
         "returnProduct": "id",
         "changeProduct": "id",
         "repairProduct": "id",
@@ -588,6 +599,9 @@ var dataList = (function ($) {
                 5: "换货订单"
             }
         },
+        "orderDetail": {
+            "state": {0: "未售", 1: "已售", 2: "预定"}
+        },
         "returnProduct": {"state": {0: "申请", 1: "已退款", 2:"取消", 3:"销售确认可退", 31:"销售确认不可退", 4:"销售总监确认可退", 41:"销售总监确认不可退", 5:"仓储确认可退", 51:"仓储确认不可退", 6:"采购退货申请", 61:"采购退货已退款", 63:"采购退货取消", 7:"采购确认退货", 8:"仓储确认已邮寄货物", 9:"供应商确认收货"}},
         "changeProduct": {"state": {0: "申请", 1: "已换", 2:"取消", 3:"销售确认要退商品可退", 31:"销售确认要退商品不可退", 4:"销售总监确认要退商品可退", 41:"销售总监确认要退商品不可退", 5:"仓储确认要退商品可退", 51:"仓储确认要退商品不可退", 6:"采购退货申请",61:"采购退货已退款", 63:"采购退货取消", 7:"采购确认退货", 8:"仓储确认已邮寄货物", 9:"供应商确认收货"}},
         "repairProduct": {"state": {0: "申请", 1: "已付款", 2:"取消", 3:"销售确认可修补", 31:"销售确认不可修补", 4:"销售总监确认可修补", 41:"销售总监确认不可修补", 5:"仓储确认可修补", 51:"仓储确认不可修补", 6:"修补完成"}},
@@ -623,6 +637,7 @@ var dataList = (function ($) {
             }
         },
         "customerUser": {"state": {0: "在用", 1: "注销"}},
+        "customer":{"gender":{"male":"男","female":"女"}},
         "express": {"defaultUse": {"N": "否", "Y": "是"}},
         "voucher": {"state": {0: "保存", 1: "审核"}},
         "subject": {
@@ -668,6 +683,7 @@ var dataList = (function ($) {
         "printExpressWaybillNotify": "stockInOut",
         "stock": "stock",
         "order": "order",
+        "orderDetail": "orderDetail",
         "returnProduct": "returnProduct",
         "changeProduct": "returnProduct",
         "repairProduct": "repairProduct",
@@ -766,6 +782,8 @@ var dataList = (function ($) {
                     '<option value="99">换货部分申请退货</option><option value="86">申请修补</option><option value="87">已修补</option><option value="82">申请采购退货</option>' +
                     '<option value="83">采购退货完成</option><option value="84">部分申请采购退货</option><option value="85">部分采购退货完成</option>' +
                     '</select></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="productType[name]">商品分类</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="productType[name]" name="productType[name]" class="form-control col-md-7 col-xs-12" placeholder="输入商品分类" /></div></div>' +
                     '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="product[name]">商品名称</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="product[name]" name="product[name]" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>' +
                     '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="product[no]">商品编号</label>' +
@@ -773,8 +791,11 @@ var dataList = (function ($) {
             }
 
             if (entity == "productDescribe") {
-                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="seoTitle">商品优化标题</label>' +
-                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="seoTitle" name="seoTitle" class="form-control col-md-7 col-xs-12" placeholder="输入标题" /></div></div>');
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="productDescribe[seoTitle]">商品优化标题</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="productDescribe[seoTitle]" name="productDescribe[seoTitle]" class="form-control col-md-7 col-xs-12" placeholder="输入标题" /></div></div>'+
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="product[no]">商品编号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="product[no]" name="product[no]" class="form-control col-md-7 col-xs-12" placeholder="输入编号" /></div></div>'
+                );
             }
 
             if (entity == "productPriceChange") {
@@ -823,11 +844,33 @@ var dataList = (function ($) {
         } else if (modules[entity] == "/orderManagement") {
             $("#entity").empty()
                 .append(visitEntitiesOptions["order"])
+                .append(visitEntitiesOptions["orderDetail"])
                 .append(visitEntitiesOptions["orderPrivate"]);
 
             if (entity == "order") {
-                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">订单编号</label>' +
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="state">状态</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><select id="state" name="state" data-value-type="string" data-skip-falsy="true" class="form-control col-md-7 col-xs-12">' +
+                    '<option value="">所有</option><option value="0">未支付</option><option value="1">已支付</option><option value="2">取消</option>' +
+                    '<option value="3">已退款</option><option value="4">财务确认已支付</option><option value="5">部分退款</option>' +
+                    '</select></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="type">类型</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><select id="type" name="type" data-value-type="string" data-skip-falsy="true" class="form-control col-md-7 col-xs-12">' +
+                    '<option value="">所有</option><option value="0">自助下单</option><option value="1">代下单</option><option value="2">私人订制</option>' +
+                    '<option value="3">预定</option><option value="4">代下单加工</option><option value="5">换货订单</option>' +
+                    '</select></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="no">订单编号</label>' +
                     '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="no" name="no" class="form-control col-md-7 col-xs-12" placeholder="输入订单号" /></div></div>');
+            }
+
+            if (entity == "orderDetail") {
+                $("#inputItems").html('<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="state">状态</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><select id="state" name="state" data-value-type="string" data-skip-falsy="true" class="form-control col-md-7 col-xs-12">' +
+                    '<option value="">所有</option><option value="0">未售</option><option value="1">已售</option><option value="2">预定</option>' +
+                    '</select></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="productName">商品名称</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="productName" name="productName" class="form-control col-md-7 col-xs-12" placeholder="输入名称" /></div></div>' +
+                    '<div class="item form-group"><label class="control-label col-md-3 col-sm-3 col-xs-12" for="productNo">商品编号</label>' +
+                    '<div class="col-md-6 col-sm-6 col-xs-12"><input type="text" id="productNo" name="productNo" class="form-control col-md-7 col-xs-12" placeholder="输入编号" /></div></div>');
             }
 
             if (entity == "orderPrivate") {
@@ -1271,7 +1314,7 @@ var dataList = (function ($) {
                                     }
 
                                     if (propertiesShowSequence[i] == linkTitles[entity]) {
-                                        var queryUrl = contextPath + modules[entity] + viewActions[entity] + "/" + getActualEntity(entity) + "/" + getPropertiesValue(dataList[key], idColumns[entity]);
+                                        var queryUrl = contextPath + modules[entity] + viewActions[entity] + "/" + getActualViewEntity(entity) + "/" + getPropertiesValue(dataList[key], idColumns[entity]);
                                         tdData = "<a href='#" + queryUrl + "' onclick='render(\"" + queryUrl + "\")'>" + tdData + "</a>";
                                     }
 
@@ -1387,6 +1430,17 @@ var dataList = (function ($) {
     function getActualEntity(entity) {
         if (entity=="customerUser"){
             return "user";
+        }
+
+        return entity;
+    }
+
+    function getActualViewEntity(entity) {
+        if (entity=="customerUser"){
+            return "user";
+
+        } else if (entity=="orderDetail"){
+            return "order";
         }
 
         return entity;

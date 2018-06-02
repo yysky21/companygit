@@ -121,7 +121,7 @@ public class ErpController {
                 stockInOut.setInputDate(dateUtil.getSecondCurrentTimestamp());
 
                 String msg = erpService.isCanSaveStockInOut(stockInOut);
-                if (msg.equals("")) {
+                if (msg == null) {
                     result += erpService.saveStockInOut(stockInOut);
                 } else {
                     result += msg;
@@ -140,7 +140,7 @@ public class ErpController {
 
             } else if (entity.equalsIgnoreCase(ProductPriceChange.class.getSimpleName())) {
                 ProductPriceChange priceChange = writer.gson.fromJson(json, ProductPriceChange.class);
-                result += erpService.saveOrUpdatePriceChange(priceChange, CommonConstant.save);
+                result += erpService.savePriceChange(priceChange);
 
                 result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
                         ",\"" + CommonConstant.id + "\":" + priceChange.getId() + "}";
@@ -152,9 +152,21 @@ public class ErpController {
                 BorrowProduct borrowProduct = writer.gson.fromJson(json, BorrowProduct.class);
                 result += erpService.saveBorrowProduct(borrowProduct);
 
+                result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                        ",\"" + CommonConstant.id + "\":" + borrowProduct.getId() + "}";
+                writer.writeStringToJson(response, result);
+                logger.info("save end, result:" + result);
+                return;
+
             } else if (entity.equalsIgnoreCase(BorrowProductReturn.class.getSimpleName())) {
                 BorrowProductReturn borrowProductReturn = writer.gson.fromJson(json, BorrowProductReturn.class);
                 result += erpService.saveBorrowProductReturn(borrowProductReturn);
+
+                result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                        ",\"" + CommonConstant.id + "\":" + borrowProductReturn.getId() + "}";
+                writer.writeStringToJson(response, result);
+                logger.info("save end, result:" + result);
+                return;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -251,48 +263,57 @@ public class ErpController {
                 StockInOut stockInOut = writer.gson.fromJson(json, StockInOut.class);
                 StockInOut dbStockInOut = (StockInOut) erpDao.queryById(stockInOut.getId(), StockInOut.class);
 
-                /**
-                 * 修改入库信息
-                 */
-                if (dbStockInOut.getType().compareTo(ErpConstant.stockInOut_type_virtual_outWarehouse) < 0) {
-                    if (dbStockInOut.getState().compareTo(ErpConstant.stockInOut_state_apply) == 0) {
+                String msg = erpService.isCanUpdateStockInOut(stockInOut);
+                if (msg == null) {
+                    /**
+                     * 修改入库信息
+                     */
+                    if (dbStockInOut.getType().compareTo(ErpConstant.stockInOut_type_virtual_outWarehouse) < 0) {
+                        if (dbStockInOut.getState().compareTo(ErpConstant.stockInOut_state_apply) == 0) {
 
-                        if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_deposit) == 0) {
-                            result += erpDao.updateById(stockInOut.getDeposit().getId(), stockInOut.getDeposit());
-                        }
-
-                        if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_repair) == 0) {
-                            result += erpDao.updateById(stockInOut.getProcessRepair().getId(), stockInOut.getProcessRepair());
-                        }
-
-                        result += erpDao.updateById(stockInOut.getId(), stockInOut);
-                        result += erpService.saveStockInOutDetails(stockInOut);
-                        for (StockInOutDetail detail : dbStockInOut.getDetails()) {
-
-                            StockInOutDetailProduct detailProduct = new StockInOutDetailProduct();
-                            detailProduct.setStockInOutDetail(detail);
-                            List<StockInOutDetailProduct> detailProducts = erpDao.query(detailProduct);
-
-                            for (StockInOutDetailProduct dbDetailProduct : detailProducts) {
-                                result += erpDao.delete(dbDetailProduct);
+                            if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_deposit) == 0) {
+                                result += erpDao.updateById(stockInOut.getDeposit().getId(), stockInOut.getDeposit());
                             }
 
-                            result += erpDao.delete(detail);
-                        }
+                            if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_repair) == 0) {
+                                result += erpDao.updateById(stockInOut.getProcessRepair().getId(), stockInOut.getProcessRepair());
+                            }
 
-                    } else {
-                        result += CommonConstant.fail + ", 入库单 " + stockInOut.getNo() + " 不是申请状态，不能修改";
+                            result += erpDao.updateById(stockInOut.getId(), stockInOut);
+                            result += erpService.saveStockInOutDetails(stockInOut);
+                            for (StockInOutDetail detail : dbStockInOut.getDetails()) {
+
+                                StockInOutDetailProduct detailProduct = new StockInOutDetailProduct();
+                                detailProduct.setStockInOutDetail(detail);
+                                List<StockInOutDetailProduct> detailProducts = erpDao.query(detailProduct);
+
+                                for (StockInOutDetailProduct dbDetailProduct : detailProducts) {
+                                    result += erpDao.delete(dbDetailProduct);
+                                }
+
+                                result += erpDao.delete(detail);
+                            }
+
+                        } else {
+                            result += CommonConstant.fail + ", 入库单 " + stockInOut.getNo() + " 不是申请状态，不能修改";
+                        }
                     }
+
+                    result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                            ",\"" + CommonConstant.id + "\":" + stockInOut.getId() +
+                            ",\"" + CommonConstant.type + "\":" + stockInOut.getType() +
+                            ",\"" + CommonConstant.state + "\":" + stockInOut.getState() + "}";
+                    writer.writeStringToJson(response, result);
+
+                } else {
+                    result += msg;
+                    result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
+                            ",\"" + CommonConstant.id + "\":" + stockInOut.getId() + "}";
+                    writer.writeStringToJson(response, result);
                 }
 
-                result = "{\"" + CommonConstant.result + "\":\"" + transcation.dealResult(result) + "\"" +
-                        ",\"" + CommonConstant.id + "\":" + stockInOut.getId() +
-                        ",\"" + CommonConstant.type + "\":" + stockInOut.getType() +
-                        ",\"" + CommonConstant.state + "\":" + stockInOut.getState() + "}";
-                writer.writeStringToJson(response, result);
-                logger.info("save end, result:" + result);
+                logger.info("update end, result:" + result);
                 return;
-
             } else if (entity.equalsIgnoreCase(Warehouse.class.getSimpleName())) {
                 Warehouse warehouse = writer.gson.fromJson(json, Warehouse.class);
                 result += erpDao.updateById(warehouse.getId(), warehouse);
@@ -302,7 +323,7 @@ public class ErpController {
                 ProductPriceChange dbPriceChange = (ProductPriceChange) erpDao.queryById(priceChange.getId(), priceChange.getClass());
 
                 if (dbPriceChange.getState().compareTo(ErpConstant.product_price_change_state_save) == 0) {
-                    result += erpService.saveOrUpdatePriceChange(priceChange, CommonConstant.update);
+                    result += erpService.updatePriceChange(priceChange);
                 } else {
                     result += CommonConstant.fail + ",已在用或申请状态的变动价格不能修改";
                 }
@@ -604,6 +625,16 @@ public class ErpController {
                 action.setInputer(erpService.getUserBySessionId(action.getSessionId()));
                 action.setInputDate(dateUtil.getSecondCurrentTimestamp());
                 result += erpDao.save(action);
+
+            }  else if (name.equalsIgnoreCase(ErpConstant.productPriceChange_action_name_apply)) {
+                ProductPriceChange priceChange = writer.gson.fromJson(json, ProductPriceChange.class);
+                ProductPriceChange dbPriceChange = (ProductPriceChange) erpDao.queryById(priceChange.getId(), priceChange.getClass());
+
+                if (dbPriceChange.getState().compareTo(ErpConstant.product_price_change_state_save) == 0) {
+                    result += erpService.applyPriceChange(priceChange);
+                } else {
+                    result += CommonConstant.fail + ",已在用或申请状态的变动价格不能重复申请";
+                }
             }
 
         } catch (Exception e) {
@@ -1132,7 +1163,7 @@ public class ErpController {
                     limitFields.add(priceChange.getClass().getDeclaredField("state"));
                 }
 
-                if (priceChange.getProduct() != null) {
+                if (priceChange.getProductNo() != null) {
                     limitFields.add(priceChange.getClass().getDeclaredField("productNo"));
                 }
             } catch (Exception e) {
@@ -1398,17 +1429,28 @@ public class ErpController {
     public void querySalePrice(HttpServletResponse response, @RequestBody String json){
         logger.info("querySalePrice start, parameter:" + json);
 
-        Float salePrice;
+        Float salePrice = null;
         ProductPriceChange priceChange = writer.gson.fromJson(json, ProductPriceChange.class);
 
         if (priceChange.getId() != null) {
-            salePrice = ((List<ProductPriceChange>)erpDao.query(priceChange)).get(0).getPrice();
+            List<ProductPriceChange> productPriceChanges = (List<ProductPriceChange>)erpDao.query(priceChange);
+            if (!productPriceChanges.isEmpty()) {
+                salePrice = productPriceChanges.get(0).getPrice();
+            }
+
         } else {
             priceChange.getProduct().setState(ErpConstant.product_state_onSale);
-            salePrice = ((Product)erpDao.query(priceChange.getProduct()).get(0)).getFatePrice();
+            List<Product> products = (List<Product>)erpDao.query(priceChange.getProduct());
+            if (!products.isEmpty()) {
+                salePrice = products.get(0).getFatePrice();
+            }
         }
 
-        writer.writeStringToJson(response, "{\"" + ErpConstant.price +"\":" + salePrice + "}");
+        if (salePrice != null) {
+            writer.writeStringToJson(response, "{\"" + ErpConstant.price +"\":" + salePrice + "}");
+        } else {
+            writer.writeStringToJson(response, "{}");
+        }
         logger.info("querySalePrice, end");
     }
 

@@ -13,6 +13,8 @@ package com.hzg.tools;
 
 public class ErpConstant {
 
+    public final static String no_purchase_perfix = "CG";
+
     public final static String product = "product";
     public final static String purchase = "purchase";
 

@@ -1,5 +1,6 @@
 <%@ page import="com.hzg.afterSaleService.ReturnProduct" %>
-<%@ page import="com.hzg.tools.AfterSaleServiceConstant" %><%--
+<%@ page import="com.hzg.tools.AfterSaleServiceConstant" %>
+<%@ page import="com.hzg.tools.PayConstants" %><%--
 **
 * Copyright © 2012-2025 云南红掌柜珠宝有限公司 版权所有
 * 文件名: returnProduct.jsp
@@ -128,6 +129,112 @@
                         </div>
                     </div>
 
+                    <c:if test="${entity.state == 5 || entity.state == 9}">
+                        <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductRefund')}">
+                            <div class="x_content" id="refundDiv" style="display: none">
+                                <span class="section" style="margin-top: 40px">退货审核记录</span>
+                                <div class="item form-group">
+                                    <c:if test="${entity.entityNo != null}">
+                                        <c:if test="${fn:contains(entity.entityNo, 'FR')}">
+                                            <div class="col-md-6 col-sm-6 col-xs-12" style="width:1400px;margin-left: 150px;padding-top: 4px">
+                                                <div style="padding-bottom:8px">退款方式&nbsp;/&nbsp;退款账号&nbsp;/&nbsp;收款银行&nbsp;/&nbsp;收款账号&nbsp;/&nbsp;退款金额&nbsp;/&nbsp;退款日期</div>
+                                                <table id="frRefundList" class="payList">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select name="refunds[][payType]:number" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择退款方式</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts_alipay%>">支付宝转账</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts_weixin%>">微信转账</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts%>">转账</option>
+                                                                <option value="<%=PayConstants.pay_type_remit%>">汇款</option>
+                                                                <option value="<%=PayConstants.pay_type_other%>">其他</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="refundAccountInfo" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择退款账号</option>
+                                                                <c:forEach items="${accounts}" var="account">
+                                                                    <option value="${account.account}/${account.branch}/${account.bank}">${account.account}/${account.branch}/${account.bank}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                            <input type="hidden" name="refunds[][refundAccount]:string">
+                                                            <input type="hidden" name="refunds[][refundBranch]:string">
+                                                            <input type="hidden" name="refunds[][refundBank]:string">
+                                                        </td>
+                                                        <td>
+                                                            <select name="refunds[][payBank]:string" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择收款银行</option>
+                                                                <%=PayConstants.bankSelectOptions%>
+                                                            </select>
+                                                        </td>
+                                                        <td><input type="text" class="form-control col-md-7 col-xs-12" data-account="account" name="refunds[][payAccount]:string"></td>
+                                                        <td><input type="number" class="form-control col-md-7 col-xs-12" name="refunds[][amount]:number"></td>
+                                                        <td>
+                                                            <div class="input-prepend input-group" style="margin-bottom:0">
+                                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                                <input type="string" class="form-control" name="refunds[][refundDate]:string">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div style="padding-top: 8px"><a href="javascript:void(0)" id="addFrRefundItem">添加支付记录</a></div>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${fn:contains(entity.entityNo, 'CG')}">
+                                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                                <div style="padding-top:8px;padding-bottom:8px">退款方式&nbsp;/&nbsp;退款银行&nbsp;/&nbsp;退款账号&nbsp;/&nbsp;收款账号&nbsp;/&nbsp;退款金额&nbsp;/&nbsp;退款日期</div>
+                                                <table id="cgRefundList" class="payList">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <select name="refunds[][payType]:number" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择退款方式</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts_alipay%>">支付宝转账</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts_weixin%>">微信转账</option>
+                                                                <option value="<%=PayConstants.pay_type_transfer_accounts%>">转账</option>
+                                                                <option value="<%=PayConstants.pay_type_remit%>">汇款</option>
+                                                                <option value="<%=PayConstants.pay_type_other%>">其他</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="refunds[][refundBank]:string" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择退款银行</option>
+                                                                <%=PayConstants.bankSelectOptions%>
+                                                            </select>
+                                                        </td>
+                                                        <td><input type="text" class="form-control col-md-7 col-xs-12" data-account="account" name="refunds[][refundAccount]:string"></td>
+                                                        <td>
+                                                            <select name="refundAccountInfo" class="form-control col-md-7 col-xs-12">
+                                                                <option value="">请选择收款账号</option>
+                                                                <c:forEach items="${accounts}" var="account">
+                                                                    <option value="${account.account}/${account.branch}/${account.bank}">${account.account}/${account.branch}/${account.bank}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                            <input type="hidden" name="refunds[][payAccount]:string">
+                                                            <input type="hidden" name="refunds[][payBranch]:string">
+                                                            <input type="hidden" name="refunds[][payBank]:string">
+                                                        </td>
+                                                        <td><input type="number" class="form-control col-md-7 col-xs-12" name="refunds[][amount]:number"></td>
+                                                        <td>
+                                                            <div class="input-prepend input-group" style="margin-bottom:0">
+                                                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                                                <input type="string" class="form-control" name="refunds[][refundDate]:string">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div style="padding-top: 8px"><a href="javascript:void(0)" id="addCgRefundItem">添加支付记录</a></div>
+                                            </div>
+                                        </c:if>
+                                    </c:if>
+                                </div>
+                            </div>
+                        </c:if>
+                    </c:if>
+
                     <div class="x_content">
                         <c:if test="${entity.state != null}">
                         <span class="section" style="margin-top: 40px">退货审核记录</span>
@@ -233,6 +340,7 @@
                                 <button id="refund" type="button" class="btn btn-success">
                                     确认<c:if test="${fn:contains(entity.entity, 'order')}">退款</c:if><c:if test="${fn:contains(entity.entity, 'purchase')}">收款</c:if>
                                 </button>
+                                <a style="margin-left: 10px" href="#modifyRefund" id="modifyRefund">修改退款明细</a>
                                 </c:if>
                                 </c:if>
                                 </c:if>
@@ -338,8 +446,78 @@
 
         <c:if test="${entity.state == 5 || entity.state == 9}">
             <c:if test="${fn:contains(resources, '/afterSaleService/doBusiness/returnProductRefund')}">
+                $(document.getElementsByName("refunds[][payAccount]:string")).accountInput();
+                $(document.getElementsByName("refunds[][refundDate]:string")).daterangepicker({
+                    locale: {
+                        format: 'YYYY-MM-DD',
+                        applyLabel : '确定',
+                        cancelLabel : '取消',
+                        fromLabel : '起始时间',
+                        toLabel : '结束时间',
+                        customRangeLabel : '自定义',
+                        daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],
+                        monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月' ],
+                        firstDay : 1
+                    },
+                    singleDatePicker: true,
+                    singleClasses: "picker_3"
+                }, function(start, end, label) {
+                    console.log(start.toISOString(), end.toISOString(), label);
+                });
+                $(document.getElementsByName("refundAccountInfo")).click(function(){
+                    var receiptAccountInfo = $(this).val().split("/");
+
+                    $.each($(this).parent().find(":input"), function (ci, item) {
+                        var name = item.name;
+                        if (name != undefined) {
+                            if (name == "refunds[][refundAccount]:string") {
+                                $(item).val(receiptAccountInfo[0]);
+                            }
+
+                            if (name == "refunds[][refundBranch]:string") {
+                                $(item).val(receiptAccountInfo[1]);
+                            }
+
+                            if (name == "refunds[][refundBank]:string") {
+                                $(item).val(receiptAccountInfo[2]);
+                            }
+                        }
+                    });
+                });
+
+
+                $('#addFrRefundItem').click(function(){returnProduct.addFrRefund()});
+                $('#addCgRefundItem').click(function(){returnProduct.addCgRefund()});
+                $('#modifyRefund').click(function(){$("#refundDiv").show()});
+
                 $("#refund").click(function(){
-                    returnProduct.audit('Y', '<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductRefund');
+                    var $form = $("#actionForm");
+                    $("#auditResult").val('Y');
+                    var formData = $form.serializeJSON();
+
+                    var refunds = $("#refundDiv").find(":input").serializeJSON().refunds;
+                    var validRefunds = new Array(), k = 0;
+                    for (var i = 0; i < refunds.length; i++) {
+                        if ($.trim(refunds[i].amount) != "" && parseInt(refunds[i].amount) != 0) {
+                            validRefunds[k++] = refunds[i];
+                        }
+                    }
+
+                    if (validRefunds.length != 0) {
+                        var refundAmount = 0;
+                        for (i = 0; i < validRefunds.length; i++) {
+                            refundAmount = Math.formatFloat(refundAmount + parseFloat(validRefunds[i].amount), 2);
+                        }
+
+                        if (refundAmount != Math.formatFloat(parseFloat($("#amount").val()), 2)) {
+                            alert("填写的退款金额与实际退款金额不一致");
+                            return false;
+                        }
+
+                        formData["refunds"] = validRefunds;
+                    }
+
+                    $form.sendData('<%=request.getContextPath()%>/afterSaleService/doBusiness/returnProductRefund', JSON.stringify(formData));
                 });
             </c:if>
         </c:if>

@@ -54,7 +54,7 @@
                             <div class="item form-group">
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="text1">主要供货类型</label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <input type="text" id="text1" name="text1" value="${entity.mainProductType.name}" class="form-control col-md-7 col-xs-12" style="width:40%" placeholder="输入姓名" required />
+                                    <input type="text" id="text1" name="text1" value="${entity.mainProductType.name}" class="form-control col-md-7 col-xs-12" style="width:40%" placeholder="输入商品类型" required />
                                     <input type="hidden" id="mainProductType[id]" name="mainProductType[id]" value="${entity.mainProductType.id}">
                                 </div>
                             </div>

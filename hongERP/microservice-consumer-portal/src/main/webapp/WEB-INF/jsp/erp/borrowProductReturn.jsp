@@ -160,6 +160,9 @@
                                     <c:if test="${fn:contains(resources, '/erp/save/borrowProductReturn')}">
                                     <button id="saveBorrowProduct" type="button" class="btn btn-success">保存</button>
                                     </c:if>
+                                    <c:if test="${fn:contains(resources, '/erp/doBusiness/applyBorrowProductReturn')}">
+                                    <button id="applyBorrowProduct" type="button" class="btn btn-success">提交申请</button>
+                                    </c:if>
                                     </c:if>
                                     <c:if test="${entity != null}">
                                     <c:if test="${entity.state == 0}">
@@ -168,6 +171,7 @@
                                     </c:if>
                                     <c:if test="${fn:contains(resources, '/erp/update/borrowProductReturn')}">
                                     <button id="updateBorrowProduct" type="button" class="btn btn-success">修改</button>
+                                    <button id="edit" type="button" class="btn btn-primary">编辑</button>
                                     </c:if>
                                     <c:if test="${fn:contains(resources, '/erp/delete/borrowProductReturn')}">
                                     <button id="cancelBorrowProduct" type="button" class="btn btn-success">取消</button>
@@ -193,11 +197,37 @@
     init(<c:out value="${entity == null}"/>);
 
     <c:if test="${entity == null}">
+        <c:if test="${fn:contains(resources, '/erp/doBusiness/applyBorrowProductReturn')}">
+            $("#applyBorrowProduct").click(function(){
+                var json = '{"id":' + $("#id").val() +'}';
+                $('#form').sendData('<%=request.getContextPath()%>/erp/doBusiness/applyBorrowProductReturn', json, function(result){
+                    if (result.result.indexOf("success") != -1) {
+                        $("#saveBorrowProduct").attr('disabled', "true");
+                    }
+                });
+            }).hide();
+
+            $('input.flat').iCheck({
+                checkboxClass: 'icheckbox_flat-green',
+                radioClass: 'iradio_flat-green'
+            }).on("ifClicked",function(event){
+                var theICheck = $(this);
+                if(event.target.checked){
+                    theICheck.iCheck('uncheck');
+                }else{
+                    theICheck.iCheck('check');
+                }
+            });
+        </c:if>
+
         <c:if test="${fn:contains(resources, '/erp/save/borrowProductReturn')}">
             $("#saveBorrowProduct").click(function(){
                 var json = getData();
                 if (json != null) {
-                    $('#form').sendData('<%=request.getContextPath()%>/erp/save/borrowProductReturn', json);
+                    $('#form').sendData('<%=request.getContextPath()%>/erp/save/borrowProductReturn', json, function(result){
+                        $("#form").append("<input type='hidden' name='id' id='id' value='" + result.id + "'>");
+                        $("#applyBorrowProduct").show();
+                    });
                 }
             });
         </c:if>
@@ -234,6 +264,12 @@
                     $('#form').sendData('<%=request.getContextPath()%>/erp/update/borrowProductReturn', json);
                 }
             });
+
+            $("#edit").click(function(){
+                $("#updateBorrowProduct").attr('disabled', false);
+                $("#cancelBorrowProduct").attr('disabled', false);
+                $("#applyBorrowProduct").attr('disabled', false);
+            });
         </c:if>
 
         <c:if test="${fn:contains(resources, '/erp/delete/borrowProductReturn')}">
@@ -248,6 +284,10 @@
                 }
             });
         </c:if>
+
+        $("#updateBorrowProduct").attr('disabled', true);
+        $("#cancelBorrowProduct").attr('disabled', true);
+        $("#applyBorrowProduct").attr('disabled', true);
     </c:if>
 
     <c:if test="${entity != null && entity.state == 1}">

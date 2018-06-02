@@ -124,6 +124,7 @@ public class ErpConstant {
 
     public final static String product = "product";
     public final static String product_property_name_weight = "重量";
+    public final static String product_property_name_priceRange = "价格区间";
 
     // 商品计量单位
     public final static String productUnit = "productUnit";
@@ -136,6 +137,7 @@ public class ErpConstant {
     public final static Integer product_price_change_state_apply = 0;
     public final static Integer product_price_change_state_use = 1;
     public final static Integer product_price_change_state_save = 2;
+    public final static Integer product_price_change_state_used = 3;
 
     public final static float price_1000 = 1000f;
     public final static float price_3000 = 3000f;
@@ -253,6 +255,7 @@ public class ErpConstant {
     public final static Integer borrowProduct_state_partReturned = 5;
 
     public final static Integer borrowProduct_detail_state_borrowed = 0;
+    public final static Integer borrowProduct_detail_state_apply = 3;
     public final static Integer borrowProduct_detail_state_returned = 1;
     public final static Integer borrowProduct_detail_state_partReturned = 2;
 
@@ -270,4 +273,6 @@ public class ErpConstant {
     public final static Integer borrowProduct_action_warehousingAudit_notPass = 1;
     public final static Integer borrowProductReturn_action_warehousingAudit_pass = 0;
     public final static Integer borrowProductReturn_action_warehousingAudit_notPass = 1;
+
+    public final static String productPriceChange_action_name_apply = "productPriceChangeApply";
 }

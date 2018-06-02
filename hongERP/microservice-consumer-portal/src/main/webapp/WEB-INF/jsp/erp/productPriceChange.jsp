@@ -112,11 +112,13 @@
     init(<c:out value="${entity == null}"/>);
 
     $("#send").click(function(){
-        $("#id").attr("disabled",true);
-        $('#form').submitForm('<%=request.getContextPath()%>/erp/save/productPriceChange',
+        <c:if test="${entity == null}">$("#id").attr("disabled",true);</c:if>
+        $('#form').submitForm('<%=request.getContextPath()%>/erp/<c:choose><c:when test="${entity != null}">update</c:when><c:otherwise>save</c:otherwise></c:choose>/productPriceChange',
             function(result) {
                 if (result.result.indexOf("success") != -1) {
-                    $("#id").val(result.id);
+                    if (result.id != undefined) {
+                        $("#id").val(result.id);
+                    }
                 }
             });
     });
@@ -129,19 +131,19 @@
                     function(result) {
                         if (result.result.indexOf("success") != -1) {
                             $("#id").val(result.id);
-                            updateProductPriceChange();
+                            applyProductPriceChange();
                         }
                     }, false);
             } else {
-                updateProductPriceChange();
+                applyProductPriceChange();
             }
         }
     });
 
-    function updateProductPriceChange(){
+    function applyProductPriceChange(){
         $("#id").attr("disabled",false);
         $("#state").val("<%=ErpConstant.product_price_change_state_apply%>");
-        $('#form').submitForm('<%=request.getContextPath()%>/erp/update/productPriceChange');
+        $('#form').submitForm('<%=request.getContextPath()%>/erp/doBusiness/productPriceChangeApply');
     }
 
     $("#text").coolautosuggestm({

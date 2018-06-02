@@ -838,7 +838,7 @@ public class SysController {
                     refuseAudit.setPreFlowAuditNo(dbAudit.getPreFlowAuditNo());
 
                     dbAudit.setToRefuseUser(audit.getToRefuseUser());
-                    refuseAudit.setPost(sysService.getPostByAuditUser(dbAudit));
+                    refuseAudit.setPost(sysService.getPostByAuditToRefuseUser(dbAudit));
 
                     refuseAudit = sysService.getAudit(refuseAudit);
                     refuseAudit.setRefusePost(dbAudit.getPost());

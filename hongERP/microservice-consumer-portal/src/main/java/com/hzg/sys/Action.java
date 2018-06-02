@@ -2,6 +2,7 @@ package com.hzg.sys;
 
 import com.hzg.tools.AfterSaleServiceConstant;
 import com.hzg.tools.ErpConstant;
+import com.hzg.tools.OrderConstant;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -190,6 +191,14 @@ public class Action implements Serializable {
             switch (type) {
                 case 0 : return "仓储审核通过";
                 case 1 : return "仓储审核不通过";
+                default : return "";
+            }
+        } else if (entity.equals(OrderConstant.order)) {
+            switch (type) {
+                case 0 : return "取消订单";
+                case 1 : return "财务确认订单已支付";
+                case 2 : return "财务审核通过自助单";
+                case 3 : return "财务确认预订单订金已支付";
                 default : return "";
             }
         }

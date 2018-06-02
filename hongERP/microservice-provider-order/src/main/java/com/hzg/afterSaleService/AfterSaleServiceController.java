@@ -3,6 +3,7 @@ package com.hzg.afterSaleService;
 import com.google.gson.reflect.TypeToken;
 import com.hzg.erp.Product;
 import com.hzg.order.*;
+import com.hzg.pay.Refund;
 import com.hzg.sys.Action;
 import com.hzg.tools.*;
 import org.apache.log4j.Logger;
@@ -148,7 +149,11 @@ public class AfterSaleServiceController {
                  * 设置sessionId，后面入库用到
                  */
                 returnProduct.setSessionId(action.getSessionId());
-                result += afterSaleServiceService.refundReturnProduct(returnProduct);
+                if (action.getRefunds() == null) {
+                    result += afterSaleServiceService.refundReturnProduct(returnProduct);
+                } else {
+                    result += afterSaleServiceService.returnProductAndInsertRefund(returnProduct, action.getRefunds());
+                }
 
                 action.setEntity(AfterSaleServiceConstant.returnProduct);
                 action.setType(AfterSaleServiceConstant.returnProduct_action_refund);

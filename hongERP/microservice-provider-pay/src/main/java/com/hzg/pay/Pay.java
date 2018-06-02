@@ -23,6 +23,11 @@ public class Pay implements Serializable {
         super();
     }
 
+    public Pay(Integer id){
+        super();
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id", length = 11)

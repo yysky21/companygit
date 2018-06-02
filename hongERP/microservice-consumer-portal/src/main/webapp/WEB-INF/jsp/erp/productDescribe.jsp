@@ -68,16 +68,16 @@
                                     </div>
                                 </div>
                                 <div class="item form-group">
-                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="describes">软文描述 <span class="required">*</span>
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12"  for="describes">软文描述
                                     </label>
                                     <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <textarea id="describes" class="form-control col-md-7 col-xs-12" rows="4"  name="describe[describes]" required>${entity.describe.describes}</textarea>
+                                        <textarea id="describes" class="form-control col-md-7 col-xs-12" rows="4"  name="describe[describes]">${entity.describe.describes}</textarea>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="item form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12">商品编号<span class="required">*</span></label>
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12">商品编号</label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <input type="text" id="text1" name="text1" class="form-control col-md-7 col-xs-12" style="width:40%" placeholder="选择编号添加商品条目" />
                                 </div>
@@ -155,7 +155,6 @@
         width : 309,
         marginTop : "margin-top:34px",
         showProperty: "no",
-        relateShowProperty: {"no" : ["id"]},
 
         getQueryData: function(paramName){
             var queryJson = {};

@@ -5,6 +5,7 @@ import com.hzg.customer.Express;
 import com.hzg.erp.*;
 import com.hzg.order.*;
 import com.hzg.pay.Pay;
+import com.hzg.pay.Refund;
 import com.hzg.sys.Action;
 import com.hzg.sys.User;
 import com.hzg.tools.*;
@@ -662,6 +663,52 @@ public class AfterSaleServiceService {
     public String refundReturnProduct(ReturnProduct returnProduct) {
         String result = CommonConstant.fail;
 
+        String returnResult = returnProduct(returnProduct);
+        if (returnResult.contains(CommonConstant.fail)) {
+            return result + returnResult;
+        }
+
+        result += returnResult;
+        String refundResult = refund(returnProduct);
+
+        if (refundResult.contains(CommonConstant.fail)) {
+            return result + refundResult;
+        }
+
+        result += refundResult;
+        if (returnProduct.getEntity().equals(OrderConstant.order)) {
+            result += orderService.setOrderRefundState(new Order(returnProduct.getEntityId()));
+        }
+
+        /**
+         * 商品入库，商品状态调整为在售状态
+         */
+/*        if (returnProduct.getEntity().equals(OrderConstant.order)) {
+            if (!result.substring(CommonConstant.fail.length()).contains(CommonConstant.fail)) {
+                result += stockIn(returnProduct);
+            }
+
+            if (!result.substring(CommonConstant.fail.length()).contains(CommonConstant.fail)) {
+                result += setProductEdit(returnProduct);
+            }
+
+            if (!result.substring(CommonConstant.fail.length()).contains(CommonConstant.fail)) {
+                result += upShelf(returnProduct);
+            }
+        }*/
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    /**
+     * 1.设置退货单及商品为退货状态
+     * 2.设置订单为退款状态
+     * @param returnProduct
+     * @return
+     */
+    public String returnProduct(ReturnProduct returnProduct) {
+        String result = CommonConstant.fail;
+
         String isCanReturnMsg = checkReturnProductQuantity(returnProduct);
         if (!isCanReturnMsg.equals("")) {
             return CommonConstant.fail + isCanReturnMsg;
@@ -694,6 +741,17 @@ public class AfterSaleServiceService {
             result += setProductsReturnState(ErpConstant.product_action_name_setPurchaseProductsReturned, returnProduct);
         }
 
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    /**
+     * 调用退款接口退款，生成退款记录
+     * @param returnProduct
+     * @return
+     */
+    public String refund(ReturnProduct returnProduct) {
+        String result = CommonConstant.fail;
+
         /**
          * 调用退款接口退款
          */
@@ -704,9 +762,29 @@ public class AfterSaleServiceService {
         result += writer.getResult(payClient.refund(AfterSaleServiceConstant.returnProduct, returnProduct.getId(), returnProduct.getNo(),
                 returnProduct.getAmount(), writer.gson.toJson(pay)));
 
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    public String returnProductAndInsertRefund(ReturnProduct returnProduct, List<Refund> refunds) {
+        String result = CommonConstant.fail;
+
+        String returnResult = returnProduct(returnProduct);
+        if (returnResult.contains(CommonConstant.fail)) {
+            return result + returnResult;
+        }
+
+        result += returnResult;
+        String insertResult = writer.getResult(insertRefund(returnProduct, refunds));
+
+        if (insertResult.contains(CommonConstant.fail)) {
+            return result + insertResult;
+        }
+
+        result += insertResult;
         if (returnProduct.getEntity().equals(OrderConstant.order)) {
             result += orderService.setOrderRefundState(new Order(returnProduct.getEntityId()));
         }
+
         /**
          * 商品入库，商品状态调整为在售状态
          */
@@ -726,6 +804,32 @@ public class AfterSaleServiceService {
 
         return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
     }
+
+    /**
+     * 插入退款记录
+     * @param returnProduct
+     * @return
+     */
+    public String insertRefund(ReturnProduct returnProduct, List<Refund> refunds) {
+        String result = CommonConstant.fail;
+
+        for (Refund refund : refunds) {
+            refund.setEntity(AfterSaleServiceConstant.returnProduct);
+            refund.setEntityNo(returnProduct.getNo());
+            refund.setEntityId(returnProduct.getId());
+
+            if (returnProduct.getEntityNo().contains(OrderConstant.no_order_perfix)) {
+                refund.setBalanceType(PayConstants.refund_balance_type_expense);
+            } else if (returnProduct.getEntityNo().contains(ErpConstant.no_purchase_perfix)) {
+                refund.setBalanceType(PayConstants.refund_balance_type_income);
+            }
+
+            result += payClient.business(PayConstants.pay_action_name_insertRefund, writer.gson.toJson(refund));
+        }
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+
 
     /**
      * 还原商品状态

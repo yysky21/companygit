@@ -217,6 +217,11 @@ public class OrderService {
             }
 
             orderItem.setPays(queryPaysByOrder(orderItem));
+
+            Action action = new Action();
+            action.setEntity(OrderConstant.order);
+            action.setEntityId(orderItem.getId());
+            orderItem.setActions(orderDao.query(action));
         }
 
         return orders;
@@ -287,6 +292,11 @@ public class OrderService {
             }
 
             Map<String, Float> salePrice = writer.gson.fromJson(erpClient.querySalePrice(queryJson), new TypeToken<Map<String, Float>>(){}.getType());
+            if (salePrice.isEmpty()) {
+                result += "查询不到商品" + detail.getProductNo() + "商品价格";
+                break;
+            }
+
             BigDecimal detailAmount = new BigDecimal(Float.toString(salePrice.get(ErpConstant.price))).
                     multiply(new BigDecimal(Float.toString(detail.getQuantity())));
 
@@ -553,11 +563,33 @@ public class OrderService {
         String canSellMsg = "";
 
         for (OrderDetail detail : order.getDetails()) {
+            if (detail.getPriceChange() != null) {
+                ProductPriceChange tempProductPriceChange = new ProductPriceChange();
+                tempProductPriceChange.setId(detail.getPriceChange().getId());
+
+                List<ProductPriceChange> productPriceChanges = writer.gson.fromJson(
+                        erpClient.query(ProductPriceChange.class.getSimpleName(), writer.gson.toJson(tempProductPriceChange)),
+                        new TypeToken<List<ProductPriceChange>>(){}.getType());
+
+                if (productPriceChanges.isEmpty()) {
+                    canSellMsg += "编号为:" + detail.getProductNo() + "的商品，查询不到价格浮动码:" + detail.getPriceChange().getNo() + "；";
+                    break;
+
+                } else {
+                    if (!productPriceChanges.get(0).getProductNo().equals(detail.getProductNo())) {
+                        canSellMsg += "价格浮动码:" + detail.getPriceChange().getNo() + "对应的商品是：" + productPriceChanges.get(0).getProductNo() +
+                                "，与订单商品：" + detail.getProductNo() + "不一致";
+                        break;
+                    }
+                }
+            }
+
             Float sellableQuantity = getProductOnSaleQuantity(detail.getProductNo());
 
             if (sellableQuantity.compareTo(detail.getQuantity()) < 0) {
                 canSellMsg += detail.getQuantity() + detail.getUnit() + "编号为:" + detail.getProductNo() +
                         "的商品，但该商品可售数量为：" + sellableQuantity + "；";
+                break;
             }
 
             if (detail.getOrderPrivate() != null) {
@@ -568,6 +600,7 @@ public class OrderService {
                         if (sellableQuantity.compareTo(acc.getQuantity()) < 0) {
                             canSellMsg += "；配饰:" + acc.getProductNo() + "数量为：" + acc.getQuantity() + acc.getUnit() +
                                     "，但该配饰可售数量为：" + sellableQuantity + "；";
+                            break;
                         }
                     }
                 }
@@ -581,6 +614,7 @@ public class OrderService {
                 if (sellableQuantity.compareTo(gift.getQuantity()) < 0) {
                     canSellMsg += "；赠品:" + gift.getProductNo() + "数量为：" + gift.getQuantity() + gift.getUnit() +
                     "，但该赠品可售数量为：" + sellableQuantity + "；";
+                    break;
                 }
             }
         }
@@ -1024,6 +1058,13 @@ public class OrderService {
     }
 
     public String sfExpressOrder(Order order) {
+        /**
+         * 暂时不用自动下顺丰快递单
+         */
+        if (true) {
+            return CommonConstant.success;
+        }
+
         com.hzg.customer.User user = ((List<com.hzg.customer.User>)writer.gson.fromJson(
                 customerClient.unlimitedQuery(order.getUser().getClass().getSimpleName(), writer.gson.toJson(order.getUser())), new TypeToken<List<User>>(){}.getType())).get(0);
 
@@ -1192,6 +1233,24 @@ public class OrderService {
             }
 
             return details;
+
+        } else if (entity.equalsIgnoreCase(OrderDetail.class.getSimpleName())) {
+            Class[] clazzs = {OrderDetail.class, Order.class, Product.class};
+            Map<String, List<Object>> results = orderDao.queryBySql(getOrderDetailSql(json, position, rowNum), clazzs);
+
+            List<Object> orders = results.get(Order.class.getName());
+            List<Object> details = results.get(OrderDetail.class.getName());
+            List<Object> products = results.get(Product.class.getName());
+
+            int i = 0;
+            for (Object detail : details) {
+                ((OrderDetail)detail).setOrder((Order)orders.get(i));
+                ((OrderDetail)detail).setProduct((Product)products.get(i));
+
+                i++;
+            }
+
+            return details;
         }
 
         return null;
@@ -1201,6 +1260,9 @@ public class OrderService {
         String sql = "";
 
         if (entity.equalsIgnoreCase(OrderPrivate.class.getSimpleName())) {
+            sql = getOrderPrivateSql(json, 0, -1);
+
+        } else if (entity.equalsIgnoreCase(OrderDetail.class.getSimpleName())) {
             sql = getOrderPrivateSql(json, 0, -1);
         }
 
@@ -1243,6 +1305,52 @@ public class OrderService {
             fromSql += ", " + objectToSql.getTableName(OrderPrivate.class) + " t3 ";
             whereSql += " and t3." + objectToSql.getColumn(OrderPrivate.class.getDeclaredField("detail")) +
                     " = t2." + objectToSql.getColumn(OrderDetail.class.getDeclaredField("id"));
+
+            sql = "select distinct " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return sql;
+    }
+
+    public String getOrderDetailSql(String json, int position, int rowNum) {
+        String sql = "";
+
+        try {
+            Map<String, String> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
+            String productName = queryParameters.get("productName");
+            queryParameters.remove("productName");
+            String orderSql = objectToSql.generateComplexSqlByAnnotation(OrderDetail.class, queryParameters, position, rowNum);
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = orderDao.getSqlPart(orderSql, OrderDetail.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = sqlParts[3];
+
+            selectSql += ", " + orderDao.getSelectColumns("t2", Order.class);
+            fromSql += ", " + objectToSql.getTableName(Order.class) + " t2 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t2." + objectToSql.getColumn(Order.class.getDeclaredField("id")) +
+                    " = t." + objectToSql.getColumn(OrderDetail.class.getDeclaredField("order"));
+
+            fromSql += ", " + objectToSql.getTableName(OrderDetailProduct.class) + " t1 ";
+            whereSql += " and t1." + objectToSql.getColumn(OrderDetailProduct.class.getDeclaredField("orderDetail")) +
+                    " = t." + objectToSql.getColumn(OrderDetail.class.getDeclaredField("id"));
+
+            selectSql += ", " + orderDao.getSelectColumns("t3", Product.class);
+            fromSql += ", " + objectToSql.getTableName(Product.class) + " t3 ";
+            whereSql += " and t3." + objectToSql.getColumn(Product.class.getDeclaredField("id")) +
+                    " = t1." + objectToSql.getColumn(OrderDetailProduct.class.getDeclaredField("product"));
+
+            if (productName != null && !productName.trim().equals("")) {
+                whereSql += " and t3." + objectToSql.getColumn(Product.class.getDeclaredField("name")) +
+                        " like '%" + productName + "%'";
+            }
 
             sql = "select distinct " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
         } catch (Exception e) {

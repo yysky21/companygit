@@ -109,13 +109,14 @@
                             <input type="hidden" id="purchaseId" name="deposit[purchase[id]]" value="${entity.deposit.purchase.id}"/>
                             <input type="hidden" id="purchaseNo" name="deposit[purchase[no]]" value="${entity.deposit.purchase.no}"/>
                             <input type="hidden" id="depositId" name="deposit[id]" value="${entity.deposit.id}" data-value-type="number" data-skip-falsy="true" />
+                            <input type="hidden" id="purchaseType" />
                         </div>
 
                         <div id="processRepair">
                             <div class="item form-group">
-                                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="type">加工类型 <span class="required">*</span></label>
+                                <label class="control-label col-md-3 col-sm-3 col-xs-12" id="processRepairTypeLabel" for="type">加工类型 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <select id="processRepairType" name="processRepair[type]" class="form-control col-md-7 col-xs-12" data-value-type="number" data-skip-falsy="true" required>
+                                    <select id="processRepairType" name="processRepair[type]" class="form-control col-md-7 col-xs-12" data-value-type="string" data-skip-falsy="true" required>
                                         <option value="">请选择加工类型</option>
                                         <option value="0">自己加工</option>
                                         <option value="1">第三方加工</option>
@@ -509,11 +510,20 @@
             setDisabled($("#deposit").find(":input"), false);
         </c:if>
 
-        <c:if test="${entity.processRepair != null}">
+        <c:if test="${entity.type == 3 || entity.type == 5}">
             $("#processRepair").show();
             setDisabled($("#processRepair").find(":input"), false);
-
             setSelect(document.getElementById("processRepairType"), "${entity.processRepair.type}");
+
+            <c:if test="${entity.type == 5}">
+                $("#processRepairTypeLabel").html("修补类型");
+                $("#processRepairType").empty().append('<option value="10">修补</option>');
+
+                $("#processRepairExpenseLabel").html("修补费");
+                $("#processRepairDateLabel").html("修补时间");
+                $("#saleExpenseDiv").hide();
+                $("#saleExpense").attr("disabled", true);
+            </c:if>
         </c:if>
 
         <c:if test="${entity.changeWarehouse != null}">
@@ -569,6 +579,24 @@
            $("#processRepair").show();
            setDisabled($("#processRepair").find(":input"), false);
 
+           if (this.value == <%=ErpConstant.stockInOut_type_process%>) {
+               $("#processRepairTypeLabel").html("加工类型");
+               $("#processRepairType").empty().append('<option value="">请选择加工类型</option><option value="0">自己加工</option><option value="1">第三方加工</option>');
+
+               $("#processRepairExpenseLabel").html("加工费");
+               $("#processRepairDateLabel").html("加工时间");
+               $("#saleExpenseDiv").show();
+
+           } else  if (this.value == <%=ErpConstant.stockInOut_type_repair%>){
+               $("#processRepairTypeLabel").html("修补类型");
+               $("#processRepairType").empty().append('<option value="10">修补</option>');
+
+               $("#processRepairExpenseLabel").html("修补费");
+               $("#processRepairDateLabel").html("修补时间");
+               $("#saleExpenseDiv").hide();
+               $("#saleExpense").attr("disabled", true);
+           }
+
        } else if (this.value == <%=ErpConstant.stockInOut_type_changeWarehouse%>) {
            $("#text2").attr("readonly", true);
 
@@ -612,18 +640,6 @@
         }
 
         $("#tbody").empty();
-    });
-
-    $("#processRepairType").change(function(){
-        if (this.value == <%=ErpConstant.stockInOut_type_process%>) {
-            $("#processRepairExpenseLabel").html("加工费");
-            $("#processRepairDateLabel").html("加工时间");
-            $("#saleExpenseDiv").show();
-        } else if (this.value == <%=ErpConstant.stockInOut_type_repair%>) {
-            $("#processRepairExpenseLabel").html("修补费");
-            $("#processRepairDateLabel").html("修补时间");
-            $("#saleExpenseDiv").hide();
-        }
     });
 
     function setDisabled(inputs, enable){
@@ -694,6 +710,7 @@
                     $("#purchaseId").val(result.id);
                     $("#purchaseNo").val(result.no);
                     $("#amount").val(result.amount);
+                    $("#purchaseType").val(result.type);
                 }
 
                 /**
@@ -903,6 +920,11 @@
     });
 
     $("#delItem").click(function(){
+        if (parseInt($("#type").val()) == <%=ErpConstant.stockInOut_type_deposit%>) {
+            alert("押金入库需要对采购单里的商品全部入库");
+            return false;
+        }
+
         var lastTr = $("#stockInOutProductList tbody tr:last-child");
 
         if (lastTr.html().indexOf('<td>') != -1) {
@@ -1023,11 +1045,13 @@
         }
 
         if (parseInt($("#type").val()) == <%=ErpConstant.stockInOut_type_deposit%>) {
-            if (($("#purchaseNo").val() != "" && $("#purchaseNo").val().indexOf("<%=ErpConstant.no_purchase_perfix%>") != 0) || $("#purchaseNo").val() == "") {
-                alert("押金入库只可以对采购单做入库");
+            if (($("#purchaseNo").val() != "" && $("#purchaseNo").val().indexOf("<%=ErpConstant.no_purchase_perfix%>") != 0) ||
+                ($("#purchaseNo").val() == "") || ($("#purchaseType").val() != "4")) {
+                alert("押金入库只可以对押金采购单做入库");
                 return false;
             }
         }
+
         if (parseInt($("#type").val()) == <%=ErpConstant.stockInOut_type_process%>) {
             var stockInOutDetailProducts = document.getElementsByName("details[][productNo]:string");
             if (stockInOutDetailProducts.length > 1) {

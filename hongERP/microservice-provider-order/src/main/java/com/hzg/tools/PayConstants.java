@@ -17,4 +17,9 @@ public class PayConstants {
 
     public final static int balance_type_income = 0;
     public final static int balance_type_expense = 1;
+
+    public final static int refund_balance_type_income = 1;
+    public final static int refund_balance_type_expense = 0;
+
+    public final static String pay_action_name_insertRefund = "pay_action_name_insertRefund";
 }

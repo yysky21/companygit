@@ -93,18 +93,18 @@ table {
     width: 200px;
 }
 
-#payList > thead > tr > th {
+.payList > thead > tr > th {
     font-family: "Helvetica Neue",Roboto,Arial,"Droid Sans",sans-serif;
     font-size: 13px;
     font-weight: 400;
 }
 
-#payList > tbody > tr > td {
+.payList > tbody > tr > td {
     padding-top: 4px;
     padding-right: 4px;
 }
 
-#payList > tbody > tr > td > input{
+.payList > tbody > tr > td > input{
     background: snow;
 }
 

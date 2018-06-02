@@ -53,11 +53,11 @@
                                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="gender">性别 <span class="required">*</span></label>
                                 <div class="col-md-6 col-sm-6 col-xs-12">
                                     <div id="gender" class="btn-group" data-toggle="buttons">
-                                        <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                            <input type="radio" name="gender" value="male" <c:if test="${entity != null && entity.gender == 'male'}">checked</c:if>> &nbsp;男&nbsp;
+                                        <label class="btn btn-default <c:choose><c:when test="${entity == null}">active</c:when><c:otherwise><c:if test="${entity.gender == 'male'}">active</c:if></c:otherwise></c:choose>" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                            <input type="radio" name="gender" value="male" > &nbsp;男&nbsp;
                                         </label>
-                                        <label class="btn btn-default" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
-                                            <input type="radio" name="gender" value="female" <c:if test="${entity != null && entity.gender == 'female'}">checked</c:if>> &nbsp;女&nbsp;
+                                        <label class="btn btn-default <c:if test="${entity != null && entity.gender == 'female'}">active</c:if>" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                            <input type="radio" name="gender" value="female" > &nbsp;女&nbsp;
                                         </label>
                                     </div>
                                 </div>

@@ -223,7 +223,11 @@ public class ErpService {
                      */
                     Product doubleRelateProduct = new Product();
                     doubleRelateProduct.setId(product.getId());
-
+                    Integer fatePrice =(int) Math.ceil(product.getFatePrice()/100);
+                    ProductOwnProperty productOwnProperty = new ProductOwnProperty();
+                    productOwnProperty.setName(ErpConstant.product_property_name_priceRange);
+                    productOwnProperty.setValue(fatePrice.toString());
+                    product.getProperties().add(productOwnProperty);
                     if (product.getProperties() != null) {
                         for (ProductOwnProperty ownProperty : product.getProperties()) {
                             ownProperty.setProduct(doubleRelateProduct);
@@ -1165,7 +1169,19 @@ public class ErpService {
             return products;
 
         } else if (entity.equalsIgnoreCase(ProductDescribe.class.getSimpleName())) {
-            return erpDao.queryBySql(getProductDescribeSql(json, position, rowNum), ProductDescribe.class);
+            Class[] clazzs = {ProductDescribe.class, Product.class};
+            Map<String, List<Object>> results = erpDao.queryBySql(getProductDescribeSql(json, position, rowNum), clazzs);
+
+            List<Object> productDescribes = results.get(ProductDescribe.class.getName());
+            List<Object> products = results.get(Product.class.getName());
+
+            int i = 0;
+            for (int j = 0;j < productDescribes.size();j++){
+                Product product = (Product) products.get(j);
+                ((ProductDescribe)productDescribes.get(j)).setProductNo(product.getNo());
+                ((ProductDescribe)productDescribes.get(j)).setProductName(product.getName());
+            }
+            return productDescribes;
 
         } else if (entity.equalsIgnoreCase(ProductCheck.class.getSimpleName())) {
             Class[] clazzs = {ProductCheck.class, Warehouse.class, Dept.class, User.class, Company.class};
@@ -1208,8 +1224,13 @@ public class ErpService {
             sql = getProductCheckComplexSql(json, 0, -1);
         }
 
-        sql = "select count(t.id) from " + sql.split(" from ")[1];
-        return (BigInteger)sessionFactory.getCurrentSession().createSQLQuery(sql).uniqueResult();
+        if (entity.equalsIgnoreCase(ProductDescribe.class.getSimpleName())){
+            List<Object[]> values = (List<Object[]>) sessionFactory.getCurrentSession().createSQLQuery(sql).list();
+            return new BigInteger("" + values.size());
+        }else {
+            sql = "select count(t.id) from " + sql.split(" from ")[1];
+            return (BigInteger)sessionFactory.getCurrentSession().createSQLQuery(sql).uniqueResult();
+        }
     }
 
     private String getStockComplexSql(String json, int position, int rowNum) {
@@ -1302,12 +1323,15 @@ public class ErpService {
                 whereSql += " and ";
             }
             whereSql += " t13." + objectToSql.getColumn(ProductType.class.getDeclaredField("id")) +
-                    " = t." + objectToSql.getColumn(Product.class.getDeclaredField("type"));
+                    " = t." + objectToSql.getColumn(Product.class.getDeclaredField("type"))+
+                    " and t13." + objectToSql.getColumn(ProductType.class.getDeclaredField("name")) +
+                    " like '%" + ((Map)(queryParameters.get("productType"))).get("name")+"%'";
 
+            String supplier = objectToSql.getColumn(Product.class.getDeclaredField("supplier"));
             selectSql += ", " + erpDao.getSelectColumns("t12", Supplier.class);
             fromSql += ", " + objectToSql.getTableName(Supplier.class) + " t12 ";
-            whereSql += " and t12." + objectToSql.getColumn(Supplier.class.getDeclaredField("id")) +
-                    " = t." + objectToSql.getColumn(Product.class.getDeclaredField("supplier"));
+            whereSql += " and (t12." + objectToSql.getColumn(Supplier.class.getDeclaredField("id")) +
+                    " = t." + supplier + " || t." + supplier + " is null)";
 
             selectSql += ", " + erpDao.getSelectColumns("t14", ProductDescribe.class);
             fromSql += ", " + objectToSql.getTableName(ProductDescribe.class) + " t14 ";
@@ -1315,18 +1339,9 @@ public class ErpService {
                     " = t." + objectToSql.getColumn(Product.class.getDeclaredField("describe"));
 
 
-            fromSql += ", " + objectToSql.getTableName(StockInOutDetailProduct.class) + " t11 ";
-            whereSql += " and t11." + objectToSql.getColumn(StockInOutDetailProduct.class.getDeclaredField("product")) +
-                    " = t." + objectToSql.getColumn(Product.class.getDeclaredField("id"));
+            String state = objectToSql.getColumn(Product.class.getDeclaredField("state"));
+            whereSql += " and (t." + state + " != 0 || t." + state + " != 10 || t." + state + " != 11)";
 
-            fromSql += ", " + objectToSql.getTableName(StockInOutDetail.class) + " t111 ";
-            whereSql += " and t111." + objectToSql.getColumn(StockInOutDetail.class.getDeclaredField("id")) +
-                    " = t11." + objectToSql.getColumn(StockInOutDetailProduct.class.getDeclaredField("stockInOutDetail"));
-
-            fromSql += ", " + objectToSql.getTableName(StockInOut.class) + " t22 ";
-            whereSql += " and t22." + objectToSql.getColumn(StockInOut.class.getDeclaredField("id")) +
-                    " = t111." + objectToSql.getColumn(StockInOutDetail.class.getDeclaredField("stockInOut")) +
-                    " and t22.state = " + ErpConstant.stockInOut_state_finished;
 
             String stockInOutEntity = StockInOut.class.getSimpleName().substring(0,1).toLowerCase()+StockInOut.class.getSimpleName().substring(1);
             if (queryParameters.get(stockInOutEntity) != null) {
@@ -1489,25 +1504,237 @@ public class ErpService {
     }
 
     private String getProductDescribeSql(String json, int position, int rowNum) {
-        Map<String, String> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
+        String sql = "";
+
+        try {
+            Map<String, Object> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, Object>>() {}.getType());
+
+            String productDescribeSql = objectToSql.generateComplexSqlByAnnotation(ProductDescribe.class,
+                    writer.gson.fromJson(writer.gson.toJson(queryParameters.get("productDescribe")),
+                            new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType()), position, rowNum);
+
+            String selectSql = "", fromSql = "", whereSql = "", sortNumSql = "";
+
+            String[] sqlParts = erpDao.getSqlPart(productDescribeSql, ProductDescribe.class);
+            selectSql = sqlParts[0];
+            fromSql = sqlParts[1];
+            whereSql = sqlParts[2];
+            sortNumSql = sqlParts[3];
+
+            selectSql += ",t11.no,t11.name";
+            fromSql += ", " + objectToSql.getTableName(Product.class) + " t11 ";
+            if (!whereSql.trim().equals("")) {
+                whereSql += " and ";
+            }
+            whereSql += " t11." + objectToSql.getColumn(Product.class.getDeclaredField("describe")) +
+                    " = t." + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("id"))+
+                    " and t11." + objectToSql.getColumn(Product.class.getDeclaredField("no")) +
+                    " like '%" + ((Map)(queryParameters.get("product"))).get("no")+"%'";;
+
+            if (whereSql.indexOf(" and") == 0) {
+                whereSql = whereSql.substring(" and".length());
+            }
+
+            whereSql +=" and t." + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("editor")) + " is not null";
+
+            sql = "select distinct " + selectSql + " from " + fromSql + " where " + whereSql + " order by " + sortNumSql;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return sql;
+
+
+
+        /*Map<String, String> queryParameters = writer.gson.fromJson(json, new com.google.gson.reflect.TypeToken<Map<String, String>>() {}.getType());
         String sql = objectToSql.generateComplexSqlByAnnotation(ProductDescribe.class, queryParameters, position, rowNum);
 
         String[] sqlParts = null;
 
         try {
             if (sql.contains(" where ")) {
-                sqlParts = objectToSql.generateComplexSqlByAnnotation(ProductDescribe.class, queryParameters, position, rowNum).split(" where ");
-                sql = sqlParts[0] + " where " + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("editor")) + " is not null and " + sqlParts[1];
+                sqlParts = sql.split(" where ");
+                sql = sqlParts[0] + " where " + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("editor")) + " is not null and "  + sqlParts[1];
 
             } else {
-                sqlParts = objectToSql.generateComplexSqlByAnnotation(ProductDescribe.class, queryParameters, position, rowNum).split(" order by ");
+                sqlParts = sql.split(" order by ");
                 sql = sqlParts[0] + " where " + objectToSql.getColumn(ProductDescribe.class.getDeclaredField("editor")) + " is not null order by " + sqlParts[1];
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
-        return sql;
+        return sql;*/
+    }
+
+    public String savePriceChange(ProductPriceChange priceChange) {
+        String result = CommonConstant.fail;
+
+        if (priceChange.getPrePrice() > ErpConstant.price_1000) {
+            User user = (User)erpDao.getFromRedis(
+                    (String) erpDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + priceChange.getSessionId()));
+
+            if (user != null) {
+                String auditEntity  = getPriceChangeAuditEntity(priceChange);
+
+                if (auditEntity != null) {
+                    AuditFlow auditFlow = new AuditFlow();
+                    auditFlow.setEntity(auditEntity);
+                    auditFlow.setState(AuditFlowConstant.flow_state_use);
+                    List<AuditFlow> dbAuditFlows = writer.gson.fromJson(sysClient.query(auditFlow.getClass().getSimpleName(), writer.gson.toJson(auditFlow)),
+                            new TypeToken<List<AuditFlow>>(){}.getType());
+
+                    if (!dbAuditFlows.isEmpty()) {
+                        /**
+                         * 判断用户是否属于：价格浮动审核流程发起节点所在岗位
+                         */
+                        AuditFlow dbAuditFlow = dbAuditFlows.get(0);
+                        AuditFlowNode[] auditFlowNodes = new AuditFlowNode[dbAuditFlow.getAuditFlowNodes().size()];
+                        dbAuditFlow.getAuditFlowNodes().toArray(auditFlowNodes);
+
+                        Arrays.sort(auditFlowNodes, new Comparator<AuditFlowNode>() {
+                            /**
+                             * 如果要按照升序排序，
+                             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+                             * 如果要按照降序排序
+                             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+                             * @param o1
+                             * @param o2
+                             * @return
+                             */
+                            public int compare(AuditFlowNode o1, AuditFlowNode o2) {
+                                if (o1.getId().compareTo(o2.getId()) > 0) {
+                                    return 1;
+                                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                                    return -1;
+                                }
+
+                                return 0;
+                            }
+                        });
+
+                        boolean isPostContains = false;
+                        for (Post post : user.getPosts()) {
+                            if (post.getId().compareTo(auditFlowNodes[0].getPost().getId()) == 0) {
+                                isPostContains = true;
+                                break;
+                            }
+                        }
+
+                        if (isPostContains) {
+                            priceChange.setInputDate(dateUtil.getSecondCurrentTimestamp());
+                            priceChange.setUser(user);
+                            result += erpDao.save(priceChange);
+
+                        } else {
+                            List<Post> dbPosts = writer.gson.fromJson(
+                                    sysClient.query(auditFlowNodes[0].getPost().getClass().getSimpleName(), writer.gson.toJson(auditFlowNodes[0].getPost())),
+                                    new TypeToken<List<Post>>(){}.getType());
+                            result += CommonConstant.fail + ",你没有权限保存该类价格浮动,所属:" + dbPosts.get(0).getName() + " 岗位的员工才可以保存";
+                        }
+
+                    } else {
+                        result += CommonConstant.fail + ",查询不到销售价格浮动审核流程,不能保存";
+                    }
+
+                } else {
+                    priceChange.setInputDate(dateUtil.getSecondCurrentTimestamp());
+                    priceChange.setUser(user);
+                    result += erpDao.save(priceChange);
+                }
+
+            } else {
+                result += CommonConstant.fail + ",查询不到设置申请调价的用户，保存失败";
+            }
+
+        } else {
+            result += CommonConstant.fail + "," + ErpConstant.price_1000 + "元以下的商品不能调价";
+        }
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
+    }
+
+    public String updatePriceChange(ProductPriceChange priceChange) {
+        String result = CommonConstant.fail;
+
+        if (priceChange.getPrePrice() > ErpConstant.price_1000) {
+            User user = (User)erpDao.getFromRedis(
+                    (String) erpDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + priceChange.getSessionId()));
+
+            if (user != null) {
+                String auditEntity  = getPriceChangeAuditEntity(priceChange);
+
+                if (auditEntity != null) {
+                    AuditFlow auditFlow = new AuditFlow();
+                    auditFlow.setEntity(auditEntity);
+                    auditFlow.setState(AuditFlowConstant.flow_state_use);
+                    List<AuditFlow> dbAuditFlows = writer.gson.fromJson(sysClient.query(auditFlow.getClass().getSimpleName(), writer.gson.toJson(auditFlow)),
+                            new TypeToken<List<AuditFlow>>(){}.getType());
+
+                    if (!dbAuditFlows.isEmpty()) {
+                        /**
+                         * 判断用户是否属于：价格浮动审核流程发起节点所在岗位
+                         */
+                        AuditFlow dbAuditFlow = dbAuditFlows.get(0);
+                        AuditFlowNode[] auditFlowNodes = new AuditFlowNode[dbAuditFlow.getAuditFlowNodes().size()];
+                        dbAuditFlow.getAuditFlowNodes().toArray(auditFlowNodes);
+
+                        Arrays.sort(auditFlowNodes, new Comparator<AuditFlowNode>() {
+                            /**
+                             * 如果要按照升序排序，
+                             * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+                             * 如果要按照降序排序
+                             * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+                             * @param o1
+                             * @param o2
+                             * @return
+                             */
+                            public int compare(AuditFlowNode o1, AuditFlowNode o2) {
+                                if (o1.getId().compareTo(o2.getId()) > 0) {
+                                    return 1;
+                                } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                                    return -1;
+                                }
+
+                                return 0;
+                            }
+                        });
+
+                        boolean isPostContains = false;
+                        for (Post post : user.getPosts()) {
+                            if (post.getId().compareTo(auditFlowNodes[0].getPost().getId()) == 0) {
+                                isPostContains = true;
+                                break;
+                            }
+                        }
+
+                        if (isPostContains) {
+                            result += erpDao.updateById(priceChange.getId(), priceChange);
+
+                        } else {
+                            List<Post> dbPosts = writer.gson.fromJson(
+                                    sysClient.query(auditFlowNodes[0].getPost().getClass().getSimpleName(), writer.gson.toJson(auditFlowNodes[0].getPost())),
+                                    new TypeToken<List<Post>>(){}.getType());
+                            result += CommonConstant.fail + ",你没有权限修改该类价格浮动,所属:" + dbPosts.get(0).getName() + " 岗位的员工才可以修改";
+                        }
+
+                    } else {
+                        result += CommonConstant.fail + ",查询不到销售价格浮动审核流程,不能修改";
+                    }
+
+                } else {
+                    result += erpDao.updateById(priceChange.getId(), priceChange);
+                }
+
+            } else {
+                result += CommonConstant.fail + ",查询不到设置申请调价的用户，修改失败";
+            }
+
+        } else {
+            result += CommonConstant.fail + "," + ErpConstant.price_1000 + "元以下的商品不能调价";
+        }
+
+        return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
     }
 
     /**
@@ -1536,93 +1763,118 @@ public class ErpService {
      （1）所有商品都可在标价的15%范围内自主决定是否浮动。但工作职责主要是商品售价的利润最大化。
      （2）浮动金额超出权限，需向副总经理以上申请批准。
      * @param priceChange
-     * @param operator
      * @return
      */
-    public String saveOrUpdatePriceChange(ProductPriceChange priceChange, String operator) {
+    public String applyPriceChange(ProductPriceChange priceChange) {
         String result = CommonConstant.fail;
 
-        Product queryProduct = new Product();
-        queryProduct.setNo(priceChange.getProductNo());
-        queryProduct.setFatePrice(priceChange.getPrePrice());
-        queryProduct.setState(ErpConstant.product_state_onSale);
-        Product product = (Product) erpDao.query(queryProduct).get(0);
+        User user = (User)erpDao.getFromRedis(
+                (String) erpDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + priceChange.getSessionId()));
 
-        if (product.getFatePrice() > ErpConstant.price_1000) {
-            User user = (User)erpDao.getFromRedis(
-                    (String) erpDao.getFromRedis(CommonConstant.sessionId + CommonConstant.underline + priceChange.getSessionId()));
+        if (user != null) {
+            String auditEntity  = getPriceChangeAuditEntity(priceChange);
 
-            if (user != null) {
-                String auditEntity = null;
+            if (auditEntity == null) {
+                priceChange.setState(ErpConstant.product_price_change_state_use);
+            } else {
+                priceChange.setState(ErpConstant.product_price_change_state_apply);
+                priceChange.setIsAudit(CommonConstant.Y);
+            }
 
-                if (priceChange.getState().compareTo(ErpConstant.product_price_change_state_save) != 0) {
-                    String resources = (String)erpDao.getFromRedis(user.getUsername() + CommonConstant.underline + CommonConstant.resources);
+            if (auditEntity != null) {
+                AuditFlow auditFlow = new AuditFlow();
+                auditFlow.setEntity(auditEntity);
+                auditFlow.setState(AuditFlowConstant.flow_state_use);
+                List<AuditFlow> dbAuditFlows = writer.gson.fromJson(sysClient.query(auditFlow.getClass().getSimpleName(), writer.gson.toJson(auditFlow)),
+                        new TypeToken<List<AuditFlow>>(){}.getType());
 
-                    auditEntity = getPriceChangeAuditEntity(priceChange, product, resources);
+                if (!dbAuditFlows.isEmpty()) {
+                    /**
+                     * 判断用户是否属于：价格浮动审核流程发起节点所在岗位
+                     */
+                    AuditFlow dbAuditFlow = dbAuditFlows.get(0);
+                    AuditFlowNode[] auditFlowNodes = new AuditFlowNode[dbAuditFlow.getAuditFlowNodes().size()];
+                    dbAuditFlow.getAuditFlowNodes().toArray(auditFlowNodes);
 
-                    if (auditEntity == null) {
-                        priceChange.setState(ErpConstant.product_price_change_state_use);
-                    } else {
-                        priceChange.setState(ErpConstant.product_price_change_state_apply);
-                        priceChange.setIsAudit(CommonConstant.Y);
+                    Arrays.sort(auditFlowNodes, new Comparator<AuditFlowNode>() {
+                        /**
+                         * 如果要按照升序排序，
+                         * 则o1 小于o2，返回-1（负数），相等返回0，o1大于o2返回1（正数）
+                         * 如果要按照降序排序
+                         * 则o1 小于o2，返回1（正数），相等返回0，o1大于o2返回-1（负数）
+                         * @param o1
+                         * @param o2
+                         * @return
+                         */
+                        public int compare(AuditFlowNode o1, AuditFlowNode o2) {
+                            if (o1.getId().compareTo(o2.getId()) > 0) {
+                                return 1;
+                            } else if (o1.getId().compareTo(o2.getId()) < 0) {
+                                return -1;
+                            }
+
+                            return 0;
+                        }
+                    });
+
+                    boolean isPostContains = false;
+                    for (Post post : user.getPosts()) {
+                        if (post.getId().compareTo(auditFlowNodes[0].getPost().getId()) == 0) {
+                            isPostContains = true;
+                            break;
+                        }
                     }
-                }
 
-                priceChange.setInputDate(dateUtil.getSecondCurrentTimestamp());
-                priceChange.setUser(user);
-                if (operator.equals(CommonConstant.save)) {
-                    result += erpDao.save(priceChange);
+                    if (isPostContains) {
+                        result += erpDao.updateById(priceChange.getId(), priceChange);
+
+                        result += launchAuditFlow(auditEntity, priceChange.getId(), priceChange.getNo(),
+                                "申请商品：" + priceChange.getProductNo() + "的销售价格浮动为：" + priceChange.getPrice(),"如题", user);
+
+                    } else {
+                        List<Post> dbPosts = writer.gson.fromJson(
+                                sysClient.query(auditFlowNodes[0].getPost().getClass().getSimpleName(), writer.gson.toJson(auditFlowNodes[0].getPost())),
+                                new TypeToken<List<Post>>(){}.getType());
+                        result += CommonConstant.fail + ",你没有权限发起该类价格浮动审核流程,所属:" + dbPosts.get(0).getName() + " 岗位的员工才可以发起";
+                    }
+
                 } else {
-                    result += erpDao.updateById(priceChange.getId(), priceChange);
-                }
-
-                if (auditEntity != null) {
-                    result += launchAuditFlow(auditEntity, priceChange.getId(), priceChange.getNo(),
-                            "申请商品：" + product.getNo() + "的销售价格浮动为：" + priceChange.getPrice(),
-                            "请审核商品：" + product.getNo() + "的销售价格：" + priceChange.getPrice(),
-                            user);
+                    result += CommonConstant.fail + ",查询不到销售价格浮动审核流程," + auditEntity;
                 }
 
             } else {
-                result += CommonConstant.fail + ",查询不到设置申请调价的用户，调价失败";
+                result += erpDao.updateById(priceChange.getId(), priceChange);
             }
 
-
         } else {
-            result += CommonConstant.fail + "," + ErpConstant.price_1000 + "元以下的商品不能调价";
+            result += CommonConstant.fail + ",查询不到设置申请调价的用户，申请调价失败";
         }
 
         return result.equals(CommonConstant.fail) ? result : result.substring(CommonConstant.fail.length());
     }
 
-    public String getPriceChangeAuditEntity(ProductPriceChange priceChange, Product product, String resources) {
-        String entity = null;
 
-        if (resources.contains(ErpConstant.privilege_resource_uri_price_change_saler)){
-            if(isSalePriceNeedAudit(priceChange.getPrice(), product.getFatePrice())) {
-                entity = AuditFlowConstant.business_price_change_saler;
-            }
+
+    public String getPriceChangeAuditEntity(ProductPriceChange priceChange) {
+        String saleEntity = null, chargerEntity = null, managerEntity = null, directorEntity = null;
+
+        if(isSalePriceNeedAudit(priceChange.getPrice(), priceChange.getPrePrice())) {
+            saleEntity = AuditFlowConstant.business_price_change_saler;
         }
 
-        if (resources.contains(ErpConstant.privilege_resource_uri_price_change_charger)){
-            if(priceChange.getPrice()/product.getFatePrice() < ErpConstant.price_percent_95) {
-                entity = AuditFlowConstant.business_price_change_charger;
-            }
+        if(priceChange.getPrice()/priceChange.getPrePrice() < ErpConstant.price_percent_95) {
+            chargerEntity = AuditFlowConstant.business_price_change_charger;
         }
 
-        if (resources.contains(ErpConstant.privilege_resource_uri_price_change_manager)){
-            if(priceChange.getPrice()/product.getFatePrice() < ErpConstant.price_percent_90) {
-                entity = AuditFlowConstant.business_price_change_manager;
-            }
+        if(priceChange.getPrice()/priceChange.getPrePrice() < ErpConstant.price_percent_90) {
+            managerEntity = AuditFlowConstant.business_price_change_manager;
         }
 
-        if (resources.contains(ErpConstant.privilege_resource_uri_price_change_director)){
-            if(priceChange.getPrice()/product.getFatePrice() < ErpConstant.price_percent_85) {
-                entity = AuditFlowConstant.business_price_change_director;
-            }
+        if(priceChange.getPrice()/priceChange.getPrePrice() < ErpConstant.price_percent_85) {
+            directorEntity = AuditFlowConstant.business_price_change_director;
         }
 
-        return entity;
+        return directorEntity != null ? directorEntity : (managerEntity != null ? managerEntity : (chargerEntity != null ? chargerEntity : saleEntity));
     }
 
     public boolean isSalePriceNeedAudit(Float salePrice, Float price) {
@@ -2057,8 +2309,6 @@ public class ErpService {
         }
     }
 
-
-
     public Float getPurchaseQuantityByProduct(Product product) {
         Float quantity = 0f;
 
@@ -2071,6 +2321,19 @@ public class ErpService {
         }
 
         return quantity;
+    }
+
+    public Purchase getPurchaseByProduct(Product product) {
+        PurchaseDetailProduct detailProduct = new PurchaseDetailProduct();
+        detailProduct.setProduct(product);
+        List<PurchaseDetailProduct> detailProducts = erpDao.query(detailProduct);
+
+        if (detailProducts.size() > 0) {
+            Purchase purchase =detailProducts.get(0).getPurchaseDetail().getPurchase();
+            return (Purchase) erpDao.queryById(purchase.getId(), purchase.getClass());
+        }
+
+        return null;
     }
 
     /**
@@ -2322,17 +2585,38 @@ public class ErpService {
     }
 
     public String isCanStockIn(StockInOut stockIn) {
-        String result = null;
+        if (stockIn.getType().compareTo(ErpConstant.stockInOut_type_deposit) == 0) {
+            for (StockInOutDetail detail : stockIn.getDetails()) {
+                for (StockInOutDetailProduct detailProduct : detail.getStockInOutDetailProducts()) {
+                    Purchase purchase = getPurchaseByProduct(detailProduct.getProduct());
+                    if (purchase.getType().compareTo(ErpConstant.purchase_type_deposit) != 0) {
+                        return CommonConstant.fail + ",押金入库只可以对押金采购单做入库";
+                    }
+
+                    Float detailQuantity = 0f;
+                    if (detail.getUnit().equals(ErpConstant.unit_g) || detail.getUnit().equals(ErpConstant.unit_kg) ||
+                            detail.getUnit().equals(ErpConstant.unit_ct) || detail.getUnit().equals(ErpConstant.unit_oz)) {
+                        detailQuantity = detail.getQuantity();
+                    } else {
+                        detailQuantity = 1f;
+                    }
+
+                    if (detailQuantity.compareTo(getPurchaseQuantityByProduct(detailProduct.getProduct())) != 0) {
+                        return  CommonConstant.fail + ",押金入库必须对采购单里的所有商品进行入库";
+                    }
+                }
+            }
+        }
 
         if (stockIn.getType().compareTo(ErpConstant.stockInOut_type_process) == 0) {
             if (stockIn.getDetails().size() > 1) {
-                result = CommonConstant.fail + "加工单只能对单类商品做加工入库";
+                return CommonConstant.fail + ",加工单只能对单类商品做加工入库";
             }
         }
 
         if (stockIn.getType().compareTo(ErpConstant.stockInOut_type_repair) == 0) {
             if (stockIn.getDetails().size() > 1) {
-                result = CommonConstant.fail + "修补单只能对单类商品做修补入库";
+                return CommonConstant.fail + ",修补单只能对单类商品做修补入库";
             }
         }
 
@@ -2348,23 +2632,19 @@ public class ErpService {
                     dbProduct.getState().compareTo(ErpConstant.product_state_returnedProduct) != 0 &&
                     dbProduct.getState().compareTo(ErpConstant.product_state_returnedProduct_part) != 0) {
                     if (detail.getStockInOutDetailProducts().size() > 1) {
-                        result = CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的" + detail.getStockInOutDetailProducts().size() + "件商品中，" +
+                        return CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的" + detail.getStockInOutDetailProducts().size() + "件商品中，" +
                                 "有不是采购完成、出库或已退货状态的商品，不能入库";
                     } else {
-                        result = CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的商品不是采购完成、出库或已退货状态，不能入库";
+                        return CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的商品不是采购完成、出库或已退货状态，不能入库";
                     }
-
-                    break;
                 }
             }
         }
 
-        return result;
+        return null;
     }
 
     public String isCanStockOut(StockInOut stockOut) {
-        String result = null;
-
         if (stockOut.getType().compareTo(ErpConstant.stockInOut_type_virtual_outWarehouse) != 0) {
             for (StockInOutDetail detail : stockOut.getDetails()) {
                 for (StockInOutDetailProduct detailProduct : detail.getStockInOutDetailProducts()) {
@@ -2380,19 +2660,16 @@ public class ErpService {
                             dbProduct.getState().compareTo(ErpConstant.product_state_onReturnProduct_part) != 0 &&
                             dbProduct.getState().compareTo(ErpConstant.product_state_returnedProduct) != 0 &&
                             dbProduct.getState().compareTo(ErpConstant.product_state_returnedProduct_part) != 0) {
-                        result = CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的商品不是入库或已售状态，不能出库";
-                        break;
+                        return CommonConstant.fail + ",编号：" + dbProduct.getNo() + " 的商品不是入库或已售状态，不能出库";
                     }
                 }
             }
         }
 
-        return result;
+        return null;
     }
 
     public String isCanSaveStockInOut(StockInOut stockInOut) {
-        String result = "";
-
         for (StockInOutDetail detail : stockInOut.getDetails()) {
             for (StockInOutDetailProduct detailProduct : detail.getStockInOutDetailProducts()) {
                 List<StockInOutDetailProduct> dbDetailProducts = erpDao.query(detailProduct);
@@ -2400,12 +2677,23 @@ public class ErpService {
                 for (StockInOutDetailProduct dbDetailProduct : dbDetailProducts) {
                     StockInOutDetail dbDetail = (StockInOutDetail) erpDao.queryById(dbDetailProduct.getStockInOutDetail().getId(), dbDetailProduct.getStockInOutDetail().getClass());
                     if (dbDetail.getStockInOut().getState().compareTo(ErpConstant.stockInOut_state_apply) == 0) {
-                        result += CommonConstant.fail + ",申请单：" + dbDetail.getStockInOut().getNo() +"已经含有编号：" + dbDetail.getProductNo() +
+                        return CommonConstant.fail + ",申请单：" + dbDetail.getStockInOut().getNo() +"已经含有编号：" + dbDetail.getProductNo() +
                                 " 的商品，不能重复申请入库或出库";
-                        break;
                     }
                 }
+            }
+        }
 
+        return isCanStockInOut(stockInOut);
+    }
+
+    public String isCanUpdateStockInOut(StockInOut stockInOut) {
+        return isCanStockInOut(stockInOut);
+    }
+
+    public String isCanStockInOut(StockInOut stockInOut) {
+        for (StockInOutDetail detail : stockInOut.getDetails()) {
+            for (StockInOutDetailProduct detailProduct : detail.getStockInOutDetailProducts()) {
                 Product dbProduct = (Product) erpDao.queryById(detailProduct.getProduct().getId(), detailProduct.getProduct().getClass());
 
                 Float itemQuantity = 0f;
@@ -2421,8 +2709,7 @@ public class ErpService {
                             add(new BigDecimal(Float.toString(itemQuantity))).floatValue();
 
                     if (totalStockInQuantity.compareTo(getPurchaseQuantityByProduct(detailProduct.getProduct())) > 0) {
-                        result += CommonConstant.fail + ",商品:" + dbProduct.getNo() + "入库数量大于商品采购数量，不能入库";
-                        break;
+                        return CommonConstant.fail + ",商品:" + dbProduct.getNo() + "入库数量大于商品采购数量，不能入库";
                     }
                 }
 
@@ -2431,29 +2718,26 @@ public class ErpService {
                             add(new BigDecimal(Float.toString(itemQuantity))).floatValue();
 
                     if (totalStockOutQuantity.compareTo(getProductStockInQuantity(detailProduct.getProduct())) > 0) {
-                        result += CommonConstant.fail + ",商品:" + dbProduct.getNo() + "出库数量大于商品入库数量，不能出库";
-                        break;
+                        return CommonConstant.fail + ",商品:" + dbProduct.getNo() + "出库数量大于商品入库数量，不能出库";
                     }
                 }
 
             }
         }
 
-        if (result == null) {
-            if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_virtual_outWarehouse) < 0) {
-                String msg = isCanStockIn(stockInOut);
-                if (msg != null) {
-                    result += msg;
-                }
-            } else {
-                String msg = isCanStockOut(stockInOut);
-                if (msg != null) {
-                    result += msg;
-                }
+        if (stockInOut.getType().compareTo(ErpConstant.stockInOut_type_virtual_outWarehouse) < 0) {
+            String msg = isCanStockIn(stockInOut);
+            if (msg != null) {
+                return msg;
+            }
+        } else {
+            String msg = isCanStockOut(stockInOut);
+            if (msg != null) {
+                return msg;
             }
         }
 
-        return result;
+        return null;
     }
 
     public User getUserBySessionId(String sessionId){
@@ -3771,7 +4055,7 @@ public class ErpService {
         BorrowProduct idBorrowProduct = new BorrowProduct(borrowProduct.getId());
         for (BorrowProductDetail detail : borrowProduct.getDetails()) {
             detail.setBorrowProduct(idBorrowProduct);
-            detail.setState(ErpConstant.borrowProduct_detail_state_borrowed);
+            detail.setState(ErpConstant.borrowProduct_detail_state_apply);
             result += erpDao.save(detail);
 
             int detailCount = 1;

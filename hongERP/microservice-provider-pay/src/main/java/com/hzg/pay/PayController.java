@@ -446,6 +446,40 @@ public class PayController {
         logger.info("saveSplitAmountPays end, result:" + result);
     }
 
+    @Transactional
+    @PostMapping("/business")
+    public void business(HttpServletResponse response, String name, @RequestBody String json) {
+        logger.info("business start, parameter:" + name + ":" + json);
+
+        String result = CommonConstant.fail;
+
+        try {
+            if (name.equals(PayConstants.pay_action_name_insertRefund)) {
+                Refund refund = writer.gson.fromJson(json, Refund.class);
+                refund.setNo(payDao.getNo(PayConstants.no_prefix_refund));
+                refund.setState(PayConstants.refund_state_success);
+                refund.setInputDate(dateUtil.getSecondCurrentTimestamp());
+                refund.setPay(new Pay(-1));
+
+                result += payDao.save(refund);
+
+                if (refund.getBalanceType().compareTo(PayConstants.refund_balance_type_income) == 0) {
+                    result += payService.setAccountAmount(refund.getPayBank(), refund.getPayAccount(), refund.getAmount());
+
+                } else if (refund.getBalanceType().compareTo(PayConstants.refund_balance_type_expense) == 0) {
+                    result += payService.setAccountAmount(refund.getRefundBank(), refund.getRefundAccount(), -refund.getAmount());
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result += CommonConstant.fail;
+        } finally {
+            result = transcation.dealResult(result);
+        }
+
+        writer.writeStringToJson(response, "{\"" + CommonConstant.result + "\":\"" + result + "\"}");
+        logger.info("business end, result:" + result);
+    }
 
 
 
@@ -471,13 +505,12 @@ public class PayController {
      * 支付宝即时到账交易接口快速通道
      *
      * @param no 支付号
-     * @param payType
      * @param response
      * @throws IOException
      */
     @RequestMapping(value = "/alipay/pay", produces = "text/html;charset=UTF-8", method = RequestMethod.POST)
-    public void alipay(String no, String payType, HttpServletResponse response) {
-        logger.info("alipay, no:" + no + ",payType:" + payType);
+    public void alipay(String no, HttpServletResponse response) {
+        logger.info("alipay, no:" + no);
 
         String payHtml = null;
 
@@ -486,7 +519,7 @@ public class PayController {
         Pay dbPay = (Pay)payDao.query(pay).get(0);
 
         if (dbPay.getState().compareTo(PayConstants.pay_state_apply) == 0) {
-            payHtml = alipaySubmit.buildRequest(dbPay.getNo(), dbPay.getEntity() + CommonConstant.underline + dbPay.getEntityId(), dbPay.getAmount().toString(), payType);
+            payHtml = alipaySubmit.buildRequest(dbPay.getNo(), dbPay.getEntity() + CommonConstant.underline + dbPay.getEntityId(), dbPay.getAmount().toString(), PayConstants.pay_type_net+"");
         } else {
             payHtml = "支付记录：" + no + "不是未支付状态，不能支付";
         }
