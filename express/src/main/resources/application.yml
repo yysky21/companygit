@@ -1,0 +1,47 @@
+server:
+  port: 8018
+
+spring:
+  application:
+    name: microservice-provider-erp-express
+
+  mvc:
+     view:
+       prefix: /WEB-INF/jsp/
+       suffix: .jsp
+
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+  datasource:
+    url: jdbc:mysql:loadbalance://127.0.0.1:3306/hzg_new_db?roundRobinLoadBalance=true&useUnicode=true&characterEncoding=utf-8  #connect mysql cluster url: jdbc:mysql:loadbalance://192.168.31.128:3306,192.168.31.129:3306/db?roundRobinLoadBalance=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    tomcat:
+      max-wait: 10000   # Number of ms to wait before throwing an exception if no connection is available
+      max-active: 20   # Maximum number of active connections that can be allocated from this pool at the same time
+      test-on-borrow: true # Validate the connection before borrowing it from the pool
+
+  http:
+    encoding:
+      charset: utf-8
+
+hibernate:
+    dialect: org.hibernate.dialect.MySQL5Dialect
+    show_sql: true
+    current_session_context_class: thread
+
+sfExpress:
+  appId:  '00038852' # 00038852 沙盒测试 appid
+  appKey: 37A7FD4DB353C92FCEA8117A97F0115A # 37A7FD4DB353C92FCEA8117A97F0115A 沙盒测试key
+  custId: '8711320159' #  8711320159 为生产环境月结卡号; 7550010173,7550672723为两个测试的月结卡号，其中7550672723有第三方付款权限的月结卡号，付款地区为755A;
+  payArea: '755A'
+  tokenUri: https://open-sbox.sf-express.com/public/v1.0/security/access_token/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰申请访问令牌 uri
+  tokenRefreshUri: https://open-sbox.sf-express.com/public/v1.0/security/refresh_token/access_token/{access_token}/refresh_token/{refresh_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰刷新访问令牌 uri
+  orderUri: https://open-sbox.sf-express.com/rest/v1.0/order/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单下单 uri
+  orderQueryUri: https://open-sbox.sf-express.com/rest/v1.0/order/query/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单查询 uri
+  imageUri: https://open-sbox.sf-express.com/rest/v1.0/waybill/image/access_token/{access_token}/sf_appid/{sf_appid}/sf_appkey/{sf_appkey}    # 顺丰快递单图片下载 uri
